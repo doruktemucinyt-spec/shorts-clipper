@@ -284,9 +284,7 @@ $("start").onclick = async () => {
     return;
   }
 
-  const es = new EventSource(eventsUrl(id));
-  es.onmessage = (ev) => {
-    const job = JSON.parse(ev.data);
+  watchJob(id, (job) => {
     lastJob = job;
     renderJob(job);
     if (job.status === "done") {
@@ -295,9 +293,10 @@ $("start").onclick = async () => {
     } else if (job.status === "error") {
       $("start").disabled = false;
     }
-  };
-  es.addEventListener("end", () => { es.close(); refreshWorkSize(); });
-  es.onerror = () => { es.close(); $("start").disabled = false; };
+  }, () => {
+    $("start").disabled = false;
+    refreshWorkSize();
+  });
 };
 
 /** Sunucu duz metin degil anahtar gonderiyor, cevirisi burada yapiliyor. */
@@ -356,12 +355,14 @@ $("reveal").onclick = () => {
 // Sayfa internetteki siteden aciliyorsa isi yapan yardimci kullanicinin kendi
 // bilgisayarinda. Once calisiyor mu diye bakiyoruz, sonra izin.
 
-let connState = "checking";
+let connState = "idle";
 
 function paintConnection() {
   if (IS_LOCAL) return;
   const titles = {
+    idle: ["connect.idleTitle", "connect.idle", "connect.idleBtn"],
     checking: ["connect.checking", "", ""],
+    denied: ["connect.deniedTitle", "connect.denied", "connect.missingBtn"],
     missing: ["connect.missingTitle", "connect.missing", "connect.missingBtn"],
     unpaired: ["connect.unpairedTitle", "connect.unpaired", "connect.unpairedBtn"],
     waiting: ["connect.unpairedTitle", "connect.waiting", "connect.unpairedBtn"],
@@ -390,13 +391,21 @@ async function refreshConnection() {
   if (IS_LOCAL) return;
   setConnState("checking");
   const status = await helperStatus();
-  if (!status.running) setConnState("missing");
-  else if (!status.paired) setConnState("unpaired");
-  else setConnState("ok");
+  if (status.running) {
+    setConnState(status.paired ? "ok" : "unpaired");
+    return;
+  }
+  // Ulasamadik: ya yardimci kapali ya da tarayici yerel aga izin vermedi
+  setConnState(await localNetworkPermission() === "denied" ? "denied" : "missing");
 }
 
 $("connect-btn").onclick = async () => {
-  if (connState === "missing") { refreshConnection(); return; }
+  // Tarayicinin yerel ag izin penceresi ancak kullanici hareketiyle aciliyor,
+  // o yuzden ilk baglanti denemesi bu tiklamanin icinde yapiliyor.
+  if (connState === "idle" || connState === "missing" || connState === "denied") {
+    refreshConnection();
+    return;
+  }
   try {
     setConnState("waiting");
     const ok = await requestPairing();
@@ -406,6 +415,11 @@ $("connect-btn").onclick = async () => {
   }
 };
 
-onUnpaired(() => refreshConnection());
+onUnpaired(() => setConnState("idle"));
 onLangChange(() => paintConnection());
-refreshConnection();
+
+// Yardimcidan acildiysa hicbir sey sorulmuyor; siteden acildiysa kullanici
+// "Bagla" diyene kadar bekliyoruz.
+if (IS_LOCAL) setConnState("ok");
+else if (helperToken) refreshConnection();
+else paintConnection();

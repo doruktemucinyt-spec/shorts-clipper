@@ -89,6 +89,23 @@ Sebep: tarayıcı YouTube'dan video indiremiyor (YouTube başka sitelerin
 sayfalarının video adreslerini çekmesine izin vermiyor). Bu yüzden indiren
 taraf her zaman yerel bir program olmak zorunda.
 
+Site **https://shorts-clipper-seven.vercel.app** adresinde yayında (Vercel,
+statik). Yeniden yayınlamak için `deploy.bat` — siteyi baştan üretip aynı
+adrese gönderiyor.
+
+**İki ayrı izin var, karıştırmamak lazım:**
+
+1. *Tarayıcının izni* — Chrome, bir internet sitesinin yerel bilgisayara
+   bağlanmasına kendi penceresiyle karar veriyor. Bu pencere ancak kullanıcı
+   bir şeye tıkladığında açılıyor, o yüzden sayfa açılır açılmaz bağlanmayı
+   denemiyoruz: kullanıcı **Bilgisayarıma bağlan** diyor, istek o tıklamanın
+   içinde gidiyor. İsteğe `targetAddressSpace: "loopback"` eklenmezse Chrome
+   pencereyi hiç göstermeden reddediyor.
+2. *Yardımcının izni* — aşağıdaki eşleşme akışı.
+
+Aynı sebeple ilerleme takibi sitede canlı akış (SSE) yerine saniyede bir
+yoklamayla yapılıyor: EventSource'a o ipucu verilemiyor.
+
 **İzin akışı** (`pairing.py`, `web/pair.html`, `web/api.js`):
 
 1. Site `GET /api/hello` ile yardımcının açık olup olmadığına bakıyor.

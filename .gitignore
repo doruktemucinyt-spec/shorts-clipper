@@ -11,4 +11,5 @@ __pycache__/
 *.pyc
 
 # build_site.py'nin urettigi statik site
-site/
+shorts-clipper/
+.vercel-link-yedek/

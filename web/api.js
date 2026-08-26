@@ -35,20 +35,39 @@ function mediaUrl(path) {
   return API_BASE + path + (helperToken ? `?token=${encodeURIComponent(helperToken)}` : "");
 }
 
+/* Tarayici, internetteki bir sayfanin yerel bilgisayara baglanmasina kendi
+   izin penceresiyle karar veriyor (Chrome'da "yerel ag erisimi"). Istegin
+   hedefinin loopback oldugunu soylemezsek Chrome pencereyi hic gostermeden
+   reddediyor. Bu secenegi taniyan taniyor, tanimayan yok sayiyor.        */
+function withLocalHint(opts) {
+  return API_BASE ? Object.assign({ targetAddressSpace: "loopback" }, opts) : opts;
+}
+
 async function api(path, opts = {}) {
   const headers = Object.assign({}, opts.headers);
   if (helperToken) headers["X-Clipper-Token"] = helperToken;
-  const res = await fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+  const res = await fetch(API_BASE + path, withLocalHint(Object.assign({}, opts, { headers })));
   if (res.status === 403) forgetToken();
   return res;
+}
+
+/** Tarayicinin yerel ag izni: "granted" | "denied" | "prompt" | "unsupported" */
+async function localNetworkPermission() {
+  if (!API_BASE) return "granted";
+  try {
+    const status = await navigator.permissions.query({ name: "local-network-access" });
+    return status.state;
+  } catch {
+    return "unsupported";
+  }
 }
 
 /** Yardimci calisiyor mu, bu site izinli mi? */
 async function helperStatus() {
   try {
-    const res = await fetch(API_BASE + "/api/hello", {
+    const res = await fetch(API_BASE + "/api/hello", withLocalHint({
       headers: helperToken ? { "X-Clipper-Token": helperToken } : {},
-    });
+    }));
     if (!res.ok) return { running: true, paired: false };
     const info = await res.json();
     return { running: true, paired: Boolean(info.paired) || Boolean(helperToken), version: info.version };
@@ -57,15 +76,43 @@ async function helperStatus() {
   }
 }
 
-/** EventSource kendi basligini gonderemiyor, anahtar adrese ekleniyor. */
-function eventsUrl(jobId) {
-  const base = `${API_BASE}/api/jobs/${jobId}/events`;
-  return helperToken ? `${base}?token=${encodeURIComponent(helperToken)}` : base;
+/** Isin ilerlemesini izler; durdurmak icin donen fonksiyonu cagir.
+
+    Yerelde canli akis (SSE) kullaniyoruz -- anlik ve ucuz. Siteden acildiginda
+    ise kullanamiyoruz: EventSource'a "hedef yerel bilgisayar" ipucunu
+    veremiyoruz, tarayici da bu yuzden baglantiyi reddediyor. Orada saniyede
+    bir yoklama yapiyoruz; ilerleme cubugu icin fazlasiyla yeterli.        */
+function watchJob(jobId, onUpdate, onEnd) {
+  if (!API_BASE) {
+    const url = `/api/jobs/${jobId}/events`;
+    const es = new EventSource(url);
+    es.onmessage = (ev) => onUpdate(JSON.parse(ev.data));
+    es.addEventListener("end", () => { es.close(); onEnd(); });
+    es.onerror = () => { es.close(); onEnd(); };
+    return () => es.close();
+  }
+
+  let stopped = false;
+  (async () => {
+    while (!stopped) {
+      try {
+        const res = await api(`/api/jobs/${jobId}`);
+        if (res.ok) {
+          const job = await res.json();
+          onUpdate(job);
+          if (job.status !== "running") break;
+        }
+      } catch { /* yardimci bir an cevap vermediyse yoklamaya devam */ }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    onEnd();
+  })();
+  return () => { stopped = true; };
 }
 
 /** Izin akisi: onay ekrani kullanicinin kendi bilgisayarinda aciliyor. */
 async function requestPairing(onWaiting) {
-  const res = await fetch(API_BASE + "/api/pair", { method: "POST" });
+  const res = await fetch(API_BASE + "/api/pair", withLocalHint({ method: "POST" }));
   if (!res.ok) throw new Error("pair-failed");
   const { request_id, url } = await res.json();
 
@@ -75,7 +122,7 @@ async function requestPairing(onWaiting) {
   // Onay ekranindaki karari bekliyoruz
   for (let i = 0; i < 150; i++) {
     await new Promise((r) => setTimeout(r, 2000));
-    const poll = await fetch(`${API_BASE}/api/pair/${request_id}`);
+    const poll = await fetch(`${API_BASE}/api/pair/${request_id}`, withLocalHint({}));
     if (!poll.ok) continue;
     const data = await poll.json();
     if (data.status === "approved" && data.token) {
