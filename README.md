@@ -70,12 +70,14 @@ noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isa
 - **Caption yak** — kapalı geldi. Açarsan konuşulan kelimeyi vurgulayan pop-up
   caption videoya gömülür; bunun için transkript şart, yani iş yavaşlar.
   - *Vurgu rengi* — o an konuşulan kelimenin rengi.
-  - *Altyazı modeli* — varsayılan `small` (~0,5 GB iner, hızlı), diğer seçenek
-    `medium` (~1,5 GB, daha doğru). Model bir kez iniyor.
+  - *Altyazı modeli* — tek seçenek: `small` (~0,5 GB, bir kez iner). `medium`
+    ve `large-v3` listede "yakında" olarak duruyor ama seçilemiyor.
 
-    `large-v3` (~3 GB) kaldırıldı: aracı ağırlaştıran tek şey oydu. Sunucu
-    tanımadığı bir model değeri gelirse sessizce `small`'a düşüyor, yani eski
-    bir tarayıcı ayarı yüzünden 3 GB'lık indirme başlamıyor.
+    Sebep: büyük modeller aracı ağırlaştırıyordu (`large-v3` tek başına 3 GB).
+    Sunucu tanımadığı bir model değeri gelirse sessizce `small`'a düşüyor —
+    yani eski bir tarayıcı ayarı ya da elle gönderilen bir istek büyük
+    indirmeyi başlatamıyor. Açmak için `server.py` içindeki `MODELS`
+    kümesine eklemek yeterli.
 
 Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman basılır.
 

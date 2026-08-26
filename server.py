@@ -28,10 +28,11 @@ PREVIEW = WORK / "preview"
 PREVIEW.mkdir(parents=True, exist_ok=True)
 
 # Asama agirliklari: toplam ilerleme yuzdesini bu araliklara dagitiyoruz.
-# Kullanilabilecek altyazi modelleri. large-v3 kaldirildi: 3 GB iniyordu ve
-# bu araci agirlastiran tek sey oydu. Tanimadigimiz bir deger gelirse (eski
-# bir tarayici ayari gibi) sessizce small'a dusuyoruz.
-MODELS = {"small", "medium"}
+# Su an tek model: small (~0,5 GB). Buyuk modeller araci agirlastirdigi icin
+# kapali; arayuzde "yakinda" diye gorunuyorlar. Tanimadigimiz bir deger
+# gelirse (eski bir tarayici ayari ya da elle gonderilmis istek) sessizce
+# small'a dusuyoruz -- kimse farkinda olmadan 3 GB indirmesin.
+MODELS = {"small"}
 DEFAULT_MODEL = "small"
 
 STAGES_FULL = {
