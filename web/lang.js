@@ -141,19 +141,6 @@ langMenu.addEventListener("click", (e) => {
 document.addEventListener("click", closeLangMenu);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLangMenu(); });
 
-// --- Kaydirma ------------------------------------------------------------
-// Kaydirma suresince arka plandaki akan cizgiler duruyor (CSS'te
-// html.scrolling). Sebebi: o animasyonun her karesi kartlarin arkasindaki
-// goruntuyu degistirdigi icin cam bulanikligi da her karede yeniden
-// hesaplaniyordu. Dinleyici passive, yani kaydirmayi hic bekletmiyor.
-let scrollIdle = null;
-addEventListener("scroll", () => {
-  const root = document.documentElement;
-  if (!root.classList.contains("scrolling")) root.classList.add("scrolling");
-  clearTimeout(scrollIdle);
-  scrollIdle = setTimeout(() => root.classList.remove("scrolling"), 140);
-}, { passive: true });
-
 // Sayfaya ozel scriptler kancalarini kaydettikten sonra ilk ceviriyi yap
 addEventListener("DOMContentLoaded", () => {
   applyLang(lang);
