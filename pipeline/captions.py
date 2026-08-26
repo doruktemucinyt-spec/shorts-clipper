@@ -32,7 +32,13 @@ def ass_time(t: float) -> str:
 
 
 def esc(text: str) -> str:
-    return (text or "").replace("\\", "").replace("{", "(").replace("}", ")").strip()
+    """ASS dosyasina yazilacak metni zararsiz hale getirir.
+
+    Satir sonlari da temizleniyor: video basligi disaridan geliyor ve icinde
+    satir sonu olsa ASS dosyasina sahte bir Dialogue satiri eklenebilirdi.
+    """
+    text = (text or "").replace("\\", "").replace("{", "(").replace("}", ")")
+    return " ".join(text.split()).strip()
 
 
 def group_words(words, max_words=4, min_words=2, max_gap=0.5, max_dur=1.8):

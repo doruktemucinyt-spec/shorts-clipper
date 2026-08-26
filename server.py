@@ -1,6 +1,8 @@
 """YouTube -> Shorts Clipper. Yerel FastAPI sunucusu."""
+import ipaddress
 import json
 import queue
+import socket
 import subprocess
 import threading
 import traceback
@@ -13,7 +15,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from pairing import Pairing
+from pairing import LOCAL_ORIGINS, Pairing
+from urllib.parse import urlparse
+
 from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
 from pipeline.tools import probe_dimensions
@@ -53,7 +57,35 @@ PAIR = Pairing(WORK / "pairing.json")
 # Izin gerektirmeyen uclar: siteyi taniyip izin isteyebilmek icin gerekli
 OPEN_PATHS = ("/api/hello", "/api/pair")
 
+# Sunucunun kabul ettigi adresler. Bu kontrol DNS yeniden baglama (rebinding)
+# saldirisini kesiyor: kotu bir site kendi alan adini 127.0.0.1'e cozdurup
+# tarayiciya "ayni site" dedirtebiliyor ve boylece butun CORS/anahtar
+# kontrollerini atlayabiliyordu. Istek baska bir alan adina geldiyse artik
+# kapida duruyor.
+ALLOWED_HOSTS = {"localhost:8000", "127.0.0.1:8000", "[::1]:8000"}
+
+# Ayni anda kac is calisabilir: her is GB'larca indirme ve GPU demek.
+MAX_ACTIVE_JOBS = 2
+
+# Bellekte tutulan is kaydi sayisi
+MAX_JOB_HISTORY = 50
+
 app = FastAPI(title="Shorts Clipper")
+
+
+def _page_is_local(request: Request) -> bool:
+    """Istek kullanicinin kendi bilgisayarindaki sayfadan mi geliyor?
+
+    Origin varsa bakmasi kolay. Ama tarayici basit GET isteklerinde Origin
+    gondermiyor: kotu bir sayfa <img src="http://127.0.0.1:8000/..."> ile
+    istek atsa origin bos gelirdi ve eskiden bu "yerel" sayilirdi. Modern
+    tarayicilar bu durumda Sec-Fetch-Site basligiyla istegin nereden geldigini
+    soyluyor; cross-site ise yabancidir.
+    """
+    origin = request.headers.get("origin", "")
+    if origin:
+        return origin in LOCAL_ORIGINS
+    return request.headers.get("sec-fetch-site", "") in ("", "none", "same-origin")
 
 
 @app.middleware("http")
@@ -70,6 +102,9 @@ async def cross_site_guard(request: Request, call_next):
     origin = request.headers.get("origin", "")
     path = request.url.path
 
+    if (request.headers.get("host") or "").lower() not in ALLOWED_HOSTS:
+        return JSONResponse({"detail": "Beklenmeyen adres"}, status_code=403)
+
     if request.method == "OPTIONS":
         response = Response(status_code=204)
         response.headers["Access-Control-Allow-Private-Network"] = "true"
@@ -82,7 +117,14 @@ async def cross_site_guard(request: Request, call_next):
             # EventSource kendi basligini gonderemedigi icin anahtari adresten
             # de kabul ediyoruz; istek zaten sadece bu bilgisayardan geliyor.
             token = request.headers.get("x-clipper-token") or                 request.query_params.get("token", "")
-            if not PAIR.allowed(origin, token):
+            # Video/onizleme dosyalari <video> ve <img> ile yukleniyor,
+            # tarayici bu isteklere Origin koymuyor: orada anahtarin kendisi
+            # yetiyor.
+            dosya_istegi = path.startswith(("/media/", "/preview/"))
+            izinli = (_page_is_local(request)
+                      or PAIR.allowed_site(origin, token)
+                      or (dosya_istegi and PAIR.token_valid(token)))
+            if not izinli:
                 return JSONResponse(
                     {"detail": "Bu site icin izin yok.", "code": "unpaired"},
                     status_code=403,
@@ -93,6 +135,13 @@ async def cross_site_guard(request: Request, call_next):
     if origin:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Vary"] = "Origin"
+
+    # Izin ekrani bir cerceve icine alinip yanlislikla tiklatilamasin
+    # (clickjacking); adresler de disari sizmasin.
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
     return response
 jobs = {}
 lock = threading.Lock()
@@ -106,6 +155,33 @@ class JobRequest(BaseModel):
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
     captions: bool = False         # caption yakilsin mi
+
+
+def check_url(url: str) -> str:
+    """Sadece internetteki http/https adresleri kabul ediliyor.
+
+    Iki sey engelleniyor:
+    - file:// gibi semalar: izinli bir site yardimciya diskteki bir dosyayi
+      okutup render ettirebilir, sonra da /media uzerinden geri okuyabilirdi.
+    - yerel ve ic ag adresleri: yardimci, ev agindaki cihazlara (modem, kamera,
+      NAS) istek atmak icin kullanilan bir arac haline gelmesin.
+    """
+    parsed = urlparse((url or "").strip())
+    if parsed.scheme not in ("http", "https"):
+        raise HTTPException(400, "Sadece http veya https adresleri kullanilabilir.")
+    host = parsed.hostname or ""
+    if not host:
+        raise HTTPException(400, "Adres okunamadi.")
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except OSError:
+        raise HTTPException(400, "Adres cozulemedi.")
+    for info in infos:
+        ip = ipaddress.ip_address(info[4][0])
+        if (ip.is_private or ip.is_loopback or ip.is_link_local
+                or ip.is_reserved or ip.is_multicast):
+            raise HTTPException(400, "Yerel ag adresleri kullanilamaz.")
+    return url.strip()
 
 
 def _emit(job_id: str, **fields):
@@ -227,6 +303,18 @@ def run_job(job_id: str, req: JobRequest):
 
 @app.post("/api/jobs")
 def create_job(req: JobRequest):
+    check_url(req.url)
+
+    active = sum(1 for j in jobs.values() if j.get("status") == "running")
+    if active >= MAX_ACTIVE_JOBS:
+        raise HTTPException(429, "Su an baska bir is calisiyor, bitmesini bekle.")
+
+    # Eski kayitlar bellekte birikmesin
+    if len(jobs) > MAX_JOB_HISTORY:
+        for old in list(jobs)[: len(jobs) - MAX_JOB_HISTORY]:
+            if jobs[old].get("status") != "running":
+                jobs.pop(old, None)
+
     job_id = uuid.uuid4().hex[:12]
     jobs[job_id] = {
         "id": job_id, "status": "running", "stage": "download", "pct": 0,
@@ -284,6 +372,7 @@ def make_preview(req: PreviewRequest):
     Kare bir kez cekilip onbellege aliniyor; zoom degistikce sadece yeniden
     kadrajlaniyor, o yuzden ikinci istekten sonrasi anlik.
     """
+    check_url(req.url)
     try:
         return preview.build(
             req.url, PREVIEW, zoom=req.zoom, at=req.at,
@@ -385,15 +474,22 @@ def pair_page():
 
 
 def _require_local(request: Request):
-    """Izin ekrani sadece bu bilgisayardan calistirilabilir."""
-    if not PAIR.is_local(request.headers.get("origin", "")):
+    """Izin ekrani sadece bu bilgisayardaki sayfadan kullanilabilir."""
+    if not _page_is_local(request):
         raise HTTPException(403, "Sadece bu bilgisayardan")
 
 
 @app.post("/api/perf")
 def perf(sample: dict):
-    """Gecici olcum modu (?perf=1) buraya yaziyor. Bkz. web/perf.js."""
-    with (WORK / "perf.log").open("a", encoding="utf-8") as fh:
+    """Gecici olcum modu (?perf=1) buraya yaziyor. Bkz. web/perf.js.
+
+    Dosya 1 MB'i gecerse yazmayi birakiyor: izinli bir site bu ucu kullanip
+    diski sisiremesin.
+    """
+    log = WORK / "perf.log"
+    if log.exists() and log.stat().st_size > 1_000_000:
+        return {"ok": False}
+    with log.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(sample, ensure_ascii=False) + chr(10))
     return {"ok": True}
 

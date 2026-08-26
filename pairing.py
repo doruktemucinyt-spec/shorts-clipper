@@ -58,13 +58,32 @@ class Pairing:
     def is_local(self, origin: str) -> bool:
         return not origin or origin in LOCAL_ORIGINS
 
-    def allowed(self, origin: str, token: str) -> bool:
-        """Bu istek gecerli mi? Yerel sayfa serbest, disaridaki site anahtarli."""
-        if self.is_local(origin):
-            return True
+    def allowed_site(self, origin: str, token: str) -> bool:
+        """Disaridaki bir site icin: adres tanidik VE anahtar dogru mu?
+
+        Bos origin'i burada serbest saymiyoruz. Sebep: tarayici basit GET
+        isteklerinde Origin gondermiyor, yani kotu bir sayfa <img> ile
+        istek atarsa origin bos gelir. Yerel sayfa ayrimini sunucu tarafinda
+        Sec-Fetch-Site basligiyla yapiyoruz (server.py/_page_is_local).
+        """
+        if not origin or not token:
+            return False
         with self.lock:
             entry = self.sites.get(origin)
-        return bool(entry and token and secrets.compare_digest(entry["token"], token))
+        return bool(entry and secrets.compare_digest(entry["token"], token))
+
+    def token_valid(self, token: str) -> bool:
+        """Anahtar izinli sitelerden birine ait mi?
+
+        Video ve onizleme kareleri sayfaya <video>/<img> ile yukleniyor;
+        tarayici bu isteklerde Origin gondermiyor. Anahtar tahmin edilemez
+        oldugu icin dosya okuma isteklerinde tek basina yeterli sayiliyor.
+        """
+        if not token:
+            return False
+        with self.lock:
+            entries = list(self.sites.values())
+        return any(secrets.compare_digest(e["token"], token) for e in entries)
 
     def known(self, origin: str) -> bool:
         with self.lock:
@@ -78,6 +97,13 @@ class Pairing:
     def request(self, origin: str) -> str:
         """Site izin istiyor; onay ekraninda kullanilacak istek numarasi."""
         self._sweep()
+        with self.lock:
+            # Bekleyen istek yigilmasin: kotu niyetli bir sayfa arka arkaya
+            # istek atarak belleği sisiremesin.
+            if len(self.pending) >= 20:
+                eskiler = sorted(self.pending.items(), key=lambda kv: kv[1]["at"])
+                for rid, _ in eskiler[:10]:
+                    self.pending.pop(rid, None)
         request_id = secrets.token_urlsafe(9)
         with self.lock:
             self.pending[request_id] = {"origin": origin, "at": time.time(), "token": None}

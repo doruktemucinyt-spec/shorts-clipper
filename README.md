@@ -130,6 +130,57 @@ veriyor. `server.py` içindeki `cross_site_guard` bu ikisini birlikte yapıyor.
 `python build_site.py` internete konacak statik siteyi `site/` klasörüne
 üretiyor: sadece HTML/CSS/JS, sunucu ve ekran kartı gerektirmiyor.
 
+## Güvenlik
+
+Yardımcı, kullanıcının kendi bilgisayarında çalışan bir sunucu ve internetteki
+bir sayfa ona istek atıyor. Bu, dikkat edilmezse tehlikeli bir kurgu: o zaman
+**herhangi bir web sayfası** da aynı sunucuya emir verebilirdi. Kapatılan
+saldırılar ve kontrolleri (`server.py` içindeki `cross_site_guard`,
+`_page_is_local`, `check_url` ve `pairing.py`):
+
+**DNS yeniden bağlama (rebinding).** Kötü bir site kendi alan adını
+`127.0.0.1`'e çözdürüp tarayıcıya "bu aynı site" dedirtebiliyor; o anda bütün
+CORS ve anahtar kontrolleri devre dışı kalır. Sunucu artık `Host` başlığına
+bakıyor: istek `localhost:8000`, `127.0.0.1:8000` veya `[::1]:8000` adına
+gelmediyse kapıda duruyor.
+
+**Origin göndermeyen istekler.** Tarayıcı basit GET isteklerinde `Origin`
+göndermiyor. Yani kötü bir sayfa `<img src="http://127.0.0.1:8000/api/sites">`
+yazsa istek "yerel" sanılıyordu ve izinli site listesi sızıyordu. Artık
+`Sec-Fetch-Site` başlığına bakılıyor: `cross-site` ise yabancıdır.
+
+**Dosya ve iç ağ adresleri.** İzinli bir site iş adresi olarak
+`file:///C:/...` verip diskteki bir videoyu render ettirip `/media` üzerinden
+geri okuyabilirdi; ya da `http://192.168.1.1/...` ile ev ağındaki cihazlara
+istek attırabilirdi. `check_url` yalnızca http/https kabul ediyor ve adresin
+çözüldüğü IP yerel/özel ağdaysa reddediyor.
+
+**Onay ekranının çerçevelenmesi (clickjacking).** İzin ekranı görünmez bir
+çerçeveye alınıp kullanıcıya yanlışlıkla tıklatılabilirdi. Tüm yanıtlarda
+`X-Frame-Options: DENY` ve `frame-ancestors 'none'` var.
+
+**Anahtar hırsızlığı.** Anahtar siteye (origin'e) bağlı: bir sitenin anahtarı
+başka bir siteden gönderilirse reddediliyor. Karşılaştırma sabit zamanlı
+(`secrets.compare_digest`).
+
+**Video ve önizleme dosyaları.** Bunlar sayfaya `<video>` ve `<img>` ile
+yükleniyor, tarayıcı bu isteklere `Origin` koymuyor. Orada tahmin edilemez
+anahtarın kendisi yeterli sayılıyor; anahtarsız istek 403.
+
+**Klasör açma ucu.** `/api/reveal` yalnızca çıktı klasörünün içini açabiliyor,
+başka bir yolu değil.
+
+**Altyazı dosyasına satır enjeksiyonu.** Video başlığı dışarıdan geliyor ve ASS
+dosyasına yazılıyor; içinde satır sonu olsa sahte bir altyazı satırı
+eklenebilirdi. `captions.esc` satır sonlarını da temizliyor.
+
+**Kaynak tüketimi.** Aynı anda en fazla iki iş çalışabiliyor, bekleyen izin
+istekleri 20 ile sınırlı, ölçüm günlüğü 1 MB'ı geçince yazmayı bırakıyor.
+
+Kapsam dışı olan bir şey var, bilerek: bilgisayarda **zaten çalışan** bir
+program bu sunucuya istediği başlıkla istek atabilir. Ama o programın zaten
+dosyalara doğrudan erişimi var, yani orada korunacak bir sınır kalmıyor.
+
 ## Bilgi sayfaları
 
 Alt taraftaki bağlantılardan üç sayfa açılıyor: **SSS** (`/sss`), **Çerezler**
