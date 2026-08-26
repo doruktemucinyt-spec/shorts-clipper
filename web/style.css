@@ -548,16 +548,37 @@ input[type=range]::-moz-range-thumb {
 
 /* ---------- Butonlar ------------------------------------------------------ */
 
-button {
+/* Butonlar ve buton gibi davranan baglantilar ayni tabani paylasiyor.
+   Ayri tutulduklarinda <a> etiketi bu kurallarin hicbirini almiyordu:
+   kosesiz, alti cizili ve farkli yazi tipiyle duruyordu.                  */
+/* :where() ile yaziliyor cunku bu sadece bir TABAN: asagidaki .ghost gibi
+   kurallar (daha kucuk dolgu, daha kucuk yazi) bunu ezebilmeli. Duz
+   "a.ghost" yazilsaydi taban daha guclu olur, ghost dolgusu tutmazdi.   */
+:where(button, a.ghost) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 12px 20px;
   font: 500 15px var(--sans);
+  text-decoration: none;
   cursor: pointer;
-  transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  /* Birakista yaylanarak geri geliyor; basista asagidaki kural bu sureyi
+     kisaltiyor, boylece tepki anlik hissediliyor ama donusu yumusak. */
+  transition: transform .26s cubic-bezier(.2, .9, .25, 1.06),
+              box-shadow .18s ease, background .18s ease,
+              color .18s ease, border-color .18s ease;
 }
+
 button:disabled { opacity: .45; cursor: not-allowed; }
-button:active:not(:disabled) { transform: translateY(1px); }
+
+/* Basma: parmagin altinda hafifce cokuyor */
+button:active:not(:disabled),
+a.ghost:active {
+  transform: translateY(1px) scale(.978);
+  transition-duration: .06s;
+}
 
 .primary {
   width: 100%;
@@ -568,11 +589,13 @@ button:active:not(:disabled) { transform: translateY(1px); }
   box-shadow: 0 10px 30px -10px rgba(255, 190, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .5);
 }
 .primary:hover:not(:disabled) { box-shadow: 0 14px 40px -10px rgba(255, 190, 0, .8), inset 0 1px 0 rgba(255, 255, 255, .55); }
+.primary:active:not(:disabled) { box-shadow: 0 6px 18px -8px rgba(255, 190, 0, .75), inset 0 1px 0 rgba(255, 255, 255, .35); }
 
 .ghost {
   background: rgba(255, 255, 255, .04);
   color: var(--dim);
   border: 1px solid var(--line);
+  border-radius: 11px;      /* kucuk buton, kose de biraz daha kucuk */
   padding: 8px 14px;
   font-size: 13px;
   /* Burada backdrop-filter: blur(8px) vardi. Butonun arkasinda kartin duz
@@ -580,6 +603,7 @@ button:active:not(:disabled) { transform: translateY(1px); }
      filtre yuzeyi aciyordu -- ekranda bes tane var. */
 }
 .ghost:hover { color: var(--fg); background: rgba(255, 255, 255, .08); border-color: rgba(255, 212, 0, .35); }
+.ghost:active:not(:disabled) { background: rgba(255, 255, 255, .13); border-color: rgba(255, 212, 0, .5); }
 
 /* ---------- Ilerleme ------------------------------------------------------ */
 
@@ -742,7 +766,6 @@ button:active:not(:disabled) { transform: translateY(1px); }
 .qa b { color: var(--fg); font-weight: 600; }
 
 .doc-actions { margin-top: 24px; }
-.doc-actions .ghost { display: inline-block; text-decoration: none; }
 
 /* Altbilgi: mono, sessiz, sayfanin altinda ortada */
 .foot {
