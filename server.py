@@ -31,6 +31,12 @@ OUTPUT.mkdir(exist_ok=True)
 PREVIEW = WORK / "preview"
 PREVIEW.mkdir(parents=True, exist_ok=True)
 
+# Ayarlar ve is gecmisi. Tarayicinin kendi deposu adrese bagli oldugu icin
+# localhost:8000 ile internetteki site birbirinin gecmisini gormuyordu; ortak
+# nokta bu bilgisayardaki yardimci, o yuzden bir kopya burada duruyor.
+# Dosya kullanicinin kendi diskinde, disariya gonderilmiyor.
+USER_FILE = WORK / "user.json"
+
 # Asama agirliklari: toplam ilerleme yuzdesini bu araliklara dagitiyoruz.
 # Su an tek model: small (~0,5 GB). Buyuk modeller araci agirlastirdigi icin
 # kapali; arayuzde "yakinda" diye gorunuyorlar. Tanimadigimiz bir deger
@@ -477,6 +483,34 @@ def _require_local(request: Request):
     """Izin ekrani sadece bu bilgisayardaki sayfadan kullanilabilir."""
     if not _page_is_local(request):
         raise HTTPException(403, "Sadece bu bilgisayardan")
+
+
+@app.get("/api/settings")
+def read_settings():
+    """Yardimcida tutulan ayar/gecmis kopyasi."""
+    try:
+        return json.loads(USER_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {"at": 0}
+
+
+@app.post("/api/settings")
+def write_settings(body: dict):
+    """Arayuz her degisiklikte buraya da yaziyor.
+
+    Cakismayi zaman damgasi cozuyor: iki taraftan hangisi daha yeniyse o
+    kazaniyor (bkz. web/app.js icindeki hafiza bolumu).
+    """
+    data = {
+        "settings": body.get("settings") or {},
+        "history": (body.get("history") or [])[:100],
+        "lang": body.get("lang") or "tr",
+        "at": float(body.get("at") or 0),
+    }
+    tmp = USER_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(USER_FILE)
+    return {"ok": True}
 
 
 @app.post("/api/perf")

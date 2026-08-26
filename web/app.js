@@ -2,13 +2,25 @@
    bu dosya lang.js'ten SONRA yukleniyor.                                     */
 
 const SETTINGS_KEY = "clipper.settings";
+const STAMP_KEY = "clipper.stamp";      // son degisiklik zamani
 const HISTORY_KEY = "clipper.history";
 
 let lastJob = null;    // dil degisince ilerleme metnini yeniden cizmek icin
 let drawnParts = "";   // part listesi en son hangi durumda cizildi
 
 // Sozlukten gelmeyen metinler dil degisince elle yenilenmeli
+// Sayfa ilk acilista da bir kez ceviriliyor; o "kullanici degisiklik yapti"
+// demek degil. Damgayi sadece gercek degisikliklerde yeniliyoruz, yoksa yerel
+// kopya her acilista en yeni gorunur ve yardimcidaki hafiza asla okunmazdi.
+let memoryReady = false;
+let applyingRemote = false;
+
 onLangChange(() => {
+  if (memoryReady && !applyingRemote) {
+    save(STAMP_KEY, Date.now());
+    pushMemory();
+  }
+  memoryReady = true;
   updateZoomHint();
   updateCaptionOpts();
   renderPreviewMsg();
@@ -31,14 +43,18 @@ if (settings.zoom) $("zoom").value = settings.zoom;
 if (settings.at) $("preview-at").value = settings.at;
 $("captions").checked = Boolean(settings.captions);
 
-const rememberSettings = () => save(SETTINGS_KEY, {
-  minutes: $("minutes").value,
-  highlight: $("highlight").value,
-  model: $("model").value,
-  zoom: $("zoom").value,
-  captions: $("captions").checked,
-  at: $("preview-at").value,
-});
+const rememberSettings = () => {
+  save(STAMP_KEY, Date.now());
+  pushMemory();
+  return save(SETTINGS_KEY, {
+    minutes: $("minutes").value,
+    highlight: $("highlight").value,
+    model: $("model").value,
+    zoom: $("zoom").value,
+    captions: $("captions").checked,
+    at: $("preview-at").value,
+  });
+};
 
 ["minutes", "highlight", "model", "zoom", "captions"].forEach(
   (id) => $(id).addEventListener("change", rememberSettings)
@@ -176,6 +192,71 @@ $("url").addEventListener("input", () => {
   updateZoomHint();
 });
 
+// --- Hafiza ---------------------------------------------------------------
+// Tarayicinin kendi deposu adrese bagli: localhost:8000 ile internetteki site
+// ayri ayri hatirliyor. Ortak nokta bu bilgisayardaki yardimci, o yuzden ayni
+// bilgiyi oraya da yaziyoruz. Hangisinin gecerli oldugunu zaman damgasi
+// belirliyor -- son degisiklik kazaniyor.
+let memoryTimer = null;
+
+function pushMemory() {
+  // Ilk yazmada damga yoksa simdiyi koyuyoruz: yoksa iki taraf da sifir kalir
+  // ve hangisinin yeni oldugu hic anlasilmaz.
+  if (!load(STAMP_KEY, 0)) save(STAMP_KEY, Date.now());
+  clearTimeout(memoryTimer);
+  memoryTimer = setTimeout(async () => {
+    try {
+      await api("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: load(SETTINGS_KEY, {}),
+          history: load(HISTORY_KEY, []),
+          lang,
+          at: load(STAMP_KEY, 0),
+        }),
+      });
+    } catch { /* yardimci kapaliysa tarayici kopyasi zaten duruyor */ }
+  }, 600);
+}
+
+/** Acilista: yardimcidaki kopya daha yeniyse onu al. */
+async function pullMemory() {
+  let uzak;
+  try {
+    const res = await api("/api/settings");
+    if (!res.ok) return;
+    uzak = await res.json();
+  } catch {
+    return;
+  }
+  if (!uzak || !uzak.at || uzak.at <= load(STAMP_KEY, 0)) {
+    pushMemory();        // buradaki kopya daha yeni: yardimciyi guncelle
+    return;
+  }
+
+  applyingRemote = true;
+  if (uzak.settings) save(SETTINGS_KEY, uzak.settings);
+  if (uzak.history) save(HISTORY_KEY, uzak.history);
+  save(STAMP_KEY, uzak.at);
+
+  const ayar = uzak.settings || {};
+  if (ayar.minutes) $("minutes").value = ayar.minutes;
+  if (ayar.highlight) $("highlight").value = ayar.highlight;
+  if (ayar.zoom) $("zoom").value = ayar.zoom;
+  if (ayar.at) $("preview-at").value = ayar.at;
+  if (ayar.model && $("model").querySelector(`option[value="${ayar.model}"]`)) {
+    $("model").value = ayar.model;
+  }
+  $("captions").checked = Boolean(ayar.captions);
+
+  updateZoomHint();
+  updateCaptionOpts();
+  renderHistory();
+  if (uzak.lang && uzak.lang !== lang) applyLang(uzak.lang);
+  applyingRemote = false;
+}
+
 // --- Gecmis --------------------------------------------------------------
 function renderHistory() {
   const items = load(HISTORY_KEY, []);
@@ -195,6 +276,8 @@ function addHistory(entry) {
   const items = load(HISTORY_KEY, []);
   items.unshift(entry);
   save(HISTORY_KEY, items.slice(0, 100));
+  save(STAMP_KEY, Date.now());
+  pushMemory();
   renderHistory();
 }
 
@@ -407,6 +490,7 @@ async function refreshConnection() {
   applyHelperFeatures(status);
   if (status.running) {
     setConnState(status.paired ? "ok" : "unpaired");
+    if (status.paired) pullMemory();
     return;
   }
   // Ulasamadik: ya yardimci kapali ya da tarayici yerel aga izin vermedi
@@ -437,6 +521,7 @@ onLangChange(() => paintConnection());
 if (IS_LOCAL) {
   setConnState("ok");
   helperStatus().then(applyHelperFeatures);    // hafif kurulum mu?
+  pullMemory();
 }
 else if (helperToken) refreshConnection();
 else paintConnection();

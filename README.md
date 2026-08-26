@@ -81,7 +81,14 @@ noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isa
 
 Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman basılır.
 
-Ayarlar ve geçmiş tarayıcıda (localStorage) tutulur. **Yedek indir** ile JSON olarak
+Ayarlar ve geçmiş iki yerde tutulur, ikisi de kendi bilgisayarında: tarayıcının
+deposunda ve yardımcının `work/user.json` dosyasında. İkincisinin sebebi şu:
+tarayıcı deposu adrese bağlı, yani siteden girdiğinle `localhost:8000`'den
+girdiğin ayrı ayrı hatırlanırdı. Yardımcıdaki kopya ikisini birleştiriyor;
+hangisinin geçerli olduğunu son değişiklik zamanı belirliyor.
+
+Not: çerez kullanılmıyor. Çerez zaten bu işi tarayıcı deposundan daha iyi
+yapmazdı ve her ikisi de adrese bağlı olduğu için asıl sorunu çözmezdi. **Yedek indir** ile JSON olarak
 dışarı alıp başka bilgisayarda **Yedekten yükle** ile geri koyabilirsin.
 
 ## Site + yardımcı mimarisi
