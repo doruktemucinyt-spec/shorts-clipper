@@ -31,7 +31,17 @@ body {
    Ucu katman: sicak isik kubbesi, zaman cizelgesi cizgileri, ince grain.
    Hepsi fixed ve tiklanamaz; icerik uzerlerinde cam gibi duruyor.          */
 
-.backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+/* contain: arka plan katmanlarindaki degisiklik sayfanin geri kalanini
+   yeniden hesaplatmasin -- kaydirirken kartlarin cam katmani bosuna
+   tazelenmiyor.                                                           */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint style;
+}
 
 .glow {
   position: absolute;
@@ -111,9 +121,17 @@ body {
   .stream-inner { animation: none; }
 }
 
+/* Kaydirma suresince akis duruyor. Goz zaten kayan sayfayi takip ettigi icin
+   fark edilmiyor; kazanci su: animasyonun her karesi arkadaki goruntuyu
+   degistirdigi icin kartlarin cam bulanikligini da yeniden hesaplatiyordu.
+   Kaydirma bitiminden 140 ms sonra kaldigi yerden devam ediyor.           */
+html.scrolling .stream-inner { animation-play-state: paused; }
+
+/* Doku 160px'de kendini tekrar ettigi icin ekrandan tasmasinin gorsel bir
+   karsiligi yoktu; inset:-50% dort kat buyuk bir katman demekti.          */
 .grain {
   position: absolute;
-  inset: -50%;
+  inset: 0;
   z-index: 4;
   opacity: .035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -142,16 +160,37 @@ main {
 
 .lang { position: relative; flex: none; }
 
+/* Kure de menuyle ayni cam: bulanik bir kutu degil, kucuk bir optik cisim.
+   Tarif menununkiyle birebir, sadece kirilma olcegi cismin boyutuna gore
+   kucultulmus (bkz. #liquid-glass-sm). Menu bu butonun icinden dogdugu icin
+   ikisinin ayni malzemeden olmasi gerekiyordu.                            */
 .globe {
   position: relative;
   width: 44px; height: 44px;
   display: grid; place-items: center;
   padding: 0;
   border-radius: 13px;
-  background: var(--glass);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
+  box-shadow:
+    inset 1.2px 1.2px 0 rgba(255, 255, 255, .32),    /* sol ust kenar parlamasi */
+    inset -1.2px -1.2px 0 rgba(255, 255, 255, .09),  /* karsi kenar, daha sonuk */
+    inset 0 0 12px rgba(255, 255, 255, .05),         /* govde ici yumusak isik */
+    0 10px 22px -14px rgba(0, 0, 0, .85);
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+/* Ust kenardan suzulen isik -- menudeki ::before'un kucugu */
+.globe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 20% 0%,
+    rgba(255, 255, 255, .12) 0%, rgba(255, 255, 255, 0) 62%);
 }
 .globe svg {
   width: 21px; height: 21px;
@@ -159,7 +198,7 @@ main {
   stroke-width: 1.5;
   transition: stroke .18s ease;
 }
-.globe:hover { border-color: rgba(255, 212, 0, .38); }
+.globe:hover { border-color: rgba(255, 212, 0, .38); background: rgba(255, 255, 255, .07); }
 .globe:hover svg { stroke: var(--accent); }
 
 /* Tiklama: kure ekseni etrafinda donuyor, disina bir halka aciliyor */
@@ -218,6 +257,10 @@ main {
   transform-origin: 100% 0;
   clip-path: inset(0 0 100% calc(100% - var(--globe)) round 14px);
   pointer-events: none;
+  /* Kapaliyken tamamen devre disi: gorunmez olsa da backdrop-filter'i acik
+     kalan bir katman her karede hesaplaniyor. visibility kapanis animasyonu
+     bittikten SONRA devreye giriyor, o yuzden animasyon gorunmeye devam ediyor. */
+  visibility: hidden;
   /* Bu kural KAPANISI tanimlar: cam hizlanarak kureye geri emiliyor.
      Opaklik gecikmeli soluyor, yoksa morph gorunmeden kayboluyordu. */
   transition:
@@ -225,10 +268,12 @@ main {
     clip-path .4s cubic-bezier(.55, 0, .8, .3),
     transform .4s cubic-bezier(.55, 0, .8, .3),
     background-color .3s ease,
-    border-color .26s ease;
+    border-color .26s ease,
+    visibility 0s linear .42s;
 }
 
 .lang-menu.open {
+  visibility: visible;
   opacity: 1;
   transform: none;
   pointer-events: auto;
@@ -241,7 +286,8 @@ main {
     clip-path .62s cubic-bezier(.38, .7, .2, 1),
     transform .62s cubic-bezier(.34, 1.22, .4, 1),
     background-color .5s ease,
-    border-color .45s ease;
+    border-color .45s ease,
+    visibility 0s;
 }
 
 /* Filtreyi isitma katmani. Ayrintisi index.html'de. */

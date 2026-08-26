@@ -32,7 +32,8 @@ function t(key, args) {
   return text;
 }
 
-let lastJob = null;   // dil degisince ilerleme metnini yeniden cizmek icin
+let lastJob = null;    // dil degisince ilerleme metnini yeniden cizmek icin
+let drawnParts = "";   // part listesi en son hangi durumda cizildi
 
 function applyLang(next) {
   if (I18N[next]) lang = next;
@@ -72,7 +73,7 @@ function closeLangMenu() {
 
 /* Cam acilirken kanallari ayirip renk sacagi olusturur, sonra ust uste
    oturup kaybolurlar. SVG filtresindeki SMIL animasyonlarini tetikliyoruz. */
-const dispersion = ["disp-r", "disp-b"]
+const dispersion = ["disp-r", "disp-b", "disp-r-sm", "disp-b-sm"]
   .map((id) => document.getElementById(id))
   .filter((el) => el && typeof el.beginElement === "function");
 
@@ -106,6 +107,19 @@ langMenu.addEventListener("click", (e) => {
 
 document.addEventListener("click", closeLangMenu);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLangMenu(); });
+
+// --- Kaydirma ------------------------------------------------------------
+// Kaydirma suresince arka plandaki akan cizgiler duruyor (CSS'te
+// html.scrolling). Sebebi: o animasyonun her karesi kartlarin arkasindaki
+// goruntuyu degistirdigi icin cam bulanikligi da her karede yeniden
+// hesaplaniyordu. Dinleyici passive, yani kaydirmayi hic bekletmiyor.
+let scrollIdle = null;
+addEventListener("scroll", () => {
+  const root = document.documentElement;
+  if (!root.classList.contains("scrolling")) root.classList.add("scrolling");
+  clearTimeout(scrollIdle);
+  scrollIdle = setTimeout(() => root.classList.remove("scrolling"), 140);
+}, { passive: true });
 
 // --- Ayarlar --------------------------------------------------------------
 const settings = load(SETTINGS_KEY, {});
@@ -343,6 +357,7 @@ $("start").onclick = async () => {
   $("start").disabled = true;
   $("progress-card").classList.remove("hidden");
   $("parts").innerHTML = "";
+  drawnParts = "";
   $("reveal").classList.add("hidden");
   $("fill").classList.remove("error");
   $("fill").style.width = "0%";
@@ -407,7 +422,13 @@ function renderJob(job) {
     $("reveal").classList.remove("hidden");
   }
 
-  if (job.parts?.length) {
+  // Ilerleme mesajlari saniyede birkac kez geliyor; listeyi her seferinde
+  // bastan kurmak video kutularini da bastan yukluyor ve is bitene kadar
+  // arayuzu tirmaliyordu. Sadece yeni part eklendiginde (ya da dil degisince)
+  // yeniden ciziliyor.
+  const partsKey = `${lang}|${(job.parts || []).length}`;
+  if (job.parts?.length && partsKey !== drawnParts) {
+    drawnParts = partsKey;
     $("parts").innerHTML = job.parts.map((p) => `
       <div class="part">
         <video src="${p.url}" controls preload="metadata"></video>
