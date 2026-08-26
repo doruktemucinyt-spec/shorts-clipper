@@ -193,10 +193,8 @@ $("url").addEventListener("input", () => {
 });
 
 // --- Ustteki serit --------------------------------------------------------
-// Discord adresi belli olunca su satira yazmak yeterli; bos kaldigi surece
-// duz yazi olarak gorunuyor, doldurulunca tiklanabilir baglantiya donuyor.
-const DISCORD_URL = "";
-
+// Discord adresi config.js icinde; hem burada hem altbilgide ayni degeri
+// kullaniyoruz ki iki yerde birden guncellemek gerekmesin.
 const TICKER_KEYS = ["ticker.open", "ticker.cookies", "ticker.local", "ticker.discord"];
 
 function renderTicker() {

@@ -22,8 +22,8 @@ WEB = ROOT / "web"
 # o yuzden "site" degil.
 OUT = ROOT / "shorts-clipper"
 
-ASSETS = ["style.css", "i18n.js", "lang.js", "api.js", "app.js", "pages.js",
-          "page.js", "favicon.svg"]
+ASSETS = ["style.css", "config.js", "i18n.js", "lang.js", "api.js", "app.js",
+          "pages.js", "page.js", "favicon.svg"]
 DOC_PAGES = ["sss", "cerez", "gizlilik"]
 
 

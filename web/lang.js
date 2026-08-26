@@ -55,7 +55,25 @@ function applyLang(next) {
     b.classList.toggle("active", b.dataset.lang === lang);
   });
 
+  renderDiscord();
   for (const fn of langHooks) fn(lang);
+}
+
+/* Altbilgideki Discord maddesi. Adres config.js'te; bos oldugu surece
+   tiklanamaz duz yazi olarak duruyor, doldurulunca baglantiya donusuyor. */
+function renderDiscord() {
+  const el = $("foot-discord");
+  if (!el) return;
+  const url = typeof DISCORD_URL === "string" ? DISCORD_URL : "";
+  if (url) {
+    el.href = url;
+    el.target = "_blank";
+    el.rel = "noopener";
+    el.classList.remove("soon");
+  } else {
+    el.removeAttribute("href");
+    el.classList.add("soon");
+  }
 }
 
 // --- Dil menusu -----------------------------------------------------------

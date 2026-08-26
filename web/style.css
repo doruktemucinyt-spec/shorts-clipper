@@ -789,6 +789,10 @@ a.ghost:active {
 .foot a:hover { color: var(--accent); border-bottom-color: rgba(255, 212, 0, .45); }
 .foot .sep { opacity: .35; }
 
+/* Adres henuz girilmemis madde: tiklanamaz, biraz daha sonuk */
+.foot a.soon { opacity: .55; cursor: default; }
+.foot a.soon:hover { color: var(--faint); border-bottom-color: transparent; }
+
 /* ---------- Izin ekrani --------------------------------------------------- */
 
 /* Izin istenen adres: sayfadaki en onemli bilgi, o yuzden vurgulu */
@@ -866,8 +870,10 @@ a.ghost:active {
 .ticker a { color: var(--accent); text-decoration: none; }
 .ticker a:hover { text-decoration: underline; }
 
-/* Serit sabit durdugu icin icerik onun altindan baslasin */
-main { padding-top: 92px; }
+/* Serit sabit durdugu icin icerik onun altindan baslasin. Kural yalnizca
+   serit olan sayfalara: bilgi sayfalarinda serit yok, orada fazladan bosluk
+   kalmasin. */
+.ticker ~ main { padding-top: 92px; }
 
 .hidden { display: none; }
 
