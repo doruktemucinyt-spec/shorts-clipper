@@ -4,4 +4,4 @@
    akan seritte hem de altbilgide kendiliginden tiklanabilir baglantiya
    donusuyor. Bos kaldigi surece ikisi de duz yazi olarak duruyor.        */
 
-const DISCORD_URL = "";
+const DISCORD_URL = "https://discord.gg/8buKAhTPEs";
