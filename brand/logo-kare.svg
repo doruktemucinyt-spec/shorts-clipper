@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Ters logo: sari zemin, koyu cubuklar. Oranlar sayfadaki uc cubuk
+       isaretle birebir ayni (kisa - uzun - orta), sadece renkler yer degistirdi. -->
+  <defs>
+    <linearGradient id="zemin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd400"/>
+      <stop offset="1" stop-color="#ff9d00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#zemin)"/>
+
+  <g fill="#0b0b0e">
+    <rect x="102.5" y="258.7" width="74" height="137.6" rx="27.5"/>
+    <rect x="218.9" y="115.7" width="74" height="280.6" rx="27.5"/>
+    <rect x="335.3" y="211.0" width="74" height="185.3" rx="27.5"/>
+  </g>
+</svg>

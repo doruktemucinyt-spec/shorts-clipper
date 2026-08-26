@@ -7,6 +7,9 @@ output/
 # Gelistirme sirasinda alinan ekran goruntuleri
 *.png
 
+# Logo dosyalari kalsin
+!brand/*.png
+
 __pycache__/
 *.pyc
 
