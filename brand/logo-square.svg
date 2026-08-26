@@ -1,7 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Ters logo: yesil zemin, koyu yonca. Yonca sayfadaki isaretin ayni
-       cizimi (sol uste egik govde, sag asagi sap). Cam tarifi burada da var:
-       govdede gradient, kenar parlamasi, zemine dusen yumusak golge. -->
+  <!-- Ters logo: yesil zeminde yonca sekli KESILMIS. Yani koyu alan bir cisim
+       degil, delik. Bu yuzden:
+       - zemine golge dusurmuyor (delik golge dusurmez),
+       - isik sol ustten geldigi icin delegin KARSI duvari, yani sag alt ic
+         kenari isik aliyor; ustteki kenar karanlikta kaliyor.
+       Govdedeki hafif gradient de deligin icindeki derinlik hissi. -->
   <defs>
     <path id="leaf" d="M0 0
              C -7 -26, -40 -34, -40 -64
@@ -19,21 +22,17 @@
       <stop offset="1" stop-color="#0a0a0e"/>
     </linearGradient>
 
-    <linearGradient id="edge" x1="0" y1="0" x2="0.8" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.30"/>
-      <stop offset="0.22" stop-color="#ffffff" stop-opacity="0.08"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity="0.03"/>
+    <linearGradient id="edge" x1="1" y1="1" x2="0.2" y2="0">
+      <stop offset="0" stop-color="#d6ffb0" stop-opacity="0.55"/>
+      <stop offset="0.3" stop-color="#a9f277" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
 
-    <filter id="shade" x="-40%" y="-40%" width="180%" height="190%">
-      <feDropShadow dx="0" dy="12" stdDeviation="14"
-                    flood-color="#123a06" flood-opacity="0.45"/>
-    </filter>
   </defs>
 
   <rect width="512" height="512" fill="url(#ground)"/>
 
-  <g filter="url(#shade)" transform="rotate(-20 256 256)">
+  <g transform="rotate(-20 256 256)">
     <path d="M256 246 C 266 306, 262 340, 292 376" fill="none" stroke="#0a0a0e" stroke-width="16" stroke-linecap="round"/>
     <g transform="translate(256 238) rotate(45) scale(1.55)" fill="url(#body)">
       <use href="#leaf"/>
@@ -44,7 +43,7 @@
   </g>
 
   <g transform="rotate(-20 256 256) translate(256 238) rotate(45) scale(1.55)"
-     fill="none" stroke="url(#edge)" stroke-width="1.6">
+     fill="none" stroke="url(#edge)" stroke-width="2.4">
     <use href="#leaf"/>
     <use href="#leaf" transform="rotate(90)"/>
     <use href="#leaf" transform="rotate(180)"/>
