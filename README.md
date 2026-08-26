@@ -35,6 +35,33 @@ local helper  ──►  yt-dlp        download
 
 ## Install (Windows)
 
+Download **`ClipCloverKurulum.exe`** from the
+[latest release](https://github.com/doruktemucinyt-spec/shorts-clipper/releases/latest),
+double-click it, press Install. That is the whole procedure — Python, ffmpeg and
+the caption engine are all inside. It installs into your own user folder, so
+Windows never asks for administrator rights.
+
+Windows will show a blue **"Windows protected your PC"** screen: the installer
+is not code signed, so SmartScreen has no reputation for it. Choose *More info*
+→ *Run anyway*. This is a reputation warning, not a malware detection.
+
+Where things end up:
+
+| | |
+|---|---|
+| finished videos | `Videos\ClipClover` — untouched when you uninstall |
+| temporary files | `AppData\Local\ClipClover` — removed when you uninstall |
+| the program | `AppData\Local\Programs\ClipClover` |
+
+An NVIDIA GPU is optional. Rendering still uses NVENC when the driver supports
+it, but transcription runs on the CPU: CUDA acceleration in ctranslate2 needs
+cuBLAS and cuDNN, which are over 2 GB and deliberately not packaged.
+`transcribe.py` falls back on its own, so nothing breaks either way.
+
+## Install from source (any platform)
+
+For development, or on machines where the packaged build does not apply:
+
 1. Download or clone this repository.
 2. Double-click **`install.bat`**. It asks one question: whether to install the
    caption feature (~2 GB extra plus a ~0.5 GB subtitle model on first use).
@@ -44,8 +71,33 @@ local helper  ──►  yt-dlp        download
    <http://localhost:8000>.
 
 Requirements: Python 3.10+, ffmpeg (the installer offers to install it via
-winget). An NVIDIA GPU is optional — without one, rendering falls back to the
-CPU and is slower.
+winget).
+
+## Building the installer
+
+`python build_setup.py` (or double-click `buildsetup.bat`) does all three steps:
+downloads ffmpeg into `vendor/`, runs PyInstaller against `clipclover.spec`, and
+compiles `installer.iss` with Inno Setup into `dagitim/ClipCloverKurulum.exe`.
+
+It builds from `.buildvenv`, a separate environment, on purpose: the main Python
+has the CUDA packages installed and PyInstaller would sweep them into the bundle,
+taking it past 2 GB. Set that environment up once with
+
+```
+python -m venv .buildvenv
+.buildvenv/Scripts/python.exe -m pip install -r requirements.txt pyinstaller
+```
+
+Inno Setup itself: `winget install --id JRSoftware.InnoSetup -e --source winget`.
+
+Two packaging choices worth keeping:
+
+- **A folder plus an installer, not a single-file exe.** A one-file PyInstaller
+  build unpacks itself into a temp directory at every launch, and Defender
+  frequently reads that as a dropper. UPX compression is off for the same reason.
+- **ffmpeg from a *shared* build** (`vendor_ffmpeg.py`). In the usual static
+  build `ffmpeg.exe` and `ffprobe.exe` each carry every codec: 424 MB for the
+  pair. Sharing them through DLLs gives the same capabilities in 161 MB.
 
 ## What it does
 

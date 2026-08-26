@@ -23,3 +23,12 @@ beta-keys.txt
 
 # Gecici: GitHub girisi icin
 gh-login.bat
+
+# Paketlemeye giren ffmpeg -- surumleme sistemine girmesin, 161 MB
+vendor/
+
+# PyInstaller ve kurulum programinin ciktilari
+build/
+dist/
+dagitim/
+.buildvenv/

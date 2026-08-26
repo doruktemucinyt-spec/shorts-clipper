@@ -10,7 +10,12 @@ Ciktilar:
   shorts-clipper/faq|cookies|privacy/  bilgi sayfalari (temiz adresler)
   shorts-clipper/404.html              bulunamayan adresler
   shorts-clipper/assets/...            css + js + ikon
-  shorts-clipper/download/...          kurulum paketi (package.py uretiyor)
+  shorts-clipper/download/...          kaynak koddan kurmak isteyenler icin zip
+
+Sitedeki "Bilgisayara kur" dugmesi buradaki zipi degil, GitHub Releases'teki
+ClipCloverKurulum.exe dosyasini gosteriyor (adres web/config.js icinde).
+Sebep: kurulum dosyasi 200 MB civari ve Vercel statik dosya barindirmak icin
+dogru yer degil; GitHub Releases bu is icin ucretsiz ve sinirsiz.
 """
 import json
 import shutil
@@ -31,8 +36,9 @@ DOC_PAGES = ["faq", "cookies", "privacy"]
 # bir de bu klasorlerden servis ediliyor.
 DOC_ALIASES = ["sss", "cerez", "gizlilik"]
 
-# Sitedeki "Bilgisayara kur" dugmesinin indirdigi paket. Her yayinlamada
-# package.py yeniden uretiyor: sitedeki dosya hep koddaki halle ayni oluyor.
+# Kaynak koddan kurmak isteyenler icin duran zip. Normal kullanicinin
+# dugmesi buraya degil GitHub Releases'teki exe'ye gidiyor -- bu dosya sadece
+# gelistiriciler ve Windows disindakiler icin duruyor.
 DOWNLOAD_DIR = "download"
 DOWNLOAD_NAME = "ClipClover-Setup.zip"
 

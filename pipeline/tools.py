@@ -9,6 +9,15 @@ from pathlib import Path
 
 
 def _find(name: str):
+    # Exe halinde ffmpeg programin kendi icinde geliyor; kullanicidan ayrica
+    # kurmasini istemiyoruz. Once oraya bakiyoruz ki PATH'teki eski bir surum
+    # one gecmesin.
+    from paths import BUNDLE
+
+    icerdeki = BUNDLE / "ffmpeg" / f"{name}.exe"
+    if icerdeki.is_file():
+        return str(icerdeki)
+
     found = shutil.which(name)
     if found:
         return found

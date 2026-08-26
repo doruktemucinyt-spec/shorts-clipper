@@ -22,12 +22,11 @@ from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
 from pipeline.tools import probe_dimensions
 
-ROOT = Path(__file__).parent
-WEB = ROOT / "web"
-WORK = ROOT / "work"
-OUTPUT = ROOT / "output"
-WORK.mkdir(exist_ok=True)
-OUTPUT.mkdir(exist_ok=True)
+# Yollar exe halinde farkli yerlere gidiyor -- aciklamasi paths.py'de
+from paths import OUTPUT, WEB, WORK
+
+WORK.mkdir(parents=True, exist_ok=True)
+OUTPUT.mkdir(parents=True, exist_ok=True)
 PREVIEW = WORK / "preview"
 PREVIEW.mkdir(parents=True, exist_ok=True)
 

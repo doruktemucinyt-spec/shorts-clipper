@@ -222,7 +222,58 @@ butonu bunları siler; `output/` klasörüne dokunmaz.
 
 ## Başka bir bilgisayara kurmak
 
-`kurulum.bat`'a çift tıkla (ya da `python kurulum.py`). İki seçenek sunuyor:
+Normal kullanıcı için tek yol var: [son sürümden](https://github.com/doruktemucinyt-spec/shorts-clipper/releases/latest)
+**`ClipCloverKurulum.exe`**'yi indir, çift tıkla, Kur'a bas. Bitti. Python
+kurmak, zip açmak, ffmpeg indirmek yok — hepsi içinde. Kendi kullanıcı
+klasörüne kurulduğu için Windows yönetici izni de sormuyor.
+
+Windows mavi bir **"Windows bilgisayarınızı korudu"** ekranı gösterecek.
+*Daha fazla bilgi* → *Yine de çalıştır*. Bu "virüs bulundu" değil, "bu dosyayı
+daha önce kimse çalıştırmadı ve imzasız" demek; imzasız her programda çıkıyor.
+Kurtulmanın tek yolu kod imzalama sertifikası (yıllık birkaç yüz dolar).
+
+Ne nereye gidiyor:
+
+| | |
+|---|---|
+| biten videolar | `Videolar\ClipClover` — programı kaldırınca **silinmiyor** |
+| geçici dosyalar | `AppData\Local\ClipClover` — kaldırınca siliniyor |
+| programın kendisi | `AppData\Local\Programs\ClipClover` |
+
+Pakette CUDA kütüphaneleri yok (2 GB'ın üzerindeler). Yani render NVENC ile
+GPU'da devam ediyor ama transkript CPU'da çalışıyor. `transcribe.py` bunu
+kendiliğinden hallediyor, kimse bir şey ayarlamıyor.
+
+### Kurulum dosyasını üretmek
+
+`python build_setup.py` (ya da `buildsetup.bat`) üç adımı sırayla yapıyor:
+ffmpeg'i `vendor/` içine indiriyor, PyInstaller ile `dist/ClipClover` klasörünü
+derliyor, Inno Setup ile `dagitim/ClipCloverKurulum.exe` dosyasını çıkarıyor.
+
+Derleme ayrı bir ortamda (`.buildvenv`) yapılıyor, bilerek: ana Python'da CUDA
+paketleri kurulu ve PyInstaller onları da pakete alırsa boyut 2 GB'ı aşıyor. O
+ortamı bir kereliğine kurmak için:
+
+```
+python -m venv .buildvenv
+.buildvenv/Scripts/python.exe -m pip install -r requirements.txt pyinstaller
+```
+
+Inno Setup: `winget install --id JRSoftware.InnoSetup -e --source winget`
+
+Bozulmaması gereken iki tercih:
+
+- **Klasör + kurulum programı, tek dosyalık exe değil.** Tek dosyalık
+  PyInstaller derlemesi her açılışta kendini geçici klasöre açıyor ve Defender
+  bunu sıkça "dropper" sayıyor. UPX sıkıştırma da aynı sebeple kapalı.
+- **ffmpeg'in "shared" derlemesi** (`vendor_ffmpeg.py`). Normal derlemede
+  `ffmpeg.exe` ve `ffprobe.exe` bütün kodekleri ayrı ayrı taşıyor, ikisi
+  424 MB. Ortak DLL'lerle aynı yetenek 161 MB.
+
+### Kaynak koddan kurmak
+
+Geliştirme için ya da paketin uymadığı durumlarda: `install.bat`'a çift tıkla
+(ya da `python install.py`). İki seçenek sunuyor:
 
 Kurulum tek bir şey soruyor: **caption özelliği de kurulsun mu?**
 
@@ -234,7 +285,7 @@ Kurulum tek bir şey soruyor: **caption özelliği de kurulsun mu?**
 Kurulum sanal ortamı (`.venv`) proje klasörüne kuruyor, sistemde başka bir yeri
 değiştirmiyor; ffmpeg'i winget ile kurmayı ise soruyor, sessizce kurmuyor.
 
-Başlatmak için `baslat.bat`. Hafif kurulumda arayüz cümleye hizalı bölme ve
+Başlatmak için `start.bat`. Hafif kurulumda arayüz cümleye hizalı bölme ve
 caption seçeneklerini kendiliğinden kapatıyor, sunucu da `/api/hello` içinde
 `transcript: false` diyerek durumu bildiriyor.
 

@@ -9,3 +9,10 @@ const DISCORD_URL = "https://discord.gg/8buKAhTPEs";
 /* Kaynak kodun adresi. Bos oldugu surece altbilgideki madde tiklanamaz duz
    yazi olarak duruyor, doldurulunca baglantiya donusuyor. */
 const REPO_URL = "https://github.com/doruktemucinyt-spec/shorts-clipper";
+
+/* Kurulum dosyasinin adresi. GitHub'in "latest" adresi her zaman en son
+   surumdeki dosyayi veriyor, o yuzden yeni surum cikinca burayi degistirmeye
+   gerek yok -- yeni Release'e ayni isimde dosyayi yuklemek yetiyor.
+   Kurulum dosyasi 200 MB civari; Vercel'de degil GitHub'da duruyor. */
+const SETUP_URL =
+  "https://github.com/doruktemucinyt-spec/shorts-clipper/releases/latest/download/ClipCloverKurulum.exe";
