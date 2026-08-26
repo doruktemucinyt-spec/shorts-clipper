@@ -480,6 +480,8 @@ function paintConnection() {
   $("connect-btn").classList.toggle("hidden", !btnKey);
   $("connect-btn").disabled = connState === "waiting" || connState === "checking";
   $("connect").classList.toggle("hidden", connState === "ok");
+  // Yardimci calisiyorsa kurulum karti isini bitirmis demektir
+  $("install").classList.toggle("hidden", connState === "ok");
 
   // Baglanti yokken is baslatilamasin
   const blocked = connState !== "ok";

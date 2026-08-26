@@ -10,10 +10,13 @@ Ciktilar:
   shorts-clipper/faq|cookies|privacy/  bilgi sayfalari (temiz adresler)
   shorts-clipper/404.html              bulunamayan adresler
   shorts-clipper/assets/...            css + js + ikon
+  shorts-clipper/download/...          kurulum paketi (package.py uretiyor)
 """
 import json
 import shutil
 from pathlib import Path
+
+import package
 
 ROOT = Path(__file__).parent
 WEB = ROOT / "web"
@@ -27,6 +30,11 @@ DOC_PAGES = ["faq", "cookies", "privacy"]
 # Eski Turkce adresler: paylasilmis baglantilar kirilmasin diye ayni sayfa
 # bir de bu klasorlerden servis ediliyor.
 DOC_ALIASES = ["sss", "cerez", "gizlilik"]
+
+# Sitedeki "Bilgisayara kur" dugmesinin indirdigi paket. Her yayinlamada
+# package.py yeniden uretiyor: sitedeki dosya hep koddaki halle ayni oluyor.
+DOWNLOAD_DIR = "download"
+DOWNLOAD_NAME = "ClipClover-Setup.zip"
 
 
 def rewrite(html: str) -> str:
@@ -81,6 +89,9 @@ def build() -> Path:
         (OUT / name).mkdir(parents=True, exist_ok=True)
         (OUT / name / "index.html").write_text(page, encoding="utf-8")
     (OUT / "404.html").write_text(page, encoding="utf-8")
+
+    (OUT / DOWNLOAD_DIR).mkdir(parents=True, exist_ok=True)
+    shutil.copy2(package.paketle(), OUT / DOWNLOAD_DIR / DOWNLOAD_NAME)
 
     return OUT
 

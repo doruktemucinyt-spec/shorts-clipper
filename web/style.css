@@ -565,7 +565,7 @@ input[type=range]::-moz-range-thumb {
 /* :where() ile yaziliyor cunku bu sadece bir TABAN: asagidaki .ghost gibi
    kurallar (daha kucuk dolgu, daha kucuk yazi) bunu ezebilmeli. Duz
    "a.ghost" yazilsaydi taban daha guclu olur, ghost dolgusu tutmazdi.   */
-:where(button, a.ghost) {
+:where(button, a.ghost, a.primary) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -586,7 +586,8 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 
 /* Basma: parmagin altinda hafifce cokuyor */
 button:active:not(:disabled),
-a.ghost:active {
+a.ghost:active,
+a.primary:active {
   transform: translateY(1px) scale(.978);
   transition-duration: .06s;
 }
