@@ -23,7 +23,7 @@ WEB = ROOT / "web"
 OUT = ROOT / "shorts-clipper"
 
 ASSETS = ["style.css", "config.js", "i18n.js", "lang.js", "api.js", "app.js",
-          "pages.js", "page.js", "favicon.svg"]
+          "pages.js", "page.js", "gate.js", "favicon.svg"]
 DOC_PAGES = ["sss", "cerez", "gizlilik"]
 
 

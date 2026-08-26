@@ -6,6 +6,15 @@ const I18N = {
     "lang.name": "Türkçe",
     "sub": "YouTube linki → 9:16 dikey partlar",
 
+    "gate.tag": "Beta",
+    "gate.title": "Davetli beta",
+    "gate.lead": "Shorts Clipper şu an kapalı beta. Devam etmek için davet anahtarını gir.",
+    "gate.placeholder": "CLIP-XXXX-XXXX",
+    "gate.button": "Devam et",
+    "gate.error": "Bu anahtar geçerli değil.",
+    "gate.nokey": "Anahtarın yok mu?",
+    "gate.discord": "Discord'dan iste",
+
     "ticker.open": "Tamamı açık kaynak",
     "ticker.cookies": "Çerez toplanmıyor",
     "ticker.local": "Her şey senin bilgisayarında çalışır",
@@ -135,6 +144,15 @@ const I18N = {
   en: {
     "lang.name": "English",
     "sub": "YouTube link → 9:16 vertical parts",
+
+    "gate.tag": "Beta",
+    "gate.title": "Invite-only beta",
+    "gate.lead": "Shorts Clipper is in closed beta. Enter your invite key to continue.",
+    "gate.placeholder": "CLIP-XXXX-XXXX",
+    "gate.button": "Continue",
+    "gate.error": "That key is not valid.",
+    "gate.nokey": "No key yet?",
+    "gate.discord": "Ask on Discord",
 
     "ticker.open": "Fully open source",
     "ticker.cookies": "No cookies collected",
@@ -266,6 +284,15 @@ const I18N = {
     "lang.name": "Deutsch",
     "sub": "YouTube-Link → 9:16 vertikale Teile",
 
+    "gate.tag": "Beta",
+    "gate.title": "Beta nur mit Einladung",
+    "gate.lead": "Shorts Clipper ist in der geschlossenen Beta. Gib deinen Einladungsschlüssel ein.",
+    "gate.placeholder": "CLIP-XXXX-XXXX",
+    "gate.button": "Weiter",
+    "gate.error": "Dieser Schlüssel ist ungültig.",
+    "gate.nokey": "Noch keinen Schlüssel?",
+    "gate.discord": "Auf Discord fragen",
+
     "ticker.open": "Vollständig quelloffen",
     "ticker.cookies": "Keine Cookies",
     "ticker.local": "Alles läuft auf deinem eigenen Rechner",
@@ -395,6 +422,15 @@ const I18N = {
   fr: {
     "lang.name": "Français",
     "sub": "Lien YouTube → parties verticales 9:16",
+
+    "gate.tag": "Bêta",
+    "gate.title": "Bêta sur invitation",
+    "gate.lead": "Shorts Clipper est en bêta fermée. Saisis ta clé d'invitation pour continuer.",
+    "gate.placeholder": "CLIP-XXXX-XXXX",
+    "gate.button": "Continuer",
+    "gate.error": "Cette clé n'est pas valide.",
+    "gate.nokey": "Pas encore de clé ?",
+    "gate.discord": "Demande sur Discord",
 
     "ticker.open": "Entièrement open source",
     "ticker.cookies": "Aucun cookie collecté",

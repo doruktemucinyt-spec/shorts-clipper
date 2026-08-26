@@ -43,6 +43,16 @@
   <!-- Sadece tiklama suresince (0,62 sn) devrede: gercek camda kirmizi, yesil
        ve mavi farkli acilarda kirilir. Acilirken R ve B ayrisip renk sacagi
        yapiyor, sonra yesile yakinsayarak kayboluyor. -->
+  <filter id="liquid-glass-lg" x="0%" y="0%" width="100%" height="100%"
+          color-interpolation-filters="sRGB">
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="70"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- Sadece tiklama suresince (0,62 sn) devrede: gercek camda kirmizi, yesil
+       ve mavi farkli acilarda kirilir. Acilirken R ve B ayrisip renk sacagi
+       yapiyor, sonra yesile yakinsayarak kayboluyor. -->
   <filter id="liquid-glass-rgb" x="0%" y="0%" width="100%" height="100%"
           color-interpolation-filters="sRGB">
     <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
@@ -247,6 +257,7 @@
 <script src="/static/i18n.js"></script>
 <script src="/static/lang.js"></script>
 <script src="/static/api.js"></script>
+<script src="/static/gate.js"></script>
 <script src="/static/app.js"></script>
 <script src="/static/perf.js"></script>
 </body>

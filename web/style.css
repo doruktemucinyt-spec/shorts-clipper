@@ -882,6 +882,89 @@ a.ghost:active {
    kalmasin. */
 .ticker ~ main { padding-top: 92px; }
 
+/* ---------- Beta anahtar kapisi ------------------------------------------
+   Menu ve kureyle ayni cam, sadece kirilma olcegi bu boyuta gore buyuk
+   (#liquid-glass-lg). Kapi acikken arka plan kilitli.                     */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 6, 9, .72);
+  animation: gate-in .5s cubic-bezier(.2, .8, .25, 1);
+}
+
+@keyframes gate-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.gate.open { opacity: 0; transition: opacity .4s ease; pointer-events: none; }
+
+.gate-card {
+  width: min(440px, 100%);
+  padding: 30px 30px 26px;
+  border-radius: 22px;
+  text-align: left;
+  /* Cam tarifi: menuyle ayni -- govde rengi yok denecek kadar az, kalinlik
+     hissi kenar yansimalarindan geliyor, bulaniklik neredeyse sifir. */
+  background: rgba(255, 255, 255, .045);
+  backdrop-filter: url(#liquid-glass-lg) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass-lg) blur(1px) saturate(175%) brightness(1.04);
+  border: 1px solid rgba(255, 255, 255, .18);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, .3),
+    inset -2px -2px 0 rgba(255, 255, 255, .08),
+    inset 0 0 40px rgba(255, 255, 255, .05),
+    0 40px 90px -40px rgba(0, 0, 0, .95),
+    0 0 60px -30px rgba(255, 212, 0, .35);
+  animation: gate-card-in .62s cubic-bezier(.34, 1.16, .4, 1);
+}
+
+@keyframes gate-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+.gate-card .doc-title { font-size: 25px; margin-bottom: 10px; }
+.gate-card .doc-lead { font-size: 14.5px; }
+
+#gate-key {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+#gate-key.bad {
+  border-color: var(--danger);
+  animation: gate-shake .5s cubic-bezier(.36, .07, .19, .97);
+}
+
+@keyframes gate-shake {
+  10%, 90% { transform: translateX(-2px); }
+  30%, 70% { transform: translateX(4px); }
+  50%      { transform: translateX(-5px); }
+}
+
+.gate-error { color: var(--danger); min-height: 18px; margin-top: 8px; }
+#gate-btn { margin-top: 6px; }
+.gate-foot { text-align: center; margin-top: 16px; }
+.gate-foot a { color: var(--accent); text-decoration: none; }
+.gate-foot a:hover { color: #5865f2; }
+.gate-foot a.soon { opacity: .5; cursor: default; }
+
+/* Kapi acikken sayfa kaymasin */
+html.gated, html.gated body { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gate, .gate-card { animation: none; }
+}
+
 .hidden { display: none; }
 
 @media (max-width: 560px) {
