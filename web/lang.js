@@ -20,10 +20,35 @@ const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
 ));
 
 // --- Ceviri ---------------------------------------------------------------
-// Varsayilan Turkce. Tarayici dilinden tahmin etmiyoruz: Windows cogu kurulumda
-// en-US dondurdugu icin ilk acilis yanlis dilde geliyordu.
-let lang = localStorage.getItem(LANG_KEY);
-if (!I18N[lang]) lang = "tr";
+// Sira: kullanicinin kendi secimi > bulundugu bolge > tarayici dili > Ingilizce.
+//
+// Tarayici dili tek basina yetmiyor: Windows cogu kurulumda en-US donduruyor,
+// yani Turkiye'deki biri Ingilizce sayfayla karsilasiyordu. Saat dilimi ise
+// makinenin dilini degil bulundugu yeri soyluyor, o yuzden once ona bakiyoruz.
+// Adres istemiyor, ag istegi yok, her sey tarayicinin icinde.
+const ZONE_LANG = {
+  "Europe/Istanbul": "tr", "Asia/Istanbul": "tr",
+  "Europe/Berlin": "de", "Europe/Vienna": "de", "Europe/Zurich": "de",
+  "Europe/Busingen": "de",
+  "Europe/Paris": "fr", "Europe/Brussels": "fr", "Europe/Luxembourg": "fr",
+  "Europe/Monaco": "fr",
+};
+
+function guessLang() {
+  try {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (ZONE_LANG[zone]) return ZONE_LANG[zone];
+  } catch {}
+  for (const tag of navigator.languages ?? [navigator.language ?? ""]) {
+    const code = String(tag).slice(0, 2).toLowerCase();
+    if (I18N[code]) return code;
+  }
+  return "en";
+}
+
+let lang = null;
+try { lang = localStorage.getItem(LANG_KEY); } catch {}
+if (!I18N[lang]) lang = guessLang();
 
 /** Anahtari cevirir; {isim} yer tutucularini args ile doldurur. */
 function t(key, args) {

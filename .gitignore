@@ -23,3 +23,6 @@ beta-keys.txt
 
 # Gecici: GitHub girisi icin
 gh-login.bat
+
+# Makineye ozel kisayol (icindeki yollar mutlak)
+DeployClover.lnk

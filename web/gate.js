@@ -77,7 +77,10 @@ function buildGate() {
   el.id = "gate";
   el.innerHTML = `
     <div class="gate-card">
-      <span class="tag" data-i18n="gate.tag"></span>
+      <div class="gate-top">
+        <span class="tag" data-i18n="gate.tag"></span>
+        <div class="gate-langs" role="group" aria-label="Language"></div>
+      </div>
       <h2 class="doc-title" data-i18n="gate.title"></h2>
       <p class="doc-lead" data-i18n="gate.lead"></p>
       <input id="gate-key" type="text" autocomplete="off" spellcheck="false"
@@ -90,6 +93,24 @@ function buildGate() {
       </p>
     </div>`;
   document.body.appendChild(el);
+
+  /* Dil bayraklari kartin ustunde duruyor. Sebep: sayfadaki kure kapinin
+     ARKASINDA kaliyor, yani anahtar girilmeden dil degistirilemiyordu --
+     Turkce okuyamayan biri kapiya sikisiyordu. Bayraklar menudekilerin
+     kopyasi; isaretleme tek yerde, menude kaliyor. */
+  const langRow = el.querySelector(".gate-langs");
+  document.querySelectorAll("#lang-menu button[data-lang]").forEach((src) => {
+    const flag = src.querySelector(".flag");
+    if (!flag) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.lang = src.dataset.lang;
+    btn.title = src.textContent.trim();
+    btn.setAttribute("aria-label", src.textContent.trim());
+    btn.appendChild(flag.cloneNode(true));
+    btn.onclick = () => applyLang(src.dataset.lang);
+    langRow.appendChild(btn);
+  });
 
   const url = typeof DISCORD_URL === "string" ? DISCORD_URL : "";
   if (url) $("gate-discord").href = url;
@@ -123,11 +144,14 @@ if (!betaUnlocked()) {
   document.documentElement.classList.add("gated");
   buildGate();
   // Metinler dil degisiminde de yenilensin
-  onLangChange(() => {
+  onLangChange((secili) => {
     document.querySelectorAll("#gate [data-i18n]").forEach((el) => {
       el.textContent = t(el.dataset.i18n);
     });
     const alan = document.getElementById("gate-key");
     if (alan) alan.placeholder = t("gate.placeholder");
+    document.querySelectorAll("#gate .gate-langs button").forEach((b) => {
+      b.classList.toggle("active", b.dataset.lang === secili);
+    });
   });
 }

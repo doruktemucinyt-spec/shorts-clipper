@@ -86,7 +86,7 @@ website cannot draw a fake one. Permissions can be revoked at any time from
 | `server.py`, `serve.py`, `pairing.py` | the helper: API, launcher, permission handling |
 | `pipeline/` | download, transcribe, split, captions, render |
 | `web/` | the interface (plain HTML/CSS/JS, no framework) |
-| `build_site.py`, `deploy.bat` | build and publish the static site |
+| `build_site.py`, `deployclover.bat` | build and publish the static site |
 | `install.py`, `install.bat`, `start.bat` | setup and launcher |
 | `package.py` | build the distributable zip |
 | `brand/` | logo, square and reversed |

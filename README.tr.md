@@ -104,7 +104,8 @@ sayfalarının video adreslerini çekmesine izin vermiyor). Bu yüzden indiren
 taraf her zaman yerel bir program olmak zorunda.
 
 Site **https://clipclover.online** adresinde yayında (Vercel,
-statik). Yeniden yayınlamak için `deploy.bat` — siteyi baştan üretip aynı
+statik). Yeniden yayınlamak için `deployclover.bat` (ya da klasördeki
+yonca ikonlu **DeployClover** kısayolu) — siteyi baştan üretip aynı
 adrese gönderiyor.
 
 **İki ayrı izin var, karıştırmamak lazım:**
