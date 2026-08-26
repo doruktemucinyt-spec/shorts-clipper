@@ -1,15 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Sayfanin sol ustundeki uc cubuk isaretin sekmedeki hali.
-       Oranlar birebir ayni: kisa - uzun - orta, ayni yesil gecis. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Dort yaprakli yonca: tek yaprak tanimlanip 90 derecelik adimlarla
+       dondurulyor. Grup 45 derece egik, boylece alt ortada sapin cikacagi
+       bosluk aciliyor; sap yapraklarin arkasinda. -->
   <defs>
-    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4ade80"/>
-      <stop offset="1" stop-color="#22c55e"/>
+    <path id="leaf" d="M0 0
+             C -7 -26, -40 -34, -40 -64
+             C -40 -88, -16 -97, 0 -80
+             C 16 -97, 40 -88, 40 -64
+             C 40 -34, 7 -26, 0 0 Z"/>
+    <linearGradient id="leafGrad" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#8bf283"/>
+      <stop offset="1" stop-color="#23b843"/>
     </linearGradient>
   </defs>
-  <g fill="url(#bar)">
-    <rect x="1.5"  y="16.5" width="7" height="13"   rx="2.6"/>
-    <rect x="12.5" y="3"    width="7" height="26.5" rx="2.6"/>
-    <rect x="23.5" y="12"   width="7" height="17.5" rx="2.6"/>
+
+  <path d="M256 240 C 264 316, 258 350, 288 386"
+        fill="none" stroke="#1f9d47" stroke-width="17" stroke-linecap="round"/>
+
+  <g transform="translate(256 236) rotate(45) scale(1.85)" fill="url(#leafGrad)">
+    <use href="#leaf"/>
+    <use href="#leaf" transform="rotate(90)"/>
+    <use href="#leaf" transform="rotate(180)"/>
+    <use href="#leaf" transform="rotate(270)"/>
   </g>
 </svg>
