@@ -17,7 +17,6 @@ const I18N = {
     "check.captions": "Captionlar görünsün",
     "label.highlight": "Vurgu rengi",
     "label.model": "Altyazı modeli",
-    "opt.large": "large-v3 — en doğru, ~3 GB iner",
     "opt.medium": "medium — dengeli, ~1,5 GB",
     "opt.small": "small — hızlı, ~0,5 GB (varsayılan)",
 
@@ -141,7 +140,6 @@ const I18N = {
     "check.captions": "Show captions",
     "label.highlight": "Highlight colour",
     "label.model": "Caption model",
-    "opt.large": "large-v3 — most accurate, ~3 GB download",
     "opt.medium": "medium — balanced, ~1.5 GB",
     "opt.small": "small — fast, ~0.5 GB (default)",
 
@@ -265,7 +263,6 @@ const I18N = {
     "check.captions": "Untertitel anzeigen",
     "label.highlight": "Hervorhebungsfarbe",
     "label.model": "Untertitelmodell",
-    "opt.large": "large-v3 — am genauesten, ~3 GB",
     "opt.medium": "medium — ausgewogen, ~1,5 GB",
     "opt.small": "small — schnell, ~0,5 GB (Standard)",
 
@@ -389,7 +386,6 @@ const I18N = {
     "check.captions": "Afficher les sous-titres",
     "label.highlight": "Couleur de surbrillance",
     "label.model": "Modèle de sous-titres",
-    "opt.large": "large-v3 — le plus précis, ~3 Go",
     "opt.medium": "medium — équilibré, ~1,5 Go",
     "opt.small": "small — rapide, ~0,5 Go (par défaut)",
 

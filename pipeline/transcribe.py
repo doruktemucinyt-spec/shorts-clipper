@@ -123,7 +123,7 @@ def _run(model, audio: Path, device: str, duration: float, on_progress,
     return segments, getattr(info, "language", "?")
 
 
-def transcribe(audio: Path, model_size: str = "large-v3", duration: float = 0,
+def transcribe(audio: Path, model_size: str = "small", duration: float = 0,
                on_progress=None) -> dict:
     attempts = (("cuda", "float16"), ("cpu", "int8"))
     last_error = None

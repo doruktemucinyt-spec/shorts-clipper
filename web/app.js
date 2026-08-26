@@ -22,7 +22,11 @@ onLangChange(() => {
 const settings = load(SETTINGS_KEY, {});
 if (settings.minutes) $("minutes").value = settings.minutes;
 if (settings.highlight) $("highlight").value = settings.highlight;
-if (settings.model) $("model").value = settings.model;
+// Kayitli model listeden kalkmis olabilir (large-v3 kaldirildi); oyleyse
+// secim bos kalmasin diye dokunmuyoruz, listenin ilki secili geliyor.
+if (settings.model && $("model").querySelector(`option[value="${settings.model}"]`)) {
+  $("model").value = settings.model;
+}
 if (settings.zoom) $("zoom").value = settings.zoom;
 if (settings.at) $("preview-at").value = settings.at;
 $("captions").checked = Boolean(settings.captions);

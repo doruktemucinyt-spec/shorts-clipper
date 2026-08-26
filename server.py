@@ -28,6 +28,12 @@ PREVIEW = WORK / "preview"
 PREVIEW.mkdir(parents=True, exist_ok=True)
 
 # Asama agirliklari: toplam ilerleme yuzdesini bu araliklara dagitiyoruz.
+# Kullanilabilecek altyazi modelleri. large-v3 kaldirildi: 3 GB iniyordu ve
+# bu araci agirlastiran tek sey oydu. Tanimadigimiz bir deger gelirse (eski
+# bir tarayici ayari gibi) sessizce small'a dusuyoruz.
+MODELS = {"small", "medium"}
+DEFAULT_MODEL = "small"
+
 STAGES_FULL = {
     "download": (0, 18), "transcribe": (18, 55),
     "split": (55, 58), "render": (58, 100),
@@ -153,8 +159,9 @@ def run_job(job_id: str, req: JobRequest):
             _emit(job_id, stage="transcribe", pct=pct("transcribe", 0),
                   msg_key="job.extractingAudio", msg_args={})
             wav = transcribe.extract_audio(source, workdir)
+            model_size = req.model if req.model in MODELS else DEFAULT_MODEL
             result = transcribe.transcribe(
-                wav, model_size=req.model, duration=info["duration"],
+                wav, model_size=model_size, duration=info["duration"],
                 on_progress=lambda p, k, a: _emit(
                     job_id, pct=pct("transcribe", p), msg_key=k, msg_args=a),
             )

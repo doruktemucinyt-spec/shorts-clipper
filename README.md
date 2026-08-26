@@ -48,7 +48,8 @@ gerçek en-boy oranıyla hesaplanıyor (öncesinde 16:9 varsayıyor).
   kendi hızı, yani bu adım artık dibe yakın.
 - **Transkript** — faster-whisper'ın toplu (batched) çıkarımı kullanılıyor:
   ses parçaları tek tek değil demet halinde GPU'ya giriyor.
-  60 sn'lik ses, large-v3: **10,7 sn → 4,0 sn**. Kelimeler aynı.
+  60 sn'lik ses (o zamanki large-v3 modeliyle ölçüldü): **10,7 sn → 4,0 sn**.
+  Kelimeler aynı.
   Toplu çıkarım tutmazsa otomatik olarak eski yönteme, o da olmazsa CPU'ya
   düşüyor.
 
@@ -69,9 +70,12 @@ noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isa
 - **Caption yak** — kapalı geldi. Açarsan konuşulan kelimeyi vurgulayan pop-up
   caption videoya gömülür; bunun için transkript şart, yani iş yavaşlar.
   - *Vurgu rengi* — o an konuşulan kelimenin rengi.
-  - *Altyazı modeli* — varsayılan `small` (~0,5 GB iner, hızlı). `medium`
-    (~1,5 GB) ve `large-v3` (~3 GB) daha doğru ama ilk kullanımda o kadar
-    indirir. Model seçilen boyutta ve sadece bir kez iniyor.
+  - *Altyazı modeli* — varsayılan `small` (~0,5 GB iner, hızlı), diğer seçenek
+    `medium` (~1,5 GB, daha doğru). Model bir kez iniyor.
+
+    `large-v3` (~3 GB) kaldırıldı: aracı ağırlaştıran tek şey oydu. Sunucu
+    tanımadığı bir model değeri gelirse sessizce `small`'a düşüyor, yani eski
+    bir tarayıcı ayarı yüzünden 3 GB'lık indirme başlamıyor.
 
 Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman basılır.
 

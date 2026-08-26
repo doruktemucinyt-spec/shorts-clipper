@@ -79,7 +79,7 @@ def main() -> int:
     print()
     print("    + ~2 GB kurulum")
     print("    + ilk kullanimda secilen altyazi modeli iner")
-    print("      (varsayilan small ~0,5 GB; arayuzden large-v3'e gecilirse ~3 GB)")
+    print("      (varsayilan small ~0,5 GB; arayuzden medium secilirse ~1,5 GB)")
     print("    + NVIDIA ekran karti varsa onu kullanir, yoksa islemciye duser")
     print()
     print("  Caption istemiyorsan bunlarin hicbiri inmiyor; sonradan bu kurulumu")
