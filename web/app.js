@@ -479,14 +479,59 @@ function paintConnection() {
   $("connect-btn").textContent = btnKey ? t(btnKey) : "";
   $("connect-btn").classList.toggle("hidden", !btnKey);
   $("connect-btn").disabled = connState === "waiting" || connState === "checking";
-  $("connect").classList.toggle("hidden", connState === "ok");
-  // Yardimci calisiyorsa kurulum karti isini bitirmis demektir
-  $("install").classList.toggle("hidden", connState === "ok");
+  paintSteps();
 
   // Baglanti yokken is baslatilamasin
   const blocked = connState !== "ok";
   $("start").disabled = blocked;
   $("preview-btn").disabled = blocked;
+}
+
+/* Kurulum kartindaki uc adim: hangisi bitti, hangisinde duruyoruz.
+
+   Ucu de bitince kart hemen kaybolmuyor. Once 3. adim yesile donup "hazirsin"
+   diyor, kullanici bunu okuyor, sonra kart yukari suzuluyor. Ama sayfa zaten
+   bagli acildiysa -- ikinci ziyaretten sonra her seferinde boyle -- bu
+   gosteriyi hic oynatmiyoruz: kart gorunmeden kapali kaliyor.
+
+   "checking" bilerek gorunurlugu degistirmiyor: kayitli anahtarla acilista
+   birkac yuz milisaniye suren o ara durumda kart bir yanip sonuyordu.      */
+let setupSeen = false;
+let setupTimer = null;
+
+function markStep(id, durum) {
+  const el = $(id);
+  el.classList.toggle("done", durum === "done");
+  el.classList.toggle("active", durum === "active");
+  el.classList.toggle("todo", durum === "todo");
+}
+
+function paintSteps() {
+  const kart = $("setup");
+  // Yardimciya ulasabiliyorsak kurulum adimi bitmis demektir
+  const kurulu = connState === "unpaired" || connState === "waiting" || connState === "ok";
+  const hazir = connState === "ok";
+
+  markStep("step-install", kurulu ? "done" : "active");
+  markStep("step-connect", hazir ? "done" : (kurulu ? "active" : "todo"));
+  markStep("step-enjoy", hazir ? "active" : "todo");
+
+  clearTimeout(setupTimer);
+  if (connState === "checking") return;
+
+  if (!hazir) {
+    setupSeen = true;
+    kart.classList.remove("hidden", "gone");
+    return;
+  }
+  if (!setupSeen) {
+    kart.classList.add("hidden");
+    return;
+  }
+  setupTimer = setTimeout(() => {
+    kart.classList.add("gone");
+    setupTimer = setTimeout(() => kart.classList.add("hidden"), 500);
+  }, 2400);
 }
 
 function setConnState(next) {

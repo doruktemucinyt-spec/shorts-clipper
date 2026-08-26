@@ -6,9 +6,25 @@
 <title>ClipClover</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Yazi tipi sayfanin cizilmesini bekletmesin: media="print" ile
+     baslangicta gecersiz sayiliyor, indigi anda "all" olup devreye
+     giriyor. Adreste zaten display=swap var, yani metin her halukarda
+     once sistem yazi tipiyle cikip sonra Inter'e donuyordu -- tek fark
+     artik sayfanin geri kalani beklemiyor. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/style.css">
+<!-- defer: indirme HTML ayristirilirken basliyor ama calistirma sayfa hazir
+     olunca, yazildigi sirayla oluyor. Betikler govdenin sonundayken indirme
+     ayristirma bitene kadar bekliyordu. -->
+<script defer src="/static/config.js"></script>
+<script defer src="/static/i18n.js"></script>
+<script defer src="/static/lang.js"></script>
+<script defer src="/static/api.js"></script>
+<script defer src="/static/gate.js"></script>
+<script defer src="/static/app.js"></script>
 </head>
 <body>
 <!-- Ustteki akan serit. Icerik JS ile iki kez yaziliyor: ayni metnin ikinci
@@ -172,26 +188,46 @@
     </div>
   </header>
 
-  <!-- En ustte duruyor cunku sirasi bu: once kur, sonra baglan, sonra kullan.
-       Yardimcinin kendi adresinden acildiginda (localhost) hic gorunmuyor --
-       oraya gelebilen zaten kurmus demektir. -->
-  <section class="card hidden" id="install">
-    <span class="tag" data-i18n="install.tag"></span>
-    <h2 class="doc-title" data-i18n="install.title"></h2>
-    <p class="doc-lead" data-i18n="install.text"></p>
-    <a class="primary" id="install-btn" href="/download/ClipClover-Setup.zip"
-       download data-i18n="install.btn"></a>
-    <p class="hint" data-i18n="install.steps"></p>
-  </section>
+  <!-- Kurulum: uc dikey adim, soldan saga. Eskiden bunlar alt alta iki ayri
+       karttı (kur / baglan); tek kartta birlestirildi ki kullanici kac adim
+       kaldigini tek bakista gorsun. Sira degismiyor: once kur, sonra baglan,
+       sonra kullan. Yardimcinin kendi adresinden acildiginda (localhost) kart
+       hic gorunmuyor -- oraya gelebilen zaten kurmus demektir. -->
+  <section class="card setup hidden" id="setup">
+    <span class="tag" data-i18n="setup.tag"></span>
+    <h2 class="doc-title" data-i18n="setup.title"></h2>
+    <p class="doc-lead" data-i18n="setup.lead"></p>
 
-  <section class="card hidden" id="connect">
-    <span class="tag" data-i18n="connect.tag"></span>
-    <h2 class="doc-title" id="connect-title"></h2>
-    <p class="doc-lead" id="connect-text"></p>
-    <div class="pair-actions">
-      <button id="connect-btn" class="primary"></button>
-      <a class="ghost" href="/faq" data-i18n="connect.help"></a>
-    </div>
+    <ol class="steps">
+      <li class="step" id="step-install">
+        <span class="step-no">01</span>
+        <h3 class="step-title" data-i18n="install.title"></h3>
+        <p class="step-text" data-i18n="install.text"></p>
+        <div class="step-do">
+          <a class="primary" id="install-btn" data-i18n="install.btn"></a>
+          <p class="hint" data-i18n="install.steps"></p>
+        </div>
+      </li>
+
+      <li class="step" id="step-connect">
+        <span class="step-no">02</span>
+        <h3 class="step-title" id="connect-title"></h3>
+        <p class="step-text" id="connect-text"></p>
+        <div class="step-do">
+          <button id="connect-btn" class="primary"></button>
+          <a class="ghost" href="/faq" data-i18n="connect.help"></a>
+        </div>
+      </li>
+
+      <li class="step" id="step-enjoy">
+        <span class="step-no">03</span>
+        <h3 class="step-title" data-i18n="enjoy.title"></h3>
+        <p class="step-text" data-i18n="enjoy.text"></p>
+        <div class="step-do">
+          <p class="hint" data-i18n="enjoy.hint"></p>
+        </div>
+      </li>
+    </ol>
   </section>
 
   <section class="card">
@@ -292,11 +328,6 @@
   </footer>
 </main>
 
-<script src="/static/config.js"></script>
-<script src="/static/i18n.js"></script>
-<script src="/static/lang.js"></script>
-<script src="/static/api.js"></script>
-<script src="/static/gate.js"></script>
-<script src="/static/app.js"></script>
+
 </body>
 </html>

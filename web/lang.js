@@ -89,6 +89,8 @@ function applyLang(next) {
 function renderDiscord() {
   disLink("foot-discord", typeof DISCORD_URL === "string" ? DISCORD_URL : "");
   disLink("foot-source", typeof REPO_URL === "string" ? REPO_URL : "");
+  // Kurulum dosyasi GitHub'da durdugu icin baglanti config.js'ten geliyor
+  disLink("install-btn", typeof SETUP_URL === "string" ? SETUP_URL : "");
 }
 
 /** Adres varsa baglanti, yoksa tiklanamaz duz yazi. */

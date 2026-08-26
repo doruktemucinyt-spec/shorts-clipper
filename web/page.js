@@ -26,7 +26,7 @@ function renderDoc() {
       <p>${a}</p>
     </div>`).join("");
 
-  document.title = `${doc.title} · Shorts Clipper`;
+  document.title = `${doc.title} · ClipClover`;
 }
 
 onLangChange(renderDoc);

@@ -844,6 +844,162 @@ a.primary:active {
 
 #sites .name { font-family: var(--mono); font-size: 12.5px; }
 
+/* ---------- Kurulum: uc adim ----------------------------------------------
+   Kur / Baglan / Kullan tek kartta, yan yana uc dikey parca. Alt alta iki
+   ayri kart oldugunda kullanici toplam kac adim oldugunu goremiyordu.      */
+
+.setup .doc-lead { margin-bottom: 0; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line-soft);
+  /* Kartin cam katmani zaten arkada duruyor. Buraya ikinci bir
+     backdrop-filter koymak uc ayri bulanik yuzey acmak demekti ve gozle
+     hicbir sey katmiyordu -- duz yari saydam zemin ayni sonucu bedavaya
+     veriyor. (.ghost'ta da ayni sebeple kaldirilmisti.)                 */
+  background: rgba(255, 255, 255, .028);
+  /* Bir adimin icindeki degisiklik digerlerini yeniden hesaplatmasin */
+  contain: layout paint style;
+  /* Taban gecis = PARMAK CEKILINCE calisan gecis. Bilerek uzun tutuldu:
+     kalkis hizli, inis yumusak.                                        */
+  transition:
+    transform .46s cubic-bezier(.22, .68, .28, 1),
+    box-shadow .46s ease,
+    border-color .3s ease,
+    background .3s ease;
+  animation: step-rise .52s cubic-bezier(.2, .8, .25, 1) backwards;
+}
+
+/* Sirayla beliriyorlar: goz soldan saga, adim sirasiyla ayni yonde gidiyor */
+.step:nth-child(2) { animation-delay: .08s; }
+.step:nth-child(3) { animation-delay: .16s; }
+
+@keyframes step-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Sadece gercek farede. Dokunmatik ekranda :hover parmak kalkinca uzerinde
+   takili kaliyor ve kart havada asili duruyor.                          */
+@media (hover: hover) and (pointer: fine) {
+  .step:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, .052);
+    border-color: rgba(119, 232, 79, .3);
+    box-shadow:
+      0 26px 46px -24px rgba(0, 0, 0, .95),
+      inset 0 1px 0 rgba(255, 255, 255, .07);
+    /* Kalkista sure kisaliyor ve egrinin ucunda minik bir yaylanma var;
+       birakinca yukaridaki uzun taban gecisi devraliyor.                */
+    transition-duration: .3s, .3s, .18s, .18s;
+    transition-timing-function: cubic-bezier(.2, .9, .25, 1.08), ease, ease, ease;
+  }
+}
+
+.step-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .2em;
+  color: var(--faint);
+  transition: color .3s ease;
+}
+
+.step-title {
+  margin: 10px 0 7px;
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.25;
+}
+
+.step-text {
+  margin: 0;
+  color: var(--dim);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* Butonlar ucunde ayni hizada dursun: bosluk ustte toplaniyor, metinler
+   farkli uzunlukta olsa bile alt kenar ortak.                           */
+.step-do {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+.step-do .primary { width: 100%; margin-top: 0; padding: 11px 14px; font-size: 14px; }
+.step-do .ghost { width: 100%; }
+.step-do .hint { margin: 0; }
+
+/* Uzerinde calisilan adim: yesil kenar, numara da yesile donuyor */
+.step.active {
+  border-color: rgba(119, 232, 79, .34);
+  background: rgba(119, 232, 79, .05);
+}
+.step.active .step-no { color: var(--accent); }
+
+/* Bitmis adim: numaranin yanina tik, metin geri cekiliyor */
+.step.done .step-no { color: var(--accent-deep); }
+.step.done .step-no::after { content: " \2713"; letter-spacing: 0; }
+.step.done .step-title { color: var(--dim); font-weight: 600; }
+/* Bitmis adimdaki dugme artik "yapilacak is" degil. Yesil dolgusunu birakip
+   sessiz bir dugmeye donuyor: yoksa yanindaki asil eylemle ayni agirlikta
+   duruyor ve kullanici hangisine basacagini bilemiyor.                   */
+.step.done .primary {
+  background: rgba(255, 255, 255, .04);
+  color: var(--dim);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  font-weight: 500;
+}
+.step.done .primary:hover:not(:disabled) {
+  color: var(--fg);
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(119, 232, 79, .3);
+  box-shadow: none;
+}
+.step.done .step-text { opacity: .75; }
+
+/* Sirasi gelmemis adim: yazisi geri cekiliyor ama BUTONU degil.
+   Butun parcayi soluklastirmak yanlisti: programi zaten kurmus biri dogruca
+   2. adima geliyor ve basmasi gereken dugmeyi kapali sanip duruyordu.    */
+.step.todo :where(.step-no, .step-title, .step-text, .hint) { opacity: .6; }
+
+/* Uc adim da bitince kart isini bitirmis oluyor: yukari suzulup gidiyor.
+   Hemen yok olsaydi sayfa zipliyordu.                                   */
+.setup {
+  transition: opacity .48s ease, transform .48s cubic-bezier(.3, .8, .3, 1);
+}
+.setup.gone {
+  opacity: 0;
+  transform: translateY(-10px) scale(.99);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .steps { grid-template-columns: 1fr; }
+  .step { animation-delay: 0s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step, .setup { transition: none; animation: none; }
+  .step:hover { transform: none; }
+}
+
 /* ---------- Ustteki akan serit -------------------------------------------
    Kartlarin ONUNDE duruyor (z-index), arkasinda degil: arkada olsaydi her
    karesi kartlarin cam bulanikligini yeniden hesaplatirdi. Animasyon sadece

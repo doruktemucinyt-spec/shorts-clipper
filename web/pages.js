@@ -12,7 +12,7 @@ const PAGES = {
       lead: "Aracı kullanırken en çok takılınan yerler.",
       items: [
         ["Çıktılar nereye kaydediliyor?",
-         "Videonun adıyla açılan bir klasöre, part-01.mp4 diye. İş bitince <b>Klasörü aç</b> butonu seni doğrudan oraya götürür."],
+         "<b>Videolar → ClipClover</b> içinde, videonun adıyla açılan bir klasöre, part-01.mp4 diye. İş bitince <b>Klasörü aç</b> butonu seni doğrudan oraya götürür. Programı kaldırsan bile bu videolar silinmez."],
         ["Bir video ne kadar sürer?",
          "Üç adım var: indirme, caption açıksa transkript, sonra render. Render bu bilgisayarda videonun süresinin kabaca yedide biri kadar sürüyor. Transkript sadece caption açıkken çalışıyor ve genelde en uzun adım o oluyor."],
         ["Neden bazen çok yavaş?",
@@ -77,7 +77,7 @@ const PAGES = {
       lead: "The things people get stuck on.",
       items: [
         ["Where do the parts get saved?",
-         "Into a folder named after the video, as part-01.mp4 and so on. When a job finishes, <b>Open folder</b> takes you straight there."],
+         "Under <b>Videos → ClipClover</b>, in a folder named after the video, as part-01.mp4 and so on. When a job finishes, <b>Open folder</b> takes you straight there. Uninstalling the program never deletes them."],
         ["How long does a video take?",
          "Three steps: download, a transcript if captions are on, then render. Rendering takes roughly a seventh of the video's length on this machine. The transcript only runs with captions, and it is usually the longest step."],
         ["Why is it slow sometimes?",
@@ -142,7 +142,7 @@ const PAGES = {
       lead: "Die Stellen, an denen es meistens hakt.",
       items: [
         ["Wo landen die Teile?",
-         "In einem Ordner mit dem Namen des Videos, als part-01.mp4 und so weiter. Nach dem Job führt <b>Ordner öffnen</b> direkt dorthin."],
+         "Unter <b>Videos → ClipClover</b>, in einem Ordner mit dem Namen des Videos, als part-01.mp4 und so weiter. Nach dem Job führt <b>Ordner öffnen</b> direkt dorthin. Beim Deinstallieren bleiben sie erhalten."],
         ["Wie lange dauert ein Video?",
          "Drei Schritte: Herunterladen, bei eingeschalteten Untertiteln ein Transkript, dann Rendern. Das Rendern dauert auf diesem Rechner etwa ein Siebtel der Videolänge. Das Transkript läuft nur mit Untertiteln und ist meist der längste Schritt."],
         ["Warum ist es manchmal langsam?",
@@ -207,7 +207,7 @@ const PAGES = {
       lead: "Là où ça coince le plus souvent.",
       items: [
         ["Où sont enregistrées les parties ?",
-         "Dans un dossier au nom de la vidéo, sous la forme part-01.mp4. Une fois le travail fini, <b>Ouvrir le dossier</b> t'y emmène directement."],
+         "Dans <b>Vidéos → ClipClover</b>, dans un dossier au nom de la vidéo, sous la forme part-01.mp4. Une fois le travail fini, <b>Ouvrir le dossier</b> t'y emmène directement. La désinstallation ne les supprime pas."],
         ["Combien de temps ça prend ?",
          "Trois étapes : téléchargement, transcription si les sous-titres sont activés, puis rendu. Le rendu prend environ un septième de la durée de la vidéo sur cette machine. La transcription ne tourne qu'avec les sous-titres et c'est en général l'étape la plus longue."],
         ["Pourquoi c'est parfois lent ?",
