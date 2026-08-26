@@ -12,9 +12,48 @@ Kapatmak için siyah komut penceresini kapat.
 
 1. YouTube linkini yapıştır
 2. Part süresini, bölme yöntemini ve video boyutunu seç
-3. **Başla**
+3. **Önizle** — kadrajı render'a girmeden gör (aşağıda anlatılıyor)
+4. **Başla**
 
 Çıktılar `output/<video-adı>/part-01.mp4` şeklinde kaydedilir.
+
+## Önizleme
+
+**Önizle** butonu videonun tamamını indirmeden tek bir kare çekip çıktının
+birebir aynısını gösteriyor: blur şeritler, başlık, "Part 1" ve caption açıksa
+örnek bir caption satırı. Böylece "render bitti, kadraj olmamış" durumu ortadan
+kalkıyor.
+
+- İlk kare birkaç saniyede geliyor (yt-dlp akış adresini veriyor, ffmpeg o andan
+  tek kare çekiyor).
+- Sonrasında **video boyutu**, **vurgu rengi** veya caption anahtarını
+  oynattığında aynı kare yeniden kadrajlanıyor — yeni indirme yok, anında.
+- **Kare konumu** kaydıracı videonun neresinden bakacağını seçiyor; bunu
+  değiştirmek yeni bir kare indirdiği için birkaç saniye sürüyor.
+
+Kadraj hesabı ve filtre zinciri render ile aynı koddan (`pipeline/render.py`)
+geliyor, yani önizlemede gördüğün şey çıktının kendisi. Önizleme kareleri
+`work/preview/` altında birikiyor, **Temizle** onları da siliyor.
+
+Kaydırıcının altındaki piksel/kırpma yazısı önizleme alındıktan sonra kaynağın
+gerçek en-boy oranıyla hesaplanıyor (öncesinde 16:9 varsayıyor).
+
+## Hız
+
+İki yerde iş ciddi şekilde kısaldı (bu makinede ölçüldü):
+
+- **Render** — blur artık 1080x1920'de değil, dörtte bir ölçekte alınıp geri
+  büyütülüyor. Gözle fark yok, kare başına en pahalı adım oydu.
+  60 sn'lik video: **17,6 sn → 8,4 sn**. Kalan süre neredeyse tamamen NVENC'in
+  kendi hızı, yani bu adım artık dibe yakın.
+- **Transkript** — faster-whisper'ın toplu (batched) çıkarımı kullanılıyor:
+  ses parçaları tek tek değil demet halinde GPU'ya giriyor.
+  60 sn'lik ses, large-v3: **10,7 sn → 4,0 sn**. Kelimeler aynı.
+  Toplu çıkarım tutmazsa otomatik olarak eski yönteme, o da olmazsa CPU'ya
+  düşüyor.
+
+Ayrıca part sınırları artık Whisper'ın segmentlerine değil, kelime
+noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isabetli.
 
 ## Ayarlar
 

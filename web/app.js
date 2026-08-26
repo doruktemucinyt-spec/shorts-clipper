@@ -52,6 +52,7 @@ function applyLang(next) {
   // Dinamik metinler sozlukten gelmiyor, elle yenilenmeli
   updateZoomHint();
   updateCaptionOpts();
+  renderPreviewMsg();
   renderHistory();
   refreshWorkSize();
   if (lastJob) renderJob(lastJob);
@@ -113,6 +114,7 @@ if (settings.highlight) $("highlight").value = settings.highlight;
 if (settings.model) $("model").value = settings.model;
 if (settings.zoom) $("zoom").value = settings.zoom;
 if (settings.split) $("split").value = settings.split;
+if (settings.at) $("preview-at").value = settings.at;
 $("captions").checked = Boolean(settings.captions);
 
 const rememberSettings = () => save(SETTINGS_KEY, {
@@ -122,6 +124,7 @@ const rememberSettings = () => save(SETTINGS_KEY, {
   zoom: $("zoom").value,
   split: $("split").value,
   captions: $("captions").checked,
+  at: $("preview-at").value,
 });
 
 ["minutes", "highlight", "model", "zoom", "split", "captions"].forEach(
@@ -131,10 +134,12 @@ const rememberSettings = () => save(SETTINGS_KEY, {
 // --- Zoom onizlemesi (16:9 kaynak varsayimiyla) --------------------------
 function updateZoomHint() {
   const zoom = $("zoom").value / 100;
-  const fitH = 1080 * 9 / 16;                  // kirpma yokken video yuksekligi
+  // Onizleme alindiysa kaynagin gercek orani, alinmadiysa 16:9 varsayimi
+  const ratio = previewAspect || 16 / 9;
+  const fitH = 1080 / ratio;                   // kirpma yokken video yuksekligi
   const videoH = Math.min(1920, Math.round(fitH * zoom));
   const band = Math.max(0, Math.round((1920 - videoH) / 2));
-  const scaledW = 1920 * videoH / 1080;
+  const scaledW = videoH * ratio;
   const crop = Math.max(0, (1 - 1080 / scaledW) / 2 * 100);
   $("zoom-hint").textContent = t("hint.zoom", { videoH, band }) + " " +
     (crop < 0.5 ? t("hint.zoomNoCrop") : t("hint.zoomCrop", { crop: crop.toFixed(0) }));
@@ -149,6 +154,114 @@ function updateCaptionOpts() {
 }
 $("captions").addEventListener("change", updateCaptionOpts);
 $("split").addEventListener("change", updateCaptionOpts);
+
+// --- Onizleme -------------------------------------------------------------
+// Kare cekmek birkac saniye suruyor, ayni kareyi yeniden kadrajlamak anlik.
+// Bu yuzden zoom veya renk degisince sunucu ayni kareyi kullaniyor; sadece
+// "kare konumu" degisince videodan yeni kare iniyor.
+let previewAspect = null;    // kaynagin gercek en/boy orani
+let previewOn = false;       // ekranda bir kare var mi
+let previewTimer = null;
+let previewSeq = 0;          // gec gelen eski cevap yenisini ezmesin
+let previewMsgState = { key: "preview.empty", args: null, bad: false };
+
+function renderPreviewMsg() {
+  const el = $("preview-msg");
+  if (!el) return;
+  el.textContent = previewMsgState.key ? t(previewMsgState.key, previewMsgState.args) : "";
+  el.classList.toggle("bad", Boolean(previewMsgState.bad));
+}
+
+function previewMsg(key, args, bad) {
+  previewMsgState = { key, args, bad };
+  renderPreviewMsg();
+}
+
+const clock = (sec) => {
+  const s = Math.max(0, Math.round(sec || 0));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+async function runPreview() {
+  const url = $("url").value.trim();
+  if (!url) { previewMsg("preview.noUrl", null, true); return; }
+
+  const seq = ++previewSeq;
+  const shot = $("preview-shot");
+  shot.classList.add("busy");
+  previewMsg(previewOn ? "preview.updating" : "preview.loading");
+  $("preview-btn").disabled = true;
+
+  try {
+    const res = await fetch("/api/preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url,
+        zoom: ($("zoom").value / 100) || 1.4,
+        at: ($("preview-at").value / 100) || 0,
+        captions: $("captions").checked,
+        highlight: $("highlight").value,
+        sample: t("preview.sample"),
+        part_minutes: parseFloat($("minutes").value) || 4,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail || res.statusText);
+    }
+    const data = await res.json();
+    if (seq !== previewSeq) return;      // arada daha yeni bir istek gitti
+
+    const img = $("preview-img");
+    const done = () => { if (seq === previewSeq) shot.classList.remove("busy"); };
+    img.onload = done;
+    img.onerror = done;
+    if (img.getAttribute("src") === data.image) done();   // ayni kare, onbellekten
+    else img.src = data.image;
+    img.hidden = false;
+    $("preview-empty").hidden = true;
+
+    const [w, h] = (data.source || "").split("x").map(Number);
+    if (w && h) { previewAspect = w / h; updateZoomHint(); }
+    previewOn = true;
+    previewMsg("preview.info", { source: data.source, time: clock(data.at) });
+  } catch (err) {
+    shot.classList.remove("busy");
+    previewMsg("preview.fail", { error: err.message }, true);
+  } finally {
+    if (seq === previewSeq) $("preview-btn").disabled = false;
+  }
+}
+
+/** Ayar degisikliklerinde: kare zaten varsa kadraji sessizce tazele. */
+function schedulePreview(delay = 320) {
+  if (!previewOn) return;
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(runPreview, delay);
+}
+
+$("preview-btn").onclick = () => { clearTimeout(previewTimer); runPreview(); };
+$("zoom").addEventListener("input", () => schedulePreview());
+["captions", "highlight", "minutes"].forEach(
+  (id) => $(id).addEventListener("change", () => schedulePreview(0))
+);
+// Kare konumu yeni indirme demek: kaydirirken degil, birakinca calis
+$("preview-at").addEventListener("change", () => { if (previewOn) runPreview(); });
+
+$("url").addEventListener("input", () => {
+  previewSeq++;                     // ucusan istek varsa gecersiz kil
+  clearTimeout(previewTimer);
+  previewOn = false;
+  previewAspect = null;
+  $("preview-img").hidden = true;
+  $("preview-img").removeAttribute("src");
+  $("preview-empty").hidden = false;
+  $("preview-shot").classList.remove("busy");
+  $("preview-btn").disabled = false;
+  previewMsg("preview.empty");
+  updateZoomHint();
+});
 
 // --- Gecmis --------------------------------------------------------------
 function renderHistory() {

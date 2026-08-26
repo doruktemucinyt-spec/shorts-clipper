@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from pipeline import captions, render, segment, transcribe
+from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
 from pipeline.tools import probe_dimensions
 
@@ -22,6 +22,8 @@ WORK = ROOT / "work"
 OUTPUT = ROOT / "output"
 WORK.mkdir(exist_ok=True)
 OUTPUT.mkdir(exist_ok=True)
+PREVIEW = WORK / "preview"
+PREVIEW.mkdir(parents=True, exist_ok=True)
 
 # Asama agirliklari: toplam ilerleme yuzdesini bu araliklara dagitiyoruz.
 STAGES_FULL = {
@@ -206,6 +208,34 @@ def job_events(job_id: str):
                                       "X-Accel-Buffering": "no"})
 
 
+class PreviewRequest(BaseModel):
+    url: str
+    zoom: float = 1.4
+    at: float = 0.25               # videonun neresinden kare alinacak (0-1)
+    captions: bool = False
+    highlight: str = "#FFD400"
+    font: str = "Arial Black"
+    sample: str = "ornek altyazi"
+    part_minutes: float = 4.0
+
+
+@app.post("/api/preview")
+def make_preview(req: PreviewRequest):
+    """Render'a girmeden kadraji gosteren tek kare.
+
+    Kare bir kez cekilip onbellege aliniyor; zoom degistikce sadece yeniden
+    kadrajlaniyor, o yuzden ikinci istekten sonrasi anlik.
+    """
+    try:
+        return preview.build(
+            req.url, PREVIEW, zoom=req.zoom, at=req.at,
+            with_captions=req.captions, highlight=req.highlight,
+            font=req.font, sample=req.sample, part_minutes=req.part_minutes,
+        )
+    except Exception as exc:
+        raise HTTPException(400, str(exc)[:400])
+
+
 class RevealRequest(BaseModel):
     path: str
 
@@ -225,6 +255,7 @@ def workspace_clear():
         if child.is_dir():
             freed += sum(f.stat().st_size for f in child.rglob("*") if f.is_file())
             shutil.rmtree(child, ignore_errors=True)
+    PREVIEW.mkdir(parents=True, exist_ok=True)   # mount edilmis klasor kaybolmasin
     return {"freed_mb": round(freed / 1024 / 1024, 1)}
 
 
@@ -237,6 +268,7 @@ def reveal(req: RevealRequest):
     return {"ok": True}
 
 
+app.mount("/preview", StaticFiles(directory=str(PREVIEW)), name="preview")
 app.mount("/media", StaticFiles(directory=str(OUTPUT)), name="media")
 app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
 

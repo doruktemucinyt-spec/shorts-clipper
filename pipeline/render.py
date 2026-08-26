@@ -34,10 +34,18 @@ def compute_layout(src_w: int, src_h: int, zoom: float = 1.4) -> dict:
             "video_h": target_h, "band": band}
 
 
+# Blur'u 1080x1920'de almak pahaliydi: kare basina en buyuk maliyet oydu.
+# Once dortte bir olcege indirip orada bulaniklastirip geri buyutuyoruz.
+# Gozle fark yok (zaten bulanik goruntu), render iki kata yakin hizlaniyor.
+BLUR_W, BLUR_H = W // 4, H // 4     # 270x480
+BLUR_SIGMA = 7                      # 28 / 4 -- kucuk olcekte ayni yayilma
+
+
 def build_filter(layout: dict, ass_name: str = None) -> str:
     chain = (
-        f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,"
-        f"crop={W}:{H},gblur=sigma=28,eq=brightness=-0.08[bg];"
+        f"[0:v]scale={BLUR_W}:{BLUR_H}:force_original_aspect_ratio=increase,"
+        f"crop={BLUR_W}:{BLUR_H},gblur=sigma={BLUR_SIGMA},eq=brightness=-0.08,"
+        f"scale={W}:{H}[bg];"
         f"[0:v]scale={layout['scaled_w']}:{layout['scaled_h']},"
         f"crop={W}:{layout['scaled_h']}[fg];"
         "[bg][fg]overlay=(W-w)/2:(H-h)/2[base]"

@@ -10,6 +10,15 @@ from pathlib import Path
 from .tools import require_ffmpeg
 
 _MODEL_CACHE = {}
+_BATCH_CACHE = {}
+
+# GPU'da toplu (batched) cikarim: ses parcalari tek tek degil, demet halinde
+# modele giriyor. Ayni kelimeler, yaklasik ucte bir surede.
+BATCH_SIZE = 8
+
+SENTENCE_END = ".?!…"
+TRAIL = "”’\"')]"   # cumle sonundaki tirnak/parantezleri at
+MAX_UNIT = 14.0          # noktalama hic gelmezse en fazla bu kadar birikir
 
 
 def extract_audio(source: Path, workdir: Path) -> Path:
@@ -34,11 +43,58 @@ def _get_model(size: str, device: str, compute: str):
     return _MODEL_CACHE[key]
 
 
-def _run(model, audio: Path, device: str, duration: float, on_progress) -> list:
+def _get_batched(model, key):
+    if key not in _BATCH_CACHE:
+        from faster_whisper import BatchedInferencePipeline
+
+        _BATCH_CACHE[key] = BatchedInferencePipeline(model=model)
+    return _BATCH_CACHE[key]
+
+
+def _sentence_units(segments: list) -> list:
+    """Segmentleri kelime noktalamasina bakarak cumlelere boler.
+
+    Toplu cikarim uzun bloklar donduruyor; part sinirlarini cumle sonuna
+    hizalayabilmek icin cumle bazli birimlere ihtiyacimiz var. Kelimeden
+    uretmek Whisper'in kendi segment sinirlarindan da isabetli.
+    """
+    units = []
+
+    def flush(words):
+        if not words:
+            return
+        units.append({
+            "start": words[0]["start"], "end": words[-1]["end"],
+            "text": " ".join((w["word"] or "").strip() for w in words).strip(),
+            "words": list(words),
+        })
+
+    cur = []
+    for seg in segments:
+        for w in seg["words"]:
+            cur.append(w)
+            tail = (w["word"] or "").strip().rstrip(TRAIL)
+            long_enough = w["end"] - cur[0]["start"] >= MAX_UNIT
+            if (tail and tail[-1] in SENTENCE_END) or long_enough:
+                flush(cur)
+                cur = []
+    flush(cur)
+    return units
+
+
+def _run(model, audio: Path, device: str, duration: float, on_progress,
+         batched: bool = False) -> list:
     """Generator'u tamamen tuketir -- hatalar burada ortaya cikar."""
-    seg_iter, info = model.transcribe(
-        str(audio), word_timestamps=True, vad_filter=True, beam_size=5,
-    )
+    if batched:
+        engine = _get_batched(model, (id(model), device))
+        seg_iter, info = engine.transcribe(
+            str(audio), word_timestamps=True, vad_filter=True, beam_size=5,
+            batch_size=BATCH_SIZE,
+        )
+    else:
+        seg_iter, info = model.transcribe(
+            str(audio), word_timestamps=True, vad_filter=True, beam_size=5,
+        )
     total = duration or float(getattr(info, "duration", 0) or 0)
 
     segments = []
@@ -70,7 +126,16 @@ def transcribe(audio: Path, model_size: str = "large-v3", duration: float = 0,
             if on_progress:
                 on_progress(0, "job.whisperLoading", {"model": model_size, "device": device.upper()})
             model = _get_model(model_size, device, compute)
-            segments, language = _run(model, audio, device, duration, on_progress)
+            try:
+                segments, language = _run(model, audio, device, duration,
+                                          on_progress, batched=(device == "cuda"))
+            except Exception:
+                if device != "cuda":
+                    raise
+                # Toplu cikarim tutmadi: ayni cihazda tek tek dene, GPU'yu birakma
+                _BATCH_CACHE.clear()
+                segments, language = _run(model, audio, device, duration, on_progress)
+            segments = _sentence_units(segments)
         except Exception as exc:
             last_error = exc
             _MODEL_CACHE.pop((model_size, device), None)
