@@ -354,12 +354,12 @@ main {
 
 /* Baslik isareti: dort yaprakli yonca. Isik halesi drop-shadow ile, cunku
    sekli takip etmesi gerekiyor -- kutu golgesi kareyi golgelerdi. */
-.mark { display: block; height: 30px; margin-bottom: 16px; }
+.mark { display: block; height: 48px; margin-bottom: 14px; }
 .mark svg {
   display: block;
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 0 14px rgba(119, 232, 79, .45));
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 20px rgba(119, 232, 79, .42));
 }
 
 h1 {
