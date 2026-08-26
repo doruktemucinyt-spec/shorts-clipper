@@ -11,7 +11,7 @@ Kapatmak için siyah komut penceresini kapat.
 ## Kullanım
 
 1. YouTube linkini yapıştır
-2. Part süresini, bölme yöntemini ve video boyutunu seç
+2. Part süresini ve video boyutunu seç
 3. **Önizle** — kadrajı render'a girmeden gör (aşağıda anlatılıyor)
 4. **Başla**
 
@@ -58,12 +58,9 @@ noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isa
 ## Ayarlar
 
 - **Part süresi** — hedef süre.
-- **Bölme yöntemi**
-  - *Cümle sonuna hizala* — Whisper transkripti çıkarır, hiçbir part cümlenin
-    ortasında kesilmez. Gerçek süreler ±40 sn oynar. **Yavaş** (transkript
-    videonun uzunluğuna göre dakikalar sürer).
-  - *Tam sürede kes* — transkript hiç çalışmaz, tam sürede keser. **Çok hızlı**,
-    ama cümle ortasında kesebilir.
+  Partlar her zaman tam bu sürede kesilir; son part çok kısa kalırsa bir
+  öncekiyle birleşir. (Cümle sonuna hizalayan mod kaldırıldı: transkript
+  gerektirdiği için yavaştı ve kurulumu şişiriyordu.)
 - **Video boyutu** — videonun kadraj içindeki büyüklüğü. %100'de video hiç
   kesilmez ama blur şeritler en kalın halinde olur. Büyüttükçe video büyür,
   şeritler kısalır, sağdan ve soldan biraz kırpılır. Kaydırıcının altındaki yazı

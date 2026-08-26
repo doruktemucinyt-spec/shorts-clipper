@@ -99,7 +99,6 @@ class JobRequest(BaseModel):
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
     captions: bool = False         # caption yakilsin mi
-    split_mode: str = "sentence"   # "sentence" | "fixed"
 
 
 def _emit(job_id: str, **fields):
@@ -119,10 +118,9 @@ def _stage_pct(stage: str, inner: float, stages=None) -> float:
 
 def run_job(job_id: str, req: JobRequest):
     workdir = WORK / job_id
-    # Transkript sadece caption yakilacaksa ya da cumle sonuna hizali bolme
-    # istenirse gerekli. Ikisi de yoksa Whisper'i tamamen atliyoruz -- asil
-    # zamani yiyen adim o.
-    need_transcript = req.captions or req.split_mode == "sentence"
+    # Partlar her zaman tam surede kesiliyor; transkript yalnizca caption
+    # yakilacaksa gerekiyor -- asil zamani yiyen adim o.
+    need_transcript = req.captions
     stages = STAGES_FULL if need_transcript else STAGES_FAST
     pct = lambda stage, inner: _stage_pct(stage, inner, stages)
 
@@ -168,10 +166,7 @@ def run_job(job_id: str, req: JobRequest):
         _emit(job_id, stage="split", pct=pct("split", 50),
               msg_key="job.splitting", msg_args={})
         target = req.part_minutes * 60
-        if need_transcript and req.split_mode == "sentence":
-            parts = segment.build_parts(segments, target=target)
-        else:
-            parts = segment.build_parts_fixed(info["duration"], target=target)
+        parts = segment.build_parts_fixed(info["duration"], target=target)
         total = len(parts)
         if not total:
             raise RuntimeError("Video bolunemedi (sure okunamadi).")

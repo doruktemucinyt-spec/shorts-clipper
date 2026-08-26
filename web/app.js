@@ -24,7 +24,6 @@ if (settings.minutes) $("minutes").value = settings.minutes;
 if (settings.highlight) $("highlight").value = settings.highlight;
 if (settings.model) $("model").value = settings.model;
 if (settings.zoom) $("zoom").value = settings.zoom;
-if (settings.split) $("split").value = settings.split;
 if (settings.at) $("preview-at").value = settings.at;
 $("captions").checked = Boolean(settings.captions);
 
@@ -33,12 +32,11 @@ const rememberSettings = () => save(SETTINGS_KEY, {
   highlight: $("highlight").value,
   model: $("model").value,
   zoom: $("zoom").value,
-  split: $("split").value,
   captions: $("captions").checked,
   at: $("preview-at").value,
 });
 
-["minutes", "highlight", "model", "zoom", "split", "captions"].forEach(
+["minutes", "highlight", "model", "zoom", "captions"].forEach(
   (id) => $(id).addEventListener("change", rememberSettings)
 );
 
@@ -59,12 +57,12 @@ $("zoom").addEventListener("input", updateZoomHint);
 
 // --- Caption secenekleri -------------------------------------------------
 function updateCaptionOpts() {
+  // Caption yakmak transkript istiyor, yani isi yavaslatiyor: butonun yazisi
+  // hangi moda girildigini bastan soyluyor.
   $("caption-opts").classList.toggle("hidden", !$("captions").checked);
-  const slow = $("captions").checked || $("split").value === "sentence";
-  $("start").textContent = t(slow ? "btn.start" : "btn.startFast");
+  $("start").textContent = t($("captions").checked ? "btn.start" : "btn.startFast");
 }
 $("captions").addEventListener("change", updateCaptionOpts);
-$("split").addEventListener("change", updateCaptionOpts);
 
 // --- Onizleme -------------------------------------------------------------
 // Kare cekmek birkac saniye suruyor, ayni kareyi yeniden kadrajlamak anlik.
@@ -274,7 +272,6 @@ $("start").onclick = async () => {
         model: $("model").value,
         zoom: ($("zoom").value / 100) || 1.4,
         captions: $("captions").checked,
-        split_mode: $("split").value,
       }),
     });
     if (!res.ok) throw new Error(await res.text());
@@ -392,12 +389,9 @@ function setConnState(next) {
 function applyHelperFeatures(status) {
   const noTranscript = status.running && status.transcript === false;
   $("light-note").classList.toggle("hidden", !noTranscript);
-  const sentence = $("split").querySelector('option[value="sentence"]');
-  if (sentence) sentence.disabled = noTranscript;
   $("captions").disabled = noTranscript;
-  if (noTranscript) {
-    if ($("split").value === "sentence") $("split").value = "fixed";
-    if ($("captions").checked) $("captions").checked = false;
+  if (noTranscript && $("captions").checked) {
+    $("captions").checked = false;
     updateCaptionOpts();
   }
 }

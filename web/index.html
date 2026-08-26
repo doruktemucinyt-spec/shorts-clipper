@@ -147,19 +147,9 @@
     <label for="url" data-i18n="label.url"></label>
     <input id="url" type="url" data-i18n-placeholder="ph.url" autocomplete="off">
 
-    <div class="row two">
-      <div>
-        <label for="minutes" data-i18n="label.minutes"></label>
-        <input id="minutes" type="number" min="1" max="15" step="0.5" value="4">
-      </div>
-      <div>
-        <label for="split" data-i18n="label.split"></label>
-        <select id="split">
-          <option value="sentence" data-i18n="opt.sentence"></option>
-          <option value="fixed" data-i18n="opt.fixed"></option>
-        </select>
-      </div>
-    </div>
+    <label for="minutes" data-i18n="label.minutes"></label>
+    <input id="minutes" type="number" min="1" max="15" step="0.5" value="4">
+    <p class="hint" data-i18n="hint.minutes"></p>
 
     <label for="zoom" data-i18n="label.zoom"></label>
     <input id="zoom" type="range" min="100" max="250" step="5" value="140">
