@@ -79,6 +79,35 @@ Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman
 Ayarlar ve geçmiş tarayıcıda (localStorage) tutulur. **Yedek indir** ile JSON olarak
 dışarı alıp başka bilgisayarda **Yedekten yükle** ile geri koyabilirsin.
 
+## Site + yardımcı mimarisi
+
+Arayüz internetteki bir siteden de açılabiliyor. O zaman iş yine kullanıcının
+kendi bilgisayarında dönüyor: site sadece arayüz, indirme/transkript/render
+kullanıcının makinesindeki bu yardımcıda çalışıyor.
+
+Sebep: tarayıcı YouTube'dan video indiremiyor (YouTube başka sitelerin
+sayfalarının video adreslerini çekmesine izin vermiyor). Bu yüzden indiren
+taraf her zaman yerel bir program olmak zorunda.
+
+**İzin akışı** (`pairing.py`, `web/pair.html`, `web/api.js`):
+
+1. Site `GET /api/hello` ile yardımcının açık olup olmadığına bakıyor.
+2. İzinli değilse `POST /api/pair` ile izin istiyor; yardımcı bir istek
+   numarası ve `http://127.0.0.1:8000/izin?id=...` adresi dönüyor.
+3. Onay ekranı **kullanıcının kendi bilgisayarında** açılıyor — site o ekranı
+   çizemediği için sahtesini yapıp kendine izin veremiyor.
+4. Kullanıcı izin verirse siteye bir anahtar veriliyor. Sonraki her istek o
+   anahtarı taşımak zorunda; anahtar siteye (origin'e) bağlı, başka bir site
+   aynı anahtarla iş yaptıramıyor.
+5. İzin `http://localhost:8000/izin` sayfasından geri alınabiliyor.
+
+Ayrıca tarayıcı, bir siteden yerel ağa istek atmadan önce izin soruyor
+(preflight); sunucu buna `Access-Control-Allow-Private-Network` ile cevap
+veriyor. `server.py` içindeki `cross_site_guard` bu ikisini birlikte yapıyor.
+
+`python build_site.py` internete konacak statik siteyi `site/` klasörüne
+üretiyor: sadece HTML/CSS/JS, sunucu ve ekran kartı gerektirmiyor.
+
 ## Bilgi sayfaları
 
 Alt taraftaki bağlantılardan üç sayfa açılıyor: **SSS** (`/sss`), **Çerezler**

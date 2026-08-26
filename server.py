@@ -8,11 +8,12 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from pairing import Pairing
 from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
 from pipeline.tools import probe_dimensions
@@ -37,7 +38,55 @@ STAGES_FAST = {
     "split": (12, 14), "render": (14, 100),
 }
 
+APP_VERSION = "1.0"
+
+# Internetteki siteyle bu bilgisayar arasindaki izin mekanizmasi (pairing.py)
+PAIR = Pairing(WORK / "pairing.json")
+
+# Izin gerektirmeyen uclar: siteyi taniyip izin isteyebilmek icin gerekli
+OPEN_PATHS = ("/api/hello", "/api/pair")
+
 app = FastAPI(title="Shorts Clipper")
+
+
+@app.middleware("http")
+async def cross_site_guard(request: Request, call_next):
+    """Internetteki sayfalarin bu sunucuyu kullanmasini kurala baglar.
+
+    Tarayici, baska bir siteden yerel aga istek atarken once izin sorusu
+    (preflight) gonderiyor; ona "Access-Control-Allow-Private-Network" ile
+    cevap vermek zorundayiz, yoksa Chrome istegi hic yapmiyor.
+
+    Asil kapi ise anahtar: tanimadigimiz bir siteden gelen is istekleri
+    reddediliyor. Kullanicinin kendi bilgisayarindaki sayfa serbest.
+    """
+    origin = request.headers.get("origin", "")
+    path = request.url.path
+
+    if request.method == "OPTIONS":
+        response = Response(status_code=204)
+        response.headers["Access-Control-Allow-Private-Network"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Clipper-Token"
+        response.headers["Access-Control-Max-Age"] = "600"
+    else:
+        needs_key = path.startswith(("/api/", "/media/", "/preview/"))             and not path.startswith(OPEN_PATHS)
+        if needs_key:
+            # EventSource kendi basligini gonderemedigi icin anahtari adresten
+            # de kabul ediyoruz; istek zaten sadece bu bilgisayardan geliyor.
+            token = request.headers.get("x-clipper-token") or                 request.query_params.get("token", "")
+            if not PAIR.allowed(origin, token):
+                return JSONResponse(
+                    {"detail": "Bu site icin izin yok.", "code": "unpaired"},
+                    status_code=403,
+                    headers={"Access-Control-Allow-Origin": origin} if origin else None,
+                )
+        response = await call_next(request)
+
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
+    return response
 jobs = {}
 lock = threading.Lock()
 
@@ -260,6 +309,76 @@ def workspace_clear():
     return {"freed_mb": round(freed / 1024 / 1024, 1)}
 
 
+@app.get("/api/hello")
+def hello(request: Request):
+    """Site once buraya soruyor: yardimci calisiyor mu, izinli miyim?"""
+    origin = request.headers.get("origin", "")
+    return {"app": "shorts-clipper", "version": APP_VERSION,
+            "paired": PAIR.is_local(origin) or PAIR.known(origin)}
+
+
+@app.post("/api/pair")
+def pair_request(request: Request):
+    """Site izin istiyor. Onay ekrani bu bilgisayarda aciliyor, sitede degil."""
+    origin = request.headers.get("origin", "")
+    if not origin:
+        raise HTTPException(400, "Origin yok")
+    request_id = PAIR.request(origin)
+    return {"request_id": request_id, "url": f"http://127.0.0.1:8000/izin?id={request_id}"}
+
+
+@app.get("/api/pair/{request_id}")
+def pair_status(request_id: str):
+    status, token = PAIR.claim(request_id)
+    return {"status": status, "token": token}
+
+
+class OriginBody(BaseModel):
+    origin: str = ""
+
+
+@app.get("/api/pair-info/{request_id}")
+def pair_info(request: Request, request_id: str):
+    """Onay ekrani hangi siteyi soracagini buradan ogreniyor (sadece yerel)."""
+    _require_local(request)
+    origin = PAIR.pending_origin(request_id)
+    if not origin:
+        raise HTTPException(404, "Istek dusmus")
+    return {"origin": origin, "sites": PAIR.listing()}
+
+
+@app.post("/api/pair-decide/{request_id}")
+def pair_decide(request: Request, request_id: str, approve: bool = True):
+    _require_local(request)
+    ok = PAIR.approve(request_id) if approve else PAIR.reject(request_id)
+    if not ok:
+        raise HTTPException(404, "Istek dusmus")
+    return {"ok": True}
+
+
+@app.post("/api/sites/revoke")
+def revoke_site(request: Request, body: OriginBody):
+    _require_local(request)
+    return {"ok": PAIR.revoke(body.origin)}
+
+
+@app.get("/api/sites")
+def list_sites(request: Request):
+    _require_local(request)
+    return {"sites": PAIR.listing()}
+
+
+@app.get("/izin")
+def pair_page():
+    return FileResponse(WEB / "pair.html")
+
+
+def _require_local(request: Request):
+    """Izin ekrani sadece bu bilgisayardan calistirilabilir."""
+    if not PAIR.is_local(request.headers.get("origin", "")):
+        raise HTTPException(403, "Sadece bu bilgisayardan")
+
+
 @app.post("/api/perf")
 def perf(sample: dict):
     """Gecici olcum modu (?perf=1) buraya yaziyor. Bkz. web/perf.js."""
@@ -270,7 +389,11 @@ def perf(sample: dict):
 
 @app.post("/api/reveal")
 def reveal(req: RevealRequest):
-    target = Path(req.path)
+    target = Path(req.path).resolve()
+    # Sadece kendi cikti klasorumuzun icini acabiliyoruz: disaridaki bir site
+    # bu ucu kullanip rastgele bir klasoru actiramasin.
+    if OUTPUT.resolve() not in target.parents and target != OUTPUT.resolve():
+        raise HTTPException(400, "Bu klasor acilamaz")
     if not target.exists():
         raise HTTPException(404, "Klasor yok")
     subprocess.Popen(["explorer", str(target)])

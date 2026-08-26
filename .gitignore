@@ -9,3 +9,6 @@ output/
 
 __pycache__/
 *.pyc
+
+# build_site.py'nin urettigi statik site
+site/

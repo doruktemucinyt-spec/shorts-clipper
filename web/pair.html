@@ -110,7 +110,7 @@
   <header class="masthead">
     <div class="brand">
       <div class="mark" aria-hidden="true"><span></span><span></span><span></span></div>
-      <h1>Shorts Clipper</h1>
+      <h1><a href="/" class="home-link">Shorts Clipper</a></h1>
       <p class="sub" data-i18n="sub"></p>
     </div>
 
@@ -131,107 +131,37 @@
     </div>
   </header>
 
-  <section class="card hidden" id="connect">
-    <span class="tag" data-i18n="connect.tag"></span>
-    <h2 class="doc-title" id="connect-title"></h2>
-    <p class="doc-lead" id="connect-text"></p>
+  <section class="card hidden" id="ask">
+    <span class="tag" data-i18n="pair.tag"></span>
+    <h2 class="doc-title" data-i18n="pair.title"></h2>
+    <p class="origin" id="ask-origin"></p>
+    <p class="doc-lead" data-i18n="pair.lead"></p>
+    <ul class="can">
+      <li data-i18n="pair.can1"></li>
+      <li data-i18n="pair.can2"></li>
+      <li data-i18n="pair.can3"></li>
+    </ul>
+    <p class="hint" data-i18n="pair.note"></p>
     <div class="pair-actions">
-      <button id="connect-btn" class="primary"></button>
-      <a class="ghost" href="/sss" data-i18n="connect.help"></a>
+      <button id="approve" class="primary" data-i18n="pair.approve"></button>
+      <button id="reject" class="ghost" data-i18n="pair.reject"></button>
     </div>
   </section>
 
-  <section class="card">
-    <span class="tag" data-i18n="tag.source"></span>
-
-    <label for="url" data-i18n="label.url"></label>
-    <input id="url" type="url" data-i18n-placeholder="ph.url" autocomplete="off">
-
-    <div class="row two">
-      <div>
-        <label for="minutes" data-i18n="label.minutes"></label>
-        <input id="minutes" type="number" min="1" max="15" step="0.5" value="4">
-      </div>
-      <div>
-        <label for="split" data-i18n="label.split"></label>
-        <select id="split">
-          <option value="sentence" data-i18n="opt.sentence"></option>
-          <option value="fixed" data-i18n="opt.fixed"></option>
-        </select>
-      </div>
-    </div>
-
-    <label for="zoom" data-i18n="label.zoom"></label>
-    <input id="zoom" type="range" min="100" max="250" step="5" value="140">
-    <p class="hint" id="zoom-hint"></p>
-
-    <div class="check">
-      <input id="captions" type="checkbox">
-      <label for="captions" data-i18n="check.captions"></label>
-    </div>
-
-    <div id="caption-opts" class="row two hidden">
-      <div>
-        <label for="highlight" data-i18n="label.highlight"></label>
-        <input id="highlight" type="color" value="#FFD400">
-      </div>
-      <div>
-        <label for="model" data-i18n="label.model"></label>
-        <select id="model">
-          <option value="large-v3" data-i18n="opt.large"></option>
-          <option value="medium" data-i18n="opt.medium"></option>
-          <option value="small" data-i18n="opt.small"></option>
-        </select>
-      </div>
-    </div>
-
-    <div class="preview">
-      <div class="shot" id="preview-shot">
-        <img id="preview-img" alt="" hidden>
-        <div class="shot-empty" id="preview-empty"><span>9:16</span></div>
-      </div>
-      <div class="preview-side">
-        <span class="tag" data-i18n="tag.preview"></span>
-        <p class="hint" id="preview-msg"></p>
-        <label for="preview-at" data-i18n="label.moment"></label>
-        <input id="preview-at" type="range" min="0" max="95" step="1" value="25">
-        <button id="preview-btn" class="ghost" data-i18n="btn.preview"></button>
-      </div>
-    </div>
-
-    <button id="start" class="primary"></button>
-  </section>
-
-  <section class="card hidden" id="progress-card">
-    <span class="tag" data-i18n="tag.process"></span>
-    <div class="bar"><div class="fill" id="fill"></div></div>
-    <p class="status" id="status"></p>
-    <p class="meta" id="meta"></p>
-    <button id="reveal" class="ghost hidden" data-i18n="btn.reveal"></button>
-    <div id="parts" class="parts"></div>
+  <section class="card hidden" id="result">
+    <span class="tag" data-i18n="pair.tag"></span>
+    <h2 class="doc-title" id="result-title"></h2>
+    <p class="doc-lead" id="result-text"></p>
   </section>
 
   <section class="card">
     <div class="head">
-      <h2 data-i18n="h2.history"></h2>
-      <div class="actions">
-        <button id="export" class="ghost" data-i18n="btn.export"></button>
-        <button id="import-btn" class="ghost" data-i18n="btn.import"></button>
-        <input id="import" type="file" accept="application/json" hidden>
-      </div>
+      <h2 data-i18n="pair.sites"></h2>
     </div>
-    <div id="history" class="history"></div>
+    <div id="sites" class="history"></div>
+    <p class="hint" data-i18n="pair.manage"></p>
   </section>
 
-  <section class="card">
-    <div class="head">
-      <h2 data-i18n="h2.temp"></h2>
-      <div class="actions">
-        <button id="clear-work" class="ghost" data-i18n="btn.clear"></button>
-      </div>
-    </div>
-    <p class="hint" id="work-size"></p>
-  </section>
   <footer class="foot">
     <a href="/sss" data-i18n="foot.faq"></a>
     <span class="sep">/</span>
@@ -245,8 +175,6 @@
 
 <script src="/static/i18n.js"></script>
 <script src="/static/lang.js"></script>
-<script src="/static/api.js"></script>
-<script src="/static/app.js"></script>
-<script src="/static/perf.js"></script>
+<script src="/static/pair.js"></script>
 </body>
 </html>

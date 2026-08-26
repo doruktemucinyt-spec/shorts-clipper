@@ -104,7 +104,7 @@ async function runPreview() {
   $("preview-btn").disabled = true;
 
   try {
-    const res = await fetch("/api/preview", {
+    const res = await api("/api/preview", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -128,8 +128,8 @@ async function runPreview() {
     const done = () => { if (seq === previewSeq) shot.classList.remove("busy"); };
     img.onload = done;
     img.onerror = done;
-    if (img.getAttribute("src") === data.image) done();   // ayni kare, onbellekten
-    else img.src = data.image;
+    if (img.getAttribute("src") === mediaUrl(data.image)) done();   // ayni kare, onbellekten
+    else img.src = mediaUrl(data.image);
     img.hidden = false;
     $("preview-empty").hidden = true;
 
@@ -229,7 +229,7 @@ $("import").onchange = async (e) => {
 // --- Gecici dosyalar -----------------------------------------------------
 async function refreshWorkSize() {
   try {
-    const { mb } = await (await fetch("/api/workspace")).json();
+    const { mb } = await (await api("/api/workspace")).json();
     $("work-size").textContent = mb > 0 ? t("hint.work", { mb }) : t("hint.workEmpty");
   } catch {
     $("work-size").textContent = t("hint.workFail");
@@ -238,7 +238,7 @@ async function refreshWorkSize() {
 
 $("clear-work").onclick = async () => {
   if (!confirm(t("confirm.clear"))) return;
-  const { freed_mb } = await (await fetch("/api/workspace/clear", { method: "POST" })).json();
+  const { freed_mb } = await (await api("/api/workspace/clear", { method: "POST" })).json();
   alert(t("alert.cleaned", { mb: freed_mb }));
   refreshWorkSize();
 };
@@ -264,7 +264,7 @@ $("start").onclick = async () => {
 
   let id;
   try {
-    const res = await fetch("/api/jobs", {
+    const res = await api("/api/jobs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -284,7 +284,7 @@ $("start").onclick = async () => {
     return;
   }
 
-  const es = new EventSource(`/api/jobs/${id}/events`);
+  const es = new EventSource(eventsUrl(id));
   es.onmessage = (ev) => {
     const job = JSON.parse(ev.data);
     lastJob = job;
@@ -328,7 +328,7 @@ function renderJob(job) {
     drawnParts = partsKey;
     $("parts").innerHTML = job.parts.map((p) => `
       <div class="part">
-        <video src="${p.url}" controls preload="metadata"></video>
+        <video src="${mediaUrl(p.url)}" controls preload="metadata"></video>
         <span>${escapeHtml(t("part.label", { index: p.index, duration: p.duration }))}</span>
       </div>`).join("");
   }
@@ -343,10 +343,69 @@ function fail(message) {
 
 $("reveal").onclick = () => {
   if (!outDir) return;
-  fetch("/api/reveal", {
+  api("/api/reveal", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path: outDir }),
   });
 };
 
+
+
+// --- Yardimci baglantisi ---------------------------------------------------
+// Sayfa internetteki siteden aciliyorsa isi yapan yardimci kullanicinin kendi
+// bilgisayarinda. Once calisiyor mu diye bakiyoruz, sonra izin.
+
+let connState = "checking";
+
+function paintConnection() {
+  if (IS_LOCAL) return;
+  const titles = {
+    checking: ["connect.checking", "", ""],
+    missing: ["connect.missingTitle", "connect.missing", "connect.missingBtn"],
+    unpaired: ["connect.unpairedTitle", "connect.unpaired", "connect.unpairedBtn"],
+    waiting: ["connect.unpairedTitle", "connect.waiting", "connect.unpairedBtn"],
+    ok: ["connect.okTitle", "connect.ok", ""],
+  };
+  const [titleKey, textKey, btnKey] = titles[connState] || titles.checking;
+  $("connect-title").textContent = t(titleKey);
+  $("connect-text").textContent = textKey ? t(textKey) : "";
+  $("connect-btn").textContent = btnKey ? t(btnKey) : "";
+  $("connect-btn").classList.toggle("hidden", !btnKey);
+  $("connect-btn").disabled = connState === "waiting" || connState === "checking";
+  $("connect").classList.toggle("hidden", connState === "ok");
+
+  // Baglanti yokken is baslatilamasin
+  const blocked = connState !== "ok";
+  $("start").disabled = blocked;
+  $("preview-btn").disabled = blocked;
+}
+
+function setConnState(next) {
+  connState = next;
+  paintConnection();
+}
+
+async function refreshConnection() {
+  if (IS_LOCAL) return;
+  setConnState("checking");
+  const status = await helperStatus();
+  if (!status.running) setConnState("missing");
+  else if (!status.paired) setConnState("unpaired");
+  else setConnState("ok");
+}
+
+$("connect-btn").onclick = async () => {
+  if (connState === "missing") { refreshConnection(); return; }
+  try {
+    setConnState("waiting");
+    const ok = await requestPairing();
+    setConnState(ok ? "ok" : "unpaired");
+  } catch {
+    setConnState("missing");
+  }
+};
+
+onUnpaired(() => refreshConnection());
+onLangChange(() => paintConnection());
+refreshConnection();
