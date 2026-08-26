@@ -1,4 +1,4 @@
-"""YouTube -> Shorts Clipper. Yerel FastAPI sunucusu."""
+"""YouTube -> ClipClover. Yerel FastAPI sunucusu."""
 import ipaddress
 import json
 import queue
@@ -76,7 +76,7 @@ MAX_ACTIVE_JOBS = 2
 # Bellekte tutulan is kaydi sayisi
 MAX_JOB_HISTORY = 50
 
-app = FastAPI(title="Shorts Clipper")
+app = FastAPI(title="ClipClover")
 
 
 def _page_is_local(request: Request) -> bool:
@@ -156,7 +156,7 @@ lock = threading.Lock()
 class JobRequest(BaseModel):
     url: str
     part_minutes: float = 4.0
-    highlight: str = "#FFD400"
+    highlight: str = "#4ADE80"
     model: str = "small"      # kucuk model varsayilan: ~0,5 GB iniyor
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
@@ -365,7 +365,7 @@ class PreviewRequest(BaseModel):
     zoom: float = 1.4
     at: float = 0.25               # videonun neresinden kare alinacak (0-1)
     captions: bool = False
-    highlight: str = "#FFD400"
+    highlight: str = "#4ADE80"
     font: str = "Arial Black"
     sample: str = "ornek altyazi"
     part_minutes: float = 4.0

@@ -1,4 +1,4 @@
-# Shorts Clipper
+# ClipClover
 
 Turn a YouTube link into 9:16 vertical parts: blurred bands top and bottom, the
 original video centred, the title and "Part N" on top, and optional pop-up

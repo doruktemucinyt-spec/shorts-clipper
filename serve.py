@@ -39,10 +39,10 @@ def main():
 
     if not sockets:
         print(f"HATA: {PORT} portu zaten kullaniliyor olabilir. "
-              f"Acik bir Shorts Clipper penceresi varsa once onu kapat.")
+              f"Acik bir ClipClover penceresi varsa once onu kapat.")
         return 1
 
-    print(f"Shorts Clipper hazir:  http://localhost:{PORT}")
+    print(f"ClipClover hazir:  http://localhost:{PORT}")
     server = uvicorn.Server(uvicorn.Config(app, log_level="info"))
     server.run(sockets=sockets)
     return 0

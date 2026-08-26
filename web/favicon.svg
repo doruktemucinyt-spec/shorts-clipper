@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!-- Sayfanin sol ustundeki uc cubuk isaretin sekmedeki hali.
-       Oranlar birebir ayni: kisa - uzun - orta, ayni sari-turuncu gecis. -->
+       Oranlar birebir ayni: kisa - uzun - orta, ayni yesil gecis. -->
   <defs>
     <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffd400"/>
-      <stop offset="1" stop-color="#ff9d00"/>
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset="1" stop-color="#22c55e"/>
     </linearGradient>
   </defs>
   <g fill="url(#bar)">

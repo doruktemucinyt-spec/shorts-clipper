@@ -1,4 +1,4 @@
-# Shorts Clipper — Türkçe notlar
+# ClipClover — Türkçe notlar
 
 *(English: [README.md](README.md))*
 

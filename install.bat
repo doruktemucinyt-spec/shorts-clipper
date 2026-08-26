@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
-title Shorts Clipper kurulumu
+title ClipClover kurulumu
 where python >nul 2>&1
 if errorlevel 1 (
   echo.

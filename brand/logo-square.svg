@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Ters logo: sari zemin, koyu cubuklar. Oranlar sayfadaki uc cubuk
+  <!-- Ters logo: yesil zemin, koyu cubuklar. Oranlar sayfadaki uc cubuk
        isaretle birebir ayni.
 
        Cubuklar sitedeki cam yuzeylerle ayni tarifle isleniyor:
        - govde ustten alta hafif acilan bir gradient (duz siyah degil)
        - sol ust kenarda parlama, karsi kenarda daha sonugu
        - ustten asagi inen ve kaybolan bir isik
-       - zemine dusen sicak, yumusak golge (sari uzerinde gri golge olu durur) -->
+       - zemine dusen koyu yesil, yumusak golge (gri golge zeminde olu durur) -->
   <defs>
     <linearGradient id="zemin" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffd400"/>
-      <stop offset="1" stop-color="#ff9d00"/>
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset="1" stop-color="#22c55e"/>
     </linearGradient>
 
     <linearGradient id="govde" x1="0" y1="0" x2="0" y2="1">
@@ -32,7 +32,7 @@
 
     <filter id="golge" x="-40%" y="-40%" width="180%" height="190%">
       <feDropShadow dx="0" dy="14" stdDeviation="16"
-                    flood-color="#5c2c00" flood-opacity="0.42"/>
+                    flood-color="#08351c" flood-opacity="0.42"/>
     </filter>
   </defs>
 

@@ -1,8 +1,8 @@
 @echo off
 cd /d "%~dp0"
-title Shorts Clipper
+title ClipClover
 echo.
-echo   Shorts Clipper calisiyor.
+echo   ClipClover calisiyor.
 echo.
 echo   Site:     https://shorts-clipper-seven.vercel.app
 echo   ya da:    http://localhost:8000

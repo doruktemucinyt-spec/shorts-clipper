@@ -1,4 +1,4 @@
-"""Shorts Clipper kurulumu.
+"""ClipClover kurulumu.
 
 Neden .bat degil de Python: kurulum isini bir toplu is dosyasinda yaptigimizda
 antivirus programlari bunu zararli yazilim kalibi sayip
@@ -59,7 +59,7 @@ def ffmpeg_var() -> bool:
 def main() -> int:
     print()
     print("  ===========================================")
-    print("   Shorts Clipper - kurulum")
+    print("   ClipClover - kurulum")
     print("  ===========================================")
     print()
     print("  Bu kurulum su klasore yaziyor:")

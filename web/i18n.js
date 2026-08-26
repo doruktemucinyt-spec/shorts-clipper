@@ -8,7 +8,7 @@ const I18N = {
 
     "gate.tag": "Beta",
     "gate.title": "Davetli beta",
-    "gate.lead": "Shorts Clipper şu an kapalı beta. Devam etmek için davet anahtarını gir.",
+    "gate.lead": "ClipClover şu an kapalı beta. Devam etmek için davet anahtarını gir.",
     "gate.placeholder": "CLIP-XXXX-XXXX",
     "gate.button": "Devam et",
     "gate.error": "Bu anahtar geçerli değil.",
@@ -148,7 +148,7 @@ const I18N = {
 
     "gate.tag": "Beta",
     "gate.title": "Invite-only beta",
-    "gate.lead": "Shorts Clipper is in closed beta. Enter your invite key to continue.",
+    "gate.lead": "ClipClover is in closed beta. Enter your invite key to continue.",
     "gate.placeholder": "CLIP-XXXX-XXXX",
     "gate.button": "Continue",
     "gate.error": "That key is not valid.",
@@ -288,7 +288,7 @@ const I18N = {
 
     "gate.tag": "Beta",
     "gate.title": "Beta nur mit Einladung",
-    "gate.lead": "Shorts Clipper ist in der geschlossenen Beta. Gib deinen Einladungsschlüssel ein.",
+    "gate.lead": "ClipClover ist in der geschlossenen Beta. Gib deinen Einladungsschlüssel ein.",
     "gate.placeholder": "CLIP-XXXX-XXXX",
     "gate.button": "Weiter",
     "gate.error": "Dieser Schlüssel ist ungültig.",
@@ -428,7 +428,7 @@ const I18N = {
 
     "gate.tag": "Bêta",
     "gate.title": "Bêta sur invitation",
-    "gate.lead": "Shorts Clipper est en bêta fermée. Saisis ta clé d'invitation pour continuer.",
+    "gate.lead": "ClipClover est en bêta fermée. Saisis ta clé d'invitation pour continuer.",
     "gate.placeholder": "CLIP-XXXX-XXXX",
     "gate.button": "Continuer",
     "gate.error": "Cette clé n'est pas valide.",
