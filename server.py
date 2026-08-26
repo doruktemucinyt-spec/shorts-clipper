@@ -95,7 +95,7 @@ class JobRequest(BaseModel):
     url: str
     part_minutes: float = 4.0
     highlight: str = "#FFD400"
-    model: str = "large-v3"
+    model: str = "small"      # kucuk model varsayilan: ~0,5 GB iniyor
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
     captions: bool = False         # caption yakilsin mi

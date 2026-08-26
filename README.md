@@ -69,7 +69,9 @@ noktalamasından üretilen cümlelere hizalanıyor — kesim noktaları daha isa
 - **Caption yak** — kapalı geldi. Açarsan konuşulan kelimeyi vurgulayan pop-up
   caption videoya gömülür; bunun için transkript şart, yani iş yavaşlar.
   - *Vurgu rengi* — o an konuşulan kelimenin rengi.
-  - *Altyazı modeli* — `large-v3` en doğrusu, `medium` daha hızlı.
+  - *Altyazı modeli* — varsayılan `small` (~0,5 GB iner, hızlı). `medium`
+    (~1,5 GB) ve `large-v3` (~3 GB) daha doğru ama ilk kullanımda o kadar
+    indirir. Model seçilen boyutta ve sadece bir kez iniyor.
 
 Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman basılır.
 
@@ -151,10 +153,12 @@ butonu bunları siler; `output/` klasörüne dokunmaz.
 
 `kurulum.bat`'a çift tıkla (ya da `python kurulum.py`). İki seçenek sunuyor:
 
-- **Hafif** (~200 MB) — YouTube linkinden 9:16 partlar. Bölme tam sürede
-  yapılır, caption yoktur. Transkript kütüphanesi hiç kurulmaz.
-- **Tam** (~2 GB kurulum + ilk kullanımda ~3 GB altyazı modeli) — üstüne cümle
-  sonuna hizalı bölme ve caption yakma gelir.
+Kurulum tek bir şey soruyor: **caption özelliği de kurulsun mu?**
+
+- **Hayır** (varsayılan) — ~200 MB. YouTube linkinden 9:16 partlar çıkarır.
+- **Evet** — üstüne ~2 GB kütüphane, artı ilk kullanımda seçilen altyazı
+  modeli (varsayılan `small` ~0,5 GB). Sonradan fikir değişirse kurulum tekrar
+  çalıştırılıp eklenebiliyor.
 
 Kurulum sanal ortamı (`.venv`) proje klasörüne kuruyor, sistemde başka bir yeri
 değiştirmiyor; ffmpeg'i winget ile kurmayı ise soruyor, sessizce kurmuyor.

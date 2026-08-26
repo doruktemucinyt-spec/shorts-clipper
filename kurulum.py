@@ -71,18 +71,23 @@ def main() -> int:
               f"{sys.version.split()[0]}")
         return 1
 
-    print("  Iki secenek var:")
+    print("  Temel kurulum ~200 MB: YouTube linkinden 9:16 partlar cikarir.")
     print()
-    print("    [1] HAFIF  (~200 MB)")
-    print("        YouTube linkinden 9:16 partlar cikarir. Bolme tam surede")
-    print("        yapilir, caption yoktur. Hizli ve kucuk.")
+    print("  Bunun ustune CAPTION ozelligi var: konusulan kelimeyi vurgulayan")
+    print("  pop-up altyazi videoya gomulur. Bunun icin konusmayi metne ceviren")
+    print("  kutuphaneler gerekiyor:")
     print()
-    print("    [2] TAM    (~2 GB kurulum + ilk kullanimda ~3 GB altyazi modeli)")
-    print("        Ustune cumle sonuna hizali bolme ve caption yakma gelir.")
-    print("        NVIDIA ekran karti varsa onu kullanir, yoksa islemciye duser.")
+    print("    + ~2 GB kurulum")
+    print("    + ilk kullanimda secilen altyazi modeli iner")
+    print("      (varsayilan small ~0,5 GB; arayuzden large-v3'e gecilirse ~3 GB)")
+    print("    + NVIDIA ekran karti varsa onu kullanir, yoksa islemciye duser")
     print()
-    secim = input("  Secimin (1 veya 2) [1]: ").strip() or "1"
-    gereksinim = TAM if secim == "2" else HAFIF
+    print("  Caption istemiyorsan bunlarin hicbiri inmiyor; sonradan bu kurulumu")
+    print("  tekrar calistirip ekleyebilirsin.")
+    print()
+    gereksinim = TAM if sor("Caption ozelligi de kurulsun mu?", "h") else HAFIF
+    print()
+    print(f"  Secilen: {'caption dahil' if gereksinim is TAM else 'sadece temel'}")
 
     baslik("1/3  ffmpeg")
     if ffmpeg_var():
