@@ -101,7 +101,7 @@ butonu bunları siler; `output/` klasörüne dokunmaz.
 GPU (RTX 3080 Ti) altyazı çıkarma ve NVENC encode için kullanılır. GPU bir sebeple
 çalışmazsa otomatik CPU'ya düşer, iş durmaz — sadece yavaşlar.
 
-## Bu makineye özel iki not
+## Bu makineye özel üç not
 
 Kurulumda çıkan ve çözülen iki Windows sorunu (`pipeline/__init__.py` içinde):
 
@@ -114,6 +114,13 @@ Kurulumda çıkan ve çözülen iki Windows sorunu (`pipeline/__init__.py` için
    ile kaydediliyor.
 
 Bu ikisi silinirse GPU ve indirme çalışmaz.
+
+3. **localhost / IPv6** — bu makinede `localhost` önce IPv6 adresine (`::1`)
+   çözülüyor. Sunucu yalnızca `127.0.0.1` dinlediğinde Chrome sessizce IPv4'e
+   düşüp açabiliyor, başka tarayıcılar "bağlantı kurulamadı" diyordu. `serve.py`
+   bu yüzden iki yerel soket açıyor: biri IPv4, biri IPv6. İkisi de sadece bu
+   bilgisayara açık, dışarıya bir şey açılmıyor. `run.bat` artık `serve.py`
+   çağırıyor; doğrudan `uvicorn server:app` ile başlatılırsa sorun geri gelir.
 
 ## Yasal
 
