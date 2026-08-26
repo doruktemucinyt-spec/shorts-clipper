@@ -6,6 +6,11 @@ const I18N = {
     "lang.name": "Türkçe",
     "sub": "YouTube linki → 9:16 dikey partlar",
 
+    "ticker.open": "Tamamı açık kaynak",
+    "ticker.cookies": "Çerez toplanmıyor",
+    "ticker.local": "Her şey senin bilgisayarında çalışır",
+    "ticker.discord": "Yardım için Discord sunucumuza katıl",
+
     "tag.source": "Kaynak",
     "tag.process": "İşlem",
 
@@ -129,6 +134,11 @@ const I18N = {
   en: {
     "lang.name": "English",
     "sub": "YouTube link → 9:16 vertical parts",
+
+    "ticker.open": "Fully open source",
+    "ticker.cookies": "No cookies collected",
+    "ticker.local": "Everything runs on your own computer",
+    "ticker.discord": "Join our Discord for help",
 
     "tag.source": "Source",
     "tag.process": "Process",
@@ -254,6 +264,11 @@ const I18N = {
     "lang.name": "Deutsch",
     "sub": "YouTube-Link → 9:16 vertikale Teile",
 
+    "ticker.open": "Vollständig quelloffen",
+    "ticker.cookies": "Keine Cookies",
+    "ticker.local": "Alles läuft auf deinem eigenen Rechner",
+    "ticker.discord": "Hilfe gibt es auf unserem Discord",
+
     "tag.source": "Quelle",
     "tag.process": "Vorgang",
 
@@ -377,6 +392,11 @@ const I18N = {
   fr: {
     "lang.name": "Français",
     "sub": "Lien YouTube → parties verticales 9:16",
+
+    "ticker.open": "Entièrement open source",
+    "ticker.cookies": "Aucun cookie collecté",
+    "ticker.local": "Tout tourne sur ton propre ordinateur",
+    "ticker.discord": "Rejoins notre Discord pour de l'aide",
 
     "tag.source": "Source",
     "tag.process": "Traitement",

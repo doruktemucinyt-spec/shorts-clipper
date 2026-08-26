@@ -192,6 +192,29 @@ $("url").addEventListener("input", () => {
   updateZoomHint();
 });
 
+// --- Ustteki serit --------------------------------------------------------
+// Discord adresi belli olunca su satira yazmak yeterli; bos kaldigi surece
+// duz yazi olarak gorunuyor, doldurulunca tiklanabilir baglantiya donuyor.
+const DISCORD_URL = "";
+
+const TICKER_KEYS = ["ticker.open", "ticker.cookies", "ticker.local", "ticker.discord"];
+
+function renderTicker() {
+  const parca = TICKER_KEYS.map((key) => {
+    const yazi = escapeHtml(t(key));
+    const govde = (key === "ticker.discord" && DISCORD_URL)
+      ? `<a href="${escapeHtml(DISCORD_URL)}" target="_blank" rel="noopener">${yazi}</a>`
+      : `<b>${yazi}</b>`;
+    return `${govde}<i>&bull;</i>`;
+  }).join("");
+
+  // Ayni metin iki kez: animasyon yariya geldiginde basa donuyor ve dikis
+  // gorunmuyor.
+  $("ticker").innerHTML = `<span>${parca}</span><span>${parca}</span>`;
+}
+
+onLangChange(renderTicker);
+
 // --- Hafiza ---------------------------------------------------------------
 // Tarayicinin kendi deposu adrese bagli: localhost:8000 ile internetteki site
 // ayri ayri hatirliyor. Ortak nokta bu bilgisayardaki yardimci, o yuzden ayni
