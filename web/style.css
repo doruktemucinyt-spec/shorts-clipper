@@ -807,8 +807,12 @@ a.ghost:active {
 .can { margin: 14px 0 0; padding: 0 0 0 18px; color: var(--dim); line-height: 1.8; }
 .can li::marker { color: var(--accent); }
 
-.pair-actions { display: flex; gap: 12px; align-items: center; margin-top: 22px; }
-.pair-actions .primary { flex: 1; }
+/* Yan yana duran iki buton ayni yukseklikte olsun: stretch ile ikincisi
+   birincinin boyuna uzuyor. Birincil butonun kendi ust boslugu da burada
+   sifirlaniyor, yoksa digerinden asagida duruyor. */
+.pair-actions { display: flex; gap: 12px; align-items: stretch; margin-top: 22px; }
+.pair-actions .primary { flex: 1; margin-top: 0; }
+.pair-actions .ghost { padding-left: 18px; padding-right: 18px; }
 
 #sites .name { font-family: var(--mono); font-size: 12.5px; }
 
