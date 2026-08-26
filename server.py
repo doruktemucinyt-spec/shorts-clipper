@@ -156,7 +156,7 @@ lock = threading.Lock()
 class JobRequest(BaseModel):
     url: str
     part_minutes: float = 4.0
-    highlight: str = "#5FE36B"
+    highlight: str = "#77E84F"
     model: str = "small"      # kucuk model varsayilan: ~0,5 GB iniyor
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
@@ -365,7 +365,7 @@ class PreviewRequest(BaseModel):
     zoom: float = 1.4
     at: float = 0.25               # videonun neresinden kare alinacak (0-1)
     captions: bool = False
-    highlight: str = "#5FE36B"
+    highlight: str = "#77E84F"
     font: str = "Arial Black"
     sample: str = "ornek altyazi"
     part_minutes: float = 4.0

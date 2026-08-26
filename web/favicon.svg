@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Dort yaprakli yonca: tek yaprak tanimlanip 90 derecelik adimlarla
-       dondurulyor. Grup 45 derece egik, boylece alt ortada sapin cikacagi
-       bosluk aciliyor; sap yapraklarin arkasinda. -->
+  <!-- Dort yaprakli yonca: tek yaprak 90 derecelik adimlarla donduruluyor.
+       Govde sol uste egik, sap sag asagi savruluyor; sap yapraklarin
+       arkasinda kaliyor. -->
   <defs>
     <path id="leaf" d="M0 0
              C -7 -26, -40 -34, -40 -64
@@ -9,15 +9,14 @@
              C 16 -97, 40 -88, 40 -64
              C 40 -34, 7 -26, 0 0 Z"/>
     <linearGradient id="leafGrad" x1="0" y1="0" x2="0.25" y2="1">
-      <stop offset="0" stop-color="#8bf283"/>
-      <stop offset="1" stop-color="#23b843"/>
+      <stop offset="0" stop-color="#b6f57e"/>
+      <stop offset="1" stop-color="#3cbb2e"/>
     </linearGradient>
   </defs>
 
-  <path d="M256 240 C 264 316, 258 350, 288 386"
-        fill="none" stroke="#1f9d47" stroke-width="17" stroke-linecap="round"/>
+  <path d="M214 214 C 236 292, 288 336, 392 400" fill="none" stroke="#2f9c2a" stroke-width="17" stroke-linecap="round"/>
 
-  <g transform="translate(256 236) rotate(45) scale(1.85)" fill="url(#leafGrad)">
+  <g transform="translate(214 202) rotate(45) scale(1.72)" fill="url(#leafGrad)">
     <use href="#leaf"/>
     <use href="#leaf" transform="rotate(90)"/>
     <use href="#leaf" transform="rotate(180)"/>

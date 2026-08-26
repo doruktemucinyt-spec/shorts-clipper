@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <!-- Ters logo: yesil zemin, koyu yonca. Yonca sayfadaki isaretin ayni
-       cizimi; cam yuzeylerdeki tarif burada da var: govdede gradient, sol
-       ustte kenar parlamasi, zemine dusen yumusak golge. -->
+       cizimi (sol uste egik govde, sag asagi sap). Cam tarifi burada da var:
+       govdede gradient, kenar parlamasi, zemine dusen yumusak golge. -->
   <defs>
     <path id="leaf" d="M0 0
              C -7 -26, -40 -34, -40 -64
@@ -10,8 +10,8 @@
              C 40 -34, 7 -26, 0 0 Z"/>
 
     <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#5fe36b"/>
-      <stop offset="1" stop-color="#23b843"/>
+      <stop offset="0" stop-color="#77e84f"/>
+      <stop offset="1" stop-color="#3cbb2e"/>
     </linearGradient>
 
     <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
@@ -27,16 +27,15 @@
 
     <filter id="shade" x="-40%" y="-40%" width="180%" height="190%">
       <feDropShadow dx="0" dy="12" stdDeviation="14"
-                    flood-color="#08351c" flood-opacity="0.45"/>
+                    flood-color="#123a06" flood-opacity="0.45"/>
     </filter>
   </defs>
 
   <rect width="512" height="512" fill="url(#ground)"/>
 
   <g filter="url(#shade)">
-    <path d="M256 246 C 264 312, 258 344, 286 378"
-          fill="none" stroke="#0a0a0e" stroke-width="16" stroke-linecap="round"/>
-    <g transform="translate(256 240) rotate(45) scale(1.62)" fill="url(#body)">
+    <path d="M214 214 C 236 292, 288 336, 392 400" fill="none" stroke="#0a0a0e" stroke-width="16" stroke-linecap="round"/>
+    <g transform="translate(214 202) rotate(45) scale(1.55)" fill="url(#body)">
       <use href="#leaf"/>
       <use href="#leaf" transform="rotate(90)"/>
       <use href="#leaf" transform="rotate(180)"/>
@@ -44,7 +43,7 @@
     </g>
   </g>
 
-  <g transform="translate(256 240) rotate(45) scale(1.62)"
+  <g transform="translate(214 202) rotate(45) scale(1.55)"
      fill="none" stroke="url(#edge)" stroke-width="1.6">
     <use href="#leaf"/>
     <use href="#leaf" transform="rotate(90)"/>
