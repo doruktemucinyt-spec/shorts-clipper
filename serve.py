@@ -28,7 +28,14 @@ def _listen(family, host):
     return sock
 
 
-def main():
+def dinle():
+    """Iki yerel soketi acar (IPv4 + IPv6). Hicbiri acilamazsa bos liste doner.
+
+    Ayri bir fonksiyon cunku exe surumu (app_main.py) soketleri KENDI aciyor:
+    port zaten doluysa bunu sunucuyu baslatmadan once ogrenip kullaniciya
+    pencere icinde soyleyebilmesi gerekiyor -- konsol olmadigi icin ekrana
+    yazi basmanin bir anlami yok.
+    """
     sockets = []
     for family, host in HOSTS:
         try:
@@ -36,15 +43,24 @@ def main():
         except OSError as exc:
             # Adreslerden biri kullanilamiyorsa (ornegin IPv6 kapali) digeriyle devam
             print(f"[uyari] {host}:{PORT} dinlenemedi: {exc}")
+    return sockets
 
+
+def calistir(sockets):
+    """Verilen soketler uzerinde sunucuyu calistirir. Kapanana kadar donmez."""
+    server = uvicorn.Server(uvicorn.Config(app, log_level="info"))
+    server.run(sockets=sockets)
+
+
+def main():
+    sockets = dinle()
     if not sockets:
         print(f"HATA: {PORT} portu zaten kullaniliyor olabilir. "
               f"Acik bir ClipClover penceresi varsa once onu kapat.")
         return 1
 
     print(f"ClipClover hazir:  http://localhost:{PORT}")
-    server = uvicorn.Server(uvicorn.Config(app, log_level="info"))
-    server.run(sockets=sockets)
+    calistir(sockets)
     return 0
 
 

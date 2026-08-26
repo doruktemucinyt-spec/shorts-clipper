@@ -17,6 +17,9 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 BUILD_PY = ROOT / ".buildvenv" / "Scripts" / "python.exe"
 FFMPEG = ROOT / "vendor" / "ffmpeg" / "ffmpeg.exe"
+# Kurulum ekraninin gorselleri. Pillow gerektirdigi icin ana Python'la degil
+# .buildvenv ile uretiliyorlar.
+BANT = ROOT / "brand" / "setup" / "bant-164x314.bmp"
 CIKTI = ROOT / "dagitim" / "ClipCloverKurulum.exe"
 
 ISCC_ADAYLARI = [
@@ -62,6 +65,10 @@ def main() -> int:
         calistir([sys.executable, str(ROOT / "vendor_ffmpeg.py")])
     else:
         baslik("1/3  ffmpeg zaten var, atlandi")
+
+    if not BANT.is_file():
+        baslik("1b/3  Kurulum ekraninin gorselleri uretiliyor")
+        calistir([str(BUILD_PY), str(ROOT / "brand_installer.py")])
 
     baslik("2/3  Program derleniyor")
     calistir([str(BUILD_PY), "-m", "PyInstaller", "clipclover.spec",

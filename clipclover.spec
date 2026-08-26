@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""ClipClover'i tek klasorluk bir Windows programina cevirir.
+"""ClipClover'i tek klasorluk, penceresiz bir Windows programina cevirir.
 
 Neden "onefile" degil de klasor: tek dosyalik exe kendini her acilista gecici
 klasore acar; Windows Defender bu davranisi zararli yazilim kalibi sayip sik
@@ -17,10 +17,16 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 ROOT = Path(SPECPATH)
 
-datas = [(str(ROOT / "web"), "web")]
+datas = [
+    (str(ROOT / "web"), "web"),
+    # Tepsi simgesi calisma aninda bu dosyadan okunuyor (app_main.py)
+    (str(ROOT / "brand" / "clipclover.ico"), "brand"),
+]
 binaries = []
 hiddenimports = [
     "truststore",
+    # pystray arka ucunu isim uzerinden seciyor, import satiri yok
+    "pystray._win32",
     # uvicorn bunlari isim uzerinden yukluyor, import satiri yok
     "uvicorn.logging", "uvicorn.loops.auto", "uvicorn.loops.asyncio",
     "uvicorn.protocols.http.auto", "uvicorn.protocols.http.h11_impl",
@@ -85,7 +91,11 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name="ClipClover",
-    console=True,
+    # Pencere yok: siyah konsol yerine tepsi simgesi var (app_main.py).
+    # Bunu True yapmak konsolu geri getirir ama o zaman ffmpeg her cagrildiginda
+    # ekranda kutu yanip sonmesin diye app_main'deki Popen yamasi da gozden
+    # gecirilmeli.
+    console=False,
     icon=str(ROOT / "brand" / "clipclover.ico"),
     version=str(ROOT / "version_info.txt"),
 )

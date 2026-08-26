@@ -240,6 +240,25 @@ Ne nereye gidiyor:
 | geçici dosyalar | `AppData\Local\ClipClover` — kaldırınca siliniyor |
 | programın kendisi | `AppData\Local\Programs\ClipClover` |
 
+Program **pencere açmadan** çalışıyor. Eskiden siyah bir konsol penceresi
+açılıyor ve kullanıcı onu kapatarak programı durduruyordu; şimdi saatin
+yanındaki yonca simgesi var — çift tıkla siteyi açıyor, sağ tıkla *Çık* diyorsun.
+Açılışta tarayıcıda **clipclover.online** açılıyor, localhost değil: kullanıcıya
+gösterdiğimiz yüz site. (Yerel arayüz duruyor, gerekirse `localhost:8000` aynı
+sayfayı veriyor — sadece kendiliğinden açılmıyor.)
+
+Konsol kalkınca iki şey ayrıca halledilmek zorunda kaldı, ikisi de
+`app_main.py` içinde:
+
+- Ekrana basılan her şey `AppData\Local\ClipClover\work\clipclover.log`
+  dosyasına gidiyor. Penceresiz derlemede `sys.stdout` **None** oluyor ve
+  uvicorn ilk günlük satırını yazmaya çalıştığı anda program sessizce ölüyordu.
+- `subprocess.Popen` yamalanıp her alt sürece `CREATE_NO_WINDOW` veriliyor.
+  Windows'ta penceresiz bir süreçten başlatılan her konsol programı kendi
+  penceresini açıyor; render sırasında ekranda arka arkaya siyah kutular yanıp
+  sönüyordu. Bayrağı çağrı yerlerine tek tek eklemek yetmiyor, çünkü yt-dlp de
+  kendi içinden ffmpeg çalıştırıyor.
+
 Pakette CUDA kütüphaneleri yok (2 GB'ın üzerindeler). Yani render NVENC ile
 GPU'da devam ediyor ama transkript CPU'da çalışıyor. `transcribe.py` bunu
 kendiliğinden hallediyor, kimse bir şey ayarlamıyor.

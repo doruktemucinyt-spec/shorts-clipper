@@ -54,7 +54,7 @@ STAGES_FAST = {
     "split": (12, 14), "render": (14, 100),
 }
 
-APP_VERSION = "1.0"
+APP_VERSION = "1.1"
 
 # Internetteki siteyle bu bilgisayar arasindaki izin mekanizmasi (pairing.py)
 PAIR = Pairing(WORK / "pairing.json")

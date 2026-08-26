@@ -53,6 +53,23 @@ Where things end up:
 | temporary files | `AppData\Local\ClipClover` — removed when you uninstall |
 | the program | `AppData\Local\Programs\ClipClover` |
 
+The program runs **without a window**. There used to be a black console that
+you closed to stop it; now there is a clover icon next to the clock -- double
+click opens the site, right click gives you *Quit*. On start it opens
+**clipclover.online** in the browser, not localhost: the site is the face we
+show people. (The local UI is still there -- `localhost:8000` serves the same
+page -- it just is not opened for you.)
+
+Dropping the console forced two things, both in `app_main.py`:
+
+- Everything printed goes to `AppData\Local\ClipClover\work\clipclover.log`.
+  In a windowed build `sys.stdout` is **None**, and the process died silently
+  the moment uvicorn wrote its first log line.
+- `subprocess.Popen` is patched to pass `CREATE_NO_WINDOW` to every child. On
+  Windows a console program started from a windowless process opens its own
+  window, so rendering flashed black boxes across the screen. Adding the flag
+  at each call site is not enough: yt-dlp runs ffmpeg from inside itself.
+
 An NVIDIA GPU is optional. Rendering still uses NVENC when the driver supports
 it, but transcription runs on the CPU: CUDA acceleration in ctranslate2 needs
 cuBLAS and cuDNN, which are over 2 GB and deliberately not packaged.
