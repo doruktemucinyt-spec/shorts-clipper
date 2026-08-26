@@ -2,7 +2,11 @@
    Metinler pages.js'te, dort dilde. Sayfa hangi adreste acildiysa ona ait
    boluma bakiyor; eslesme yoksa 404 gosteriyor.                          */
 
-const DOC_PATHS = { "/sss": "sss", "/cerez": "cerez", "/gizlilik": "gizlilik" };
+// Adresler Ingilizce; eski Turkce adresler de ayni sayfaya cikiyor.
+const DOC_PATHS = {
+  "/faq": "faq", "/cookies": "cookies", "/privacy": "privacy",
+  "/sss": "faq", "/cerez": "cookies", "/gizlilik": "privacy",
+};
 const docKey = DOC_PATHS[location.pathname.replace(/\/+$/, "")] || "notfound";
 
 function renderDoc() {

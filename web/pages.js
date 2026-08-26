@@ -7,7 +7,7 @@
 const PAGES = {
   tr: {
     home: "Ana sayfa",
-    sss: {
+    faq: {
       tag: "SSS", title: "Sık sorulanlar",
       lead: "Aracı kullanırken en çok takılınan yerler.",
       items: [
@@ -29,7 +29,7 @@ const PAGES = {
          "Sadece indirilen kaynak videoları ve ara dosyaları. Render ettiğin partlara hiç dokunmaz."],
       ],
     },
-    cerez: {
+    cookies: {
       tag: "Çerez politikası", title: "Çerezler",
       lead: "Kısa cevap: bu araç çerez kullanmıyor.",
       items: [
@@ -43,7 +43,7 @@ const PAGES = {
          "Sayfanın yazı tipleri Google Fonts'tan çekiliyor; bu, tarayıcının Google'a yaptığı bir istektir ve orada standart sunucu kayıtları tutulabilir. Bunun dışında sayfa dışarıya bir şey göndermiyor — analitik, izleyici ve reklam yok."],
       ],
     },
-    gizlilik: {
+    privacy: {
       tag: "Gizlilik", title: "Gizlilik",
       lead: "Araç tamamen senin bilgisayarında çalışıyor. Videon, sesin ve transkriptin hiçbir yere gönderilmiyor.",
       items: [
@@ -72,7 +72,7 @@ const PAGES = {
 
   en: {
     home: "Home",
-    sss: {
+    faq: {
       tag: "FAQ", title: "Frequently asked",
       lead: "The things people get stuck on.",
       items: [
@@ -94,7 +94,7 @@ const PAGES = {
          "Only downloaded source videos and intermediate files. It never touches the parts you rendered."],
       ],
     },
-    cerez: {
+    cookies: {
       tag: "Cookie policy", title: "Cookies",
       lead: "Short answer: this tool uses no cookies.",
       items: [
@@ -108,7 +108,7 @@ const PAGES = {
          "The page's fonts are fetched from Google Fonts, which is a request your browser makes to Google, and standard server logs may be kept there. Beyond that the page sends nothing out — no analytics, no trackers, no ads."],
       ],
     },
-    gizlilik: {
+    privacy: {
       tag: "Privacy", title: "Privacy",
       lead: "The tool runs entirely on your computer. Your video, audio and transcript are never sent anywhere.",
       items: [
@@ -137,7 +137,7 @@ const PAGES = {
 
   de: {
     home: "Startseite",
-    sss: {
+    faq: {
       tag: "FAQ", title: "Häufige Fragen",
       lead: "Die Stellen, an denen es meistens hakt.",
       items: [
@@ -159,7 +159,7 @@ const PAGES = {
          "Nur heruntergeladene Quellvideos und Zwischendateien. Die gerenderten Teile bleiben unberührt."],
       ],
     },
-    cerez: {
+    cookies: {
       tag: "Cookie-Richtlinie", title: "Cookies",
       lead: "Kurz: dieses Werkzeug verwendet keine Cookies.",
       items: [
@@ -173,7 +173,7 @@ const PAGES = {
          "Die Schriften kommen von Google Fonts — eine Anfrage deines Browsers an Google, wo übliche Serverprotokolle anfallen können. Sonst sendet die Seite nichts: keine Analyse, kein Tracking, keine Werbung."],
       ],
     },
-    gizlilik: {
+    privacy: {
       tag: "Datenschutz", title: "Datenschutz",
       lead: "Das Werkzeug läuft vollständig auf deinem Rechner. Video, Ton und Transkript werden nirgendwohin gesendet.",
       items: [
@@ -202,7 +202,7 @@ const PAGES = {
 
   fr: {
     home: "Accueil",
-    sss: {
+    faq: {
       tag: "FAQ", title: "Questions fréquentes",
       lead: "Là où ça coince le plus souvent.",
       items: [
@@ -224,7 +224,7 @@ const PAGES = {
          "Uniquement les vidéos sources téléchargées et les fichiers intermédiaires. Jamais les parties déjà rendues."],
       ],
     },
-    cerez: {
+    cookies: {
       tag: "Politique de cookies", title: "Cookies",
       lead: "Réponse courte : cet outil n'utilise aucun cookie.",
       items: [
@@ -238,7 +238,7 @@ const PAGES = {
          "Les polices viennent de Google Fonts : c'est une requête de ton navigateur vers Google, où des journaux serveur habituels peuvent être conservés. À part ça, la page n'envoie rien — pas d'analyse, pas de traceur, pas de publicité."],
       ],
     },
-    gizlilik: {
+    privacy: {
       tag: "Confidentialité", title: "Confidentialité",
       lead: "L'outil tourne entièrement sur ton ordinateur. Ta vidéo, ton audio et ta transcription ne partent nulle part.",
       items: [

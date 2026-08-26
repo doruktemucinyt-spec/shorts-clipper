@@ -7,12 +7,11 @@ gerektirmiyor.
 
 Ciktilar:
   shorts-clipper/index.html            ana arayuz
-  shorts-clipper/sss|cerez|gizlilik/   bilgi sayfalari (temiz adresler)
+  shorts-clipper/faq|cookies|privacy/  bilgi sayfalari (temiz adresler)
   shorts-clipper/404.html              bulunamayan adresler
   shorts-clipper/assets/...            css + js + ikon
 """
 import json
-import re
 import shutil
 from pathlib import Path
 
@@ -24,7 +23,10 @@ OUT = ROOT / "shorts-clipper"
 
 ASSETS = ["style.css", "config.js", "i18n.js", "lang.js", "api.js", "app.js",
           "pages.js", "page.js", "gate.js", "favicon.svg"]
-DOC_PAGES = ["sss", "cerez", "gizlilik"]
+DOC_PAGES = ["faq", "cookies", "privacy"]
+# Eski Turkce adresler: paylasilmis baglantilar kirilmasin diye ayni sayfa
+# bir de bu klasorlerden servis ediliyor.
+DOC_ALIASES = ["sss", "cerez", "gizlilik"]
 
 
 def rewrite(html: str) -> str:
@@ -61,13 +63,11 @@ def build() -> Path:
     for name in ASSETS:
         shutil.copy2(WEB / name, OUT / "assets" / name)
 
-    index = rewrite((WEB / "index.html").read_text(encoding="utf-8"))
-    # Olcum modu sadece gelistirme icin
-    index = re.sub(r'\s*<script src="/assets/perf\.js"></script>', "", index)
-    (OUT / "index.html").write_text(index, encoding="utf-8")
+    (OUT / "index.html").write_text(
+        rewrite((WEB / "index.html").read_text(encoding="utf-8")), encoding="utf-8")
 
     page = rewrite((WEB / "page.html").read_text(encoding="utf-8"))
-    for name in DOC_PAGES:
+    for name in DOC_PAGES + DOC_ALIASES:
         (OUT / name).mkdir(parents=True, exist_ok=True)
         (OUT / name / "index.html").write_text(page, encoding="utf-8")
     (OUT / "404.html").write_text(page, encoding="utf-8")

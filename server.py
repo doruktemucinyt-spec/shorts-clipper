@@ -430,7 +430,7 @@ def pair_request(request: Request):
     if not origin:
         raise HTTPException(400, "Origin yok")
     request_id = PAIR.request(origin)
-    return {"request_id": request_id, "url": f"http://127.0.0.1:8000/izin?id={request_id}"}
+    return {"request_id": request_id, "url": f"http://127.0.0.1:8000/permission?id={request_id}"}
 
 
 @app.get("/api/pair/{request_id}")
@@ -474,6 +474,7 @@ def list_sites(request: Request):
     return {"sites": PAIR.listing()}
 
 
+@app.get("/permission")
 @app.get("/izin")
 def pair_page():
     return FileResponse(WEB / "pair.html")
@@ -513,21 +514,6 @@ def write_settings(body: dict):
     return {"ok": True}
 
 
-@app.post("/api/perf")
-def perf(sample: dict):
-    """Gecici olcum modu (?perf=1) buraya yaziyor. Bkz. web/perf.js.
-
-    Dosya 1 MB'i gecerse yazmayi birakiyor: izinli bir site bu ucu kullanip
-    diski sisiremesin.
-    """
-    log = WORK / "perf.log"
-    if log.exists() and log.stat().st_size > 1_000_000:
-        return {"ok": False}
-    with log.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(sample, ensure_ascii=False) + chr(10))
-    return {"ok": True}
-
-
 @app.post("/api/reveal")
 def reveal(req: RevealRequest):
     target = Path(req.path).resolve()
@@ -553,6 +539,11 @@ def index():
 
 # Bilgi sayfalarinin hepsi ayni kabugu kullaniyor; hangi metnin gosterilecegine
 # tarayici tarafinda adrese bakarak karar veriliyor (web/page.js).
+@app.get("/faq")
+@app.get("/cookies")
+@app.get("/privacy")
+# Eski Turkce adresler de calismaya devam ediyor: paylasilmis baglantilar
+# kirilmasin.
 @app.get("/sss")
 @app.get("/cerez")
 @app.get("/gizlilik")

@@ -24,8 +24,8 @@ ROOT = Path(__file__).parent
 VENV = ROOT / ".venv"
 PY_MIN = (3, 10)
 
-HAFIF = ROOT / "requirements-hafif.txt"
-TAM = ROOT / "requirements.txt"
+LITE = ROOT / "requirements-lite.txt"
+FULL = ROOT / "requirements.txt"
 
 
 def baslik(text: str):
@@ -84,9 +84,9 @@ def main() -> int:
     print("  Caption istemiyorsan bunlarin hicbiri inmiyor; sonradan bu kurulumu")
     print("  tekrar calistirip ekleyebilirsin.")
     print()
-    gereksinim = TAM if sor("Caption ozelligi de kurulsun mu?", "h") else HAFIF
+    gereksinim = FULL if sor("Caption ozelligi de kurulsun mu?", "h") else LITE
     print()
-    print(f"  Secilen: {'caption dahil' if gereksinim is TAM else 'sadece temel'}")
+    print(f"  Secilen: {'caption dahil' if gereksinim is FULL else 'sadece temel'}")
 
     baslik("1/3  ffmpeg")
     if ffmpeg_var():
@@ -115,8 +115,8 @@ def main() -> int:
         return 1
 
     baslik("3/3  Hazir")
-    print("  Baslatmak icin: baslat.bat dosyasina cift tikla.")
-    print("  Masaustunde dursun istersen: baslat.bat'a sag tikla ->")
+    print("  Baslatmak icin: start.bat dosyasina cift tikla.")
+    print("  Masaustunde dursun istersen: start.bat'a sag tikla ->")
     print("  'Kisayol olustur' -> cikan kisayolu masaustune tasi.")
     print()
     print("  Sonra sunlardan biriyle kullan:")

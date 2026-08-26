@@ -10,4 +10,4 @@ if errorlevel 1 (
   pause
   exit /b
 )
-python kurulum.py
+python install.py

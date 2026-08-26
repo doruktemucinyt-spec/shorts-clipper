@@ -8,12 +8,12 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-HEDEF = ROOT / "shorts-clipper-kurulum.zip"
+HEDEF = ROOT / "shorts-clipper-setup.zip"
 
 KLASORLER = ["pipeline", "web"]
-DOSYALAR = ["server.py", "serve.py", "pairing.py", "kurulum.py", "kurulum.bat",
-            "baslat.bat", "run.bat", "requirements.txt", "requirements-hafif.txt",
-            "README.md"]
+DOSYALAR = ["server.py", "serve.py", "pairing.py", "install.py", "install.bat",
+            "start.bat", "requirements.txt", "requirements-lite.txt",
+            "README.md", "README.tr.md", "LICENSE"]
 ATLA = {"__pycache__", ".venv", ".git"}
 
 
