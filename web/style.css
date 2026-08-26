@@ -789,6 +789,13 @@ a.ghost:active {
 .foot a:hover { color: var(--accent); border-bottom-color: rgba(255, 212, 0, .45); }
 .foot .sep { opacity: .35; }
 
+/* Discord maddesi digerleri gibi sariya degil, Discord'un kendi rengine
+   donuyor -- baglanti nereye gidiyorsa oranin rengi. */
+#foot-discord:hover {
+  color: #5865f2;
+  border-bottom-color: rgba(88, 101, 242, .6);
+}
+
 /* Adres henuz girilmemis madde: tiklanamaz, biraz daha sonuk */
 .foot a.soon { opacity: .55; cursor: default; }
 .foot a.soon:hover { color: var(--faint); border-bottom-color: transparent; }
