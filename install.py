@@ -121,7 +121,7 @@ def main() -> int:
     print()
     print("  Sonra sunlardan biriyle kullan:")
     print("    https://clipclover.online   (site, izin ister)")
-    print("    http://localhost:8000                     (dogrudan, izin gerekmez)")
+    print("    http://localhost:8000       (dogrudan, izin gerekmez)")
     print()
     return 0
 
