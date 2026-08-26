@@ -55,7 +55,9 @@ body {
     radial-gradient(40% 42% at 50% 50%, rgba(255, 212, 0, .30) 0%, rgba(255, 212, 0, 0) 66%),
     radial-gradient(56% 54% at 50% 52%, rgba(255, 138, 0, .16) 0%, rgba(255, 138, 0, 0) 70%),
     radial-gradient(78% 66% at 50% 54%, rgba(255, 90, 0, .06) 0%, rgba(255, 90, 0, 0) 76%);
-  filter: blur(14px);
+  /* Burada blur(14px) vardi. Gradyanlar zaten yumusak oldugu icin gozle bir
+     sey katmiyordu, ama 4K ekranda tam ekran boyutunda bulanik bir katman
+     demekti -- kaldirildi. */
 }
 
 /* Isik kubbesi asagi tasmasin: govdeyi tekrar siyaha cekiyoruz ki kartlar
@@ -107,7 +109,7 @@ body {
     transparent 0 168px, #000 206px, #000 224px, transparent 260px);
           mask-image: repeating-linear-gradient(180deg,
     transparent 0 168px, #000 206px, #000 224px, transparent 260px);
-  animation: stream-up 7s linear infinite;
+  animation: stream-up 7s steps(130, end) infinite;
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -174,6 +176,8 @@ main {
   border: 1px solid rgba(255, 255, 255, .18);
   backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
   -webkit-backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
+  /* Kanal ayrisan pahali filtre sadece tiklama animasyonu boyunca devrede;
+     durgun halde ikisi piksel piksel ayni goruntuyu veriyor. */
   box-shadow:
     inset 1.2px 1.2px 0 rgba(255, 255, 255, .32),    /* sol ust kenar parlamasi */
     inset -1.2px -1.2px 0 rgba(255, 255, 255, .09),  /* karsi kenar, daha sonuk */
@@ -198,6 +202,16 @@ main {
   stroke-width: 1.5;
   transition: stroke .18s ease;
 }
+.globe.dispersing {
+  backdrop-filter: url(#liquid-glass-sm-rgb) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass-sm-rgb) blur(1px) saturate(175%) brightness(1.04);
+}
+
+.lang-menu.dispersing {
+  backdrop-filter: url(#liquid-glass-rgb) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass-rgb) blur(1px) saturate(175%) brightness(1.04);
+}
+
 .globe:hover { border-color: rgba(255, 212, 0, .38); background: rgba(255, 255, 255, .07); }
 .globe:hover svg { stroke: var(--accent); }
 
@@ -376,8 +390,8 @@ h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
 .card {
   position: relative;
   background: var(--glass);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 24px;
@@ -561,7 +575,9 @@ button:active:not(:disabled) { transform: translateY(1px); }
   border: 1px solid var(--line);
   padding: 8px 14px;
   font-size: 13px;
-  backdrop-filter: blur(8px);
+  /* Burada backdrop-filter: blur(8px) vardi. Butonun arkasinda kartin duz
+     zemini oldugu icin gozle hicbir sey yapmiyordu, ama her biri ayri bir
+     filtre yuzeyi aciyordu -- ekranda bes tane var. */
 }
 .ghost:hover { color: var(--fg); background: rgba(255, 255, 255, .08); border-color: rgba(255, 212, 0, .35); }
 

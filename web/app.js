@@ -77,7 +77,19 @@ const dispersion = ["disp-r", "disp-b", "disp-r-sm", "disp-b-sm"]
   .map((id) => document.getElementById(id))
   .filter((el) => el && typeof el.beginElement === "function");
 
+let dispersionTimer = null;
+
 function playDispersion() {
+  // Kanal ayrismasi pahali bir filtre; sadece animasyon suresince aciliyor.
+  // Durgun filtreyle ayni goruntuyu verdigi icin gecis gorunmuyor.
+  langBtn.classList.add("dispersing");
+  langMenu.classList.add("dispersing");
+  clearTimeout(dispersionTimer);
+  dispersionTimer = setTimeout(() => {
+    langBtn.classList.remove("dispersing");
+    langMenu.classList.remove("dispersing");
+  }, 660);
+
   for (const a of dispersion) {
     try { a.beginElement(); } catch {}
   }

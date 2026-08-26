@@ -259,6 +259,14 @@ def workspace_clear():
     return {"freed_mb": round(freed / 1024 / 1024, 1)}
 
 
+@app.post("/api/perf")
+def perf(sample: dict):
+    """Gecici olcum modu (?perf=1) buraya yaziyor. Bkz. web/perf.js."""
+    with (WORK / "perf.log").open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(sample, ensure_ascii=False) + chr(10))
+    return {"ok": True}
+
+
 @app.post("/api/reveal")
 def reveal(req: RevealRequest):
     target = Path(req.path)

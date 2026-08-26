@@ -11,22 +11,35 @@
 </head>
 <body>
 <svg class="filters" aria-hidden="true">
+  <!-- Durgun cam: TEK yer degistirme. Kirmizi/yesil/mavi ayri ayri
+       buküldugunde ucunun olcegi de esit oldugu icin sonuc bununla piksel
+       piksel ayni cikiyordu -- yani 9 adimlik zincirin 7'si bosunaydi.
+       Ayrisma sadece tiklama aninda gerekiyor, o da asagidaki filtrede. -->
   <filter id="liquid-glass" x="0%" y="0%" width="100%" height="100%"
           color-interpolation-filters="sRGB">
-    <!-- Yer degistirme haritasi: R kanali yatay, G kanali dikey kirilmayi
-         tasiyor. Merkez notr (127,127) oldugu icin cam ortada duz, kenarlara
-         dogru mercek gibi buker. -->
-    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ff0000%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
-             x="0%" y="0%" width="100%" height="100%" result="mapX"/>
-    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2300ff00%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
-             x="0%" y="0%" width="100%" height="100%" result="mapY"/>
-    <feComposite in="mapX" in2="mapY" operator="arithmetic"
-                 k1="0" k2="1" k3="1" k4="0" result="map"/>
-
-    <!-- Kromatik sapma: gercek camda kirmizi, yesil ve mavi farkli acilarda
-         kirilir. Uc kanali ayri olcekte buküp yeniden birlestiriyoruz.
-         Acilirken R ve B ayrisip renk sacagi yapiyor, sonra yesile
-         yakinsayarak kayboluyor -- durgun halde uc kanal da esit. -->
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="56"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- Durgun cam: TEK yer degistirme. Kirmizi/yesil/mavi ayri ayri
+       buküldugunde ucunun olcegi de esit oldugu icin sonuc bununla piksel
+       piksel ayni cikiyordu -- yani 9 adimlik zincirin 7'si bosunaydi.
+       Ayrisma sadece tiklama aninda gerekiyor, o da asagidaki filtrede. -->
+  <filter id="liquid-glass-sm" x="0%" y="0%" width="100%" height="100%"
+          color-interpolation-filters="sRGB">
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="14"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- Sadece tiklama suresince (0,62 sn) devrede: gercek camda kirmizi, yesil
+       ve mavi farkli acilarda kirilir. Acilirken R ve B ayrisip renk sacagi
+       yapiyor, sonra yesile yakinsayarak kayboluyor. -->
+  <filter id="liquid-glass-rgb" x="0%" y="0%" width="100%" height="100%"
+          color-interpolation-filters="sRGB">
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="map"/>
     <feDisplacementMap in="SourceGraphic" in2="map" scale="56"
                        xChannelSelector="R" yChannelSelector="G" result="dR">
       <animate id="disp-r" attributeName="scale" begin="indefinite" dur="0.62s"
@@ -41,7 +54,6 @@
                values="56;20;56" keyTimes="0;0.36;1" fill="freeze"
                calcMode="spline" keySplines="0.4 0 0.3 1; 0.3 0 0.25 1"/>
     </feDisplacementMap>
-
     <feColorMatrix in="dR" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyR"/>
     <feColorMatrix in="dG" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyG"/>
     <feColorMatrix in="dB" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="onlyB"/>
@@ -50,19 +62,13 @@
     <feComposite in="rg" in2="onlyB" operator="arithmetic"
                  k1="0" k2="1" k3="1" k4="0"/>
   </filter>
-
-  <!-- Ayni cam, kucuk halde. Kirilma miktari cismin boyutuyla orantili olmali:
-       menu ~190px genislikte 56, kure 44px oldugu icin 14. Ayni degeri
-       kullansaydik 44px'lik butonun icinde goruntu darmadagin olurdu. -->
-  <filter id="liquid-glass-sm" x="0%" y="0%" width="100%" height="100%"
+  <!-- Sadece tiklama suresince (0,62 sn) devrede: gercek camda kirmizi, yesil
+       ve mavi farkli acilarda kirilir. Acilirken R ve B ayrisip renk sacagi
+       yapiyor, sonra yesile yakinsayarak kayboluyor. -->
+  <filter id="liquid-glass-sm-rgb" x="0%" y="0%" width="100%" height="100%"
           color-interpolation-filters="sRGB">
-    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ff0000%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
-             x="0%" y="0%" width="100%" height="100%" result="mapX"/>
-    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2300ff00%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
-             x="0%" y="0%" width="100%" height="100%" result="mapY"/>
-    <feComposite in="mapX" in2="mapY" operator="arithmetic"
-                 k1="0" k2="1" k3="1" k4="0" result="map"/>
-
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27x%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%237f0000%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ff0000%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27y%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23000000%27%2F%3E%3Cstop%20offset%3D%270.32%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%270.68%27%20stop-color%3D%27%23007f00%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2300ff00%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23x%29%27%2F%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20fill%3D%27url%28%23y%29%27%20style%3D%27mix-blend-mode%3Ascreen%27%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="map"/>
     <feDisplacementMap in="SourceGraphic" in2="map" scale="14"
                        xChannelSelector="R" yChannelSelector="G" result="dR">
       <animate id="disp-r-sm" attributeName="scale" begin="indefinite" dur="0.62s"
@@ -77,7 +83,6 @@
                values="14;5;14" keyTimes="0;0.36;1" fill="freeze"
                calcMode="spline" keySplines="0.4 0 0.3 1; 0.3 0 0.25 1"/>
     </feDisplacementMap>
-
     <feColorMatrix in="dR" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyR"/>
     <feColorMatrix in="dG" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyG"/>
     <feColorMatrix in="dB" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="onlyB"/>
@@ -220,5 +225,6 @@
 
 <script src="/static/i18n.js"></script>
 <script src="/static/app.js"></script>
+<script src="/static/perf.js"></script>
 </body>
 </html>
