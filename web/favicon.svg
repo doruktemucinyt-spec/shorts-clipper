@@ -14,12 +14,14 @@
     </linearGradient>
   </defs>
 
-  <path d="M214 214 C 236 292, 288 336, 392 400" fill="none" stroke="#2f9c2a" stroke-width="17" stroke-linecap="round"/>
+  <g transform="rotate(-20 256 256)">
+  <path d="M256 246 C 266 306, 262 340, 292 376" fill="none" stroke="#2f9c2a" stroke-width="17" stroke-linecap="round"/>
 
-  <g transform="translate(214 202) rotate(45) scale(1.72)" fill="url(#leafGrad)">
+  <g transform="translate(256 238) rotate(45) scale(1.72)" fill="url(#leafGrad)">
     <use href="#leaf"/>
     <use href="#leaf" transform="rotate(90)"/>
     <use href="#leaf" transform="rotate(180)"/>
     <use href="#leaf" transform="rotate(270)"/>
+  </g>
   </g>
 </svg>
