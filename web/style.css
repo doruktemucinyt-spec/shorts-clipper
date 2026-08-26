@@ -791,6 +791,11 @@ a.ghost:active {
 
 /* Discord maddesi digerleri gibi sariya degil, Discord'un kendi rengine
    donuyor -- baglanti nereye gidiyorsa oranin rengi. */
+#foot-source:hover {
+  color: #e6edf3;
+  border-bottom-color: rgba(230, 237, 243, .5);
+}
+
 #foot-discord:hover {
   color: #5865f2;
   border-bottom-color: rgba(88, 101, 242, .6);

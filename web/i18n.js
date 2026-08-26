@@ -68,6 +68,7 @@ const I18N = {
     "foot.faq": "SSS",
     "foot.cookies": "Çerezler",
     "foot.privacy": "Gizlilik",
+    "foot.source": "Kaynak kodu",
     "foot.discord": "Discord sunucusu",
     "foot.note": "Her şey bu bilgisayarda çalışır",
 
@@ -207,6 +208,7 @@ const I18N = {
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",
     "foot.privacy": "Privacy",
+    "foot.source": "Source code",
     "foot.discord": "Discord server",
     "foot.note": "Everything runs on this computer",
 
@@ -346,6 +348,7 @@ const I18N = {
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",
     "foot.privacy": "Datenschutz",
+    "foot.source": "Quellcode",
     "foot.discord": "Discord-Server",
     "foot.note": "Alles läuft auf diesem Rechner",
 
@@ -485,6 +488,7 @@ const I18N = {
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",
     "foot.privacy": "Confidentialité",
+    "foot.source": "Code source",
     "foot.discord": "Serveur Discord",
     "foot.note": "Tout tourne sur cet ordinateur",
 

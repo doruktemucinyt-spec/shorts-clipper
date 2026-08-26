@@ -267,6 +267,11 @@ Bu ikisi silinirse GPU ve indirme çalışmaz.
    bilgisayara açık, dışarıya bir şey açılmıyor. `run.bat` artık `serve.py`
    çağırıyor; doğrudan `uvicorn server:app` ile başlatılırsa sorun geri gelir.
 
+## Lisans
+
+MIT. Kısaca: kullan, değiştir, dağıt; telif satırını koru; garanti yok.
+`LICENSE` dosyasındaki isim satırını istediğin gibi değiştirebilirsin.
+
 ## Yasal
 
 YouTube'dan video indirmek, kendi içeriğin veya izin aldığın içerik dışında

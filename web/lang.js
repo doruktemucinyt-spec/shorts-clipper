@@ -62,9 +62,14 @@ function applyLang(next) {
 /* Altbilgideki Discord maddesi. Adres config.js'te; bos oldugu surece
    tiklanamaz duz yazi olarak duruyor, doldurulunca baglantiya donusuyor. */
 function renderDiscord() {
-  const el = $("foot-discord");
+  disLink("foot-discord", typeof DISCORD_URL === "string" ? DISCORD_URL : "");
+  disLink("foot-source", typeof REPO_URL === "string" ? REPO_URL : "");
+}
+
+/** Adres varsa baglanti, yoksa tiklanamaz duz yazi. */
+function disLink(id, url) {
+  const el = $(id);
   if (!el) return;
-  const url = typeof DISCORD_URL === "string" ? DISCORD_URL : "";
   if (url) {
     el.href = url;
     el.target = "_blank";
