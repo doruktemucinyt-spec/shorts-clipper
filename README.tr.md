@@ -107,6 +107,11 @@ Site **https://clipclover.online** adresinde yayında (Vercel,
 statik). Yeniden yayınlamak için `deployclover.bat` — siteyi baştan üretip aynı
 adrese gönderiyor.
 
+Kurulum paketi de sitede duruyor: en üstteki **Bilgisayara kur** düğmesi
+`/download/ClipClover-Setup.zip` dosyasını indiriyor. Paketi `build_site.py`
+her yayında `package.py` ile yeniden üretiyor, yani sitedeki dosya koddaki
+halle hep aynı oluyor — elle güncellemek gerekmiyor.
+
 **İki ayrı izin var, karıştırmamak lazım:**
 
 1. *Tarayıcının izni* — Chrome, bir internet sitesinin yerel bilgisayara
