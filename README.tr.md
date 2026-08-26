@@ -103,7 +103,7 @@ Sebep: tarayıcı YouTube'dan video indiremiyor (YouTube başka sitelerin
 sayfalarının video adreslerini çekmesine izin vermiyor). Bu yüzden indiren
 taraf her zaman yerel bir program olmak zorunda.
 
-Site **https://shorts-clipper-seven.vercel.app** adresinde yayında (Vercel,
+Site **https://clipclover.online** adresinde yayında (Vercel,
 statik). Yeniden yayınlamak için `deploy.bat` — siteyi baştan üretip aynı
 adrese gönderiyor.
 

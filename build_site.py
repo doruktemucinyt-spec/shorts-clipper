@@ -36,7 +36,17 @@ def rewrite(html: str) -> str:
 
 # Vercel'de temiz adresler: /sss klasorunun index.html'i /sss olarak aciliyor,
 # bilinmeyen adresler 404.html'e dusuyor.
-VERCEL_CONFIG = {"cleanUrls": True, "trailingSlash": False}
+VERCEL_CONFIG = {
+    "cleanUrls": True,
+    "trailingSlash": False,
+    # www ile girenler asil adrese gonderiliyor: tek adres, tek izin kaydi.
+    "redirects": [{
+        "source": "/(.*)",
+        "has": [{"type": "host", "value": "www.clipclover.online"}],
+        "destination": "https://clipclover.online/$1",
+        "permanent": True,
+    }],
+}
 
 
 def build() -> Path:

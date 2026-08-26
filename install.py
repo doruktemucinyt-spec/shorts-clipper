@@ -120,7 +120,7 @@ def main() -> int:
     print("  'Kisayol olustur' -> cikan kisayolu masaustune tasi.")
     print()
     print("  Sonra sunlardan biriyle kullan:")
-    print("    https://shorts-clipper-seven.vercel.app   (site, izin ister)")
+    print("    https://clipclover.online   (site, izin ister)")
     print("    http://localhost:8000                     (dogrudan, izin gerekmez)")
     print()
     return 0

@@ -11,7 +11,7 @@ machine.
 
 *Türkçe ayrıntılı notlar: [README.tr.md](README.tr.md)*
 
-- Site: <https://shorts-clipper-seven.vercel.app> (invite-only beta)
+- Site: <https://clipclover.online> (invite-only beta)
 - Source: <https://github.com/doruktemucinyt-spec/shorts-clipper>
 - Help / invite keys: [Discord](https://discord.gg/8buKAhTPEs)
 

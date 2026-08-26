@@ -4,7 +4,7 @@ title ClipClover
 echo.
 echo   ClipClover calisiyor.
 echo.
-echo   Site:     https://shorts-clipper-seven.vercel.app
+echo   Site:     https://clipclover.online
 echo   ya da:    http://localhost:8000
 echo.
 echo   Bu pencereyi kapatinca durur.
