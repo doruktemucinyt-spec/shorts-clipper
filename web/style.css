@@ -100,19 +100,32 @@ body {
           mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 64%, transparent 94%);
 }
 
+/* Cizgiler tek katmanda olsaydi hepsi ayni hizda akardi. Dort katmana
+   bolunuyor: her katman 560px'de bir cizgi tasiyor ve 140px kaydirilmis
+   duruyor, yani ust uste geldiklerinde eski 140px'lik ritim ayni cikiyor --
+   ama her birinin kendi hizi var. Maske de kaydirildi ki darbeler ayni anda
+   gecmesin.                                                               */
 .stream-inner {
   position: absolute;
   inset: -260px 0;
   background-image: repeating-linear-gradient(90deg,
-    rgba(119, 232, 79, .55) 0 1px, transparent 1px 140px);
+    rgba(119, 232, 79, .55) 0 1px, transparent 1px 560px);
+  background-position: var(--kayma, 0) 0;
   -webkit-mask-image: repeating-linear-gradient(180deg,
     transparent 0 168px, #000 206px, #000 224px, transparent 260px);
           mask-image: repeating-linear-gradient(180deg,
     transparent 0 168px, #000 206px, #000 224px, transparent 260px);
-  animation: stream-up 7s steps(130, end) infinite;
+  -webkit-mask-position: 0 var(--maske, 0);
+          mask-position: 0 var(--maske, 0);
+  animation: stream-up var(--hiz, 7s) steps(130, end) infinite;
   will-change: transform;
   backface-visibility: hidden;
 }
+
+.stream-inner:nth-child(1) { --kayma:   0px; --hiz:  5.5s; --maske:   0px; }
+.stream-inner:nth-child(2) { --kayma: 140px; --hiz:  8.5s; --maske:  70px; }
+.stream-inner:nth-child(3) { --kayma: 280px; --hiz: 11.5s; --maske: 140px; }
+.stream-inner:nth-child(4) { --kayma: 420px; --hiz:  7.2s; --maske: 200px; }
 
 @keyframes stream-up {
   from { transform: translate3d(0, 0, 0); }
