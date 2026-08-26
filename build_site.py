@@ -74,12 +74,17 @@ def build() -> Path:
             shutil.rmtree(stash)
         shutil.move(str(link), str(stash))
 
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    (OUT / "assets").mkdir(parents=True)
-
-    if stash:
-        shutil.move(str(stash), str(link))
+    try:
+        if OUT.exists():
+            shutil.rmtree(OUT)
+        (OUT / "assets").mkdir(parents=True)
+    finally:
+        # Buradan hatayla cikilsa bile baglanti geri konmali. Konmazsa
+        # bir sonraki yayin Vercel'de YENI bir proje aciyor, alan adi
+        # eski projede kaliyor ve site bos gorunuyor.
+        if stash and stash.exists():
+            link.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(stash), str(link))
 
     (OUT / "vercel.json").write_text(
         json.dumps(VERCEL_CONFIG, indent=2), encoding="utf-8")
