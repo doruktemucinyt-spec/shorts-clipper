@@ -50,6 +50,8 @@ const I18N = {
     "hint.work": "İndirilen kaynak videolar ve ara dosyalar: {mb} MB. Silmek çıktıları etkilemez.",
     "hint.workEmpty": "Geçici dosya yok.",
     "hint.workFail": "Okunamadı.",
+    "hint.lightMode": "Bu bilgisayarda hafif kurulum var: cümleye hizalı bölme ve caption kapalı. Açmak için kurulumu 'tam' seçeneğiyle tekrar çalıştır.",
+    "job.needFull": "Bu iş transkript istiyor ama bilgisayarda hafif kurulum var. Kurulumu 'tam' seçeneğiyle tekrar çalıştır.",
 
     "foot.faq": "SSS",
     "foot.cookies": "Çerezler",
@@ -174,6 +176,8 @@ const I18N = {
     "hint.work": "Downloaded sources and intermediates: {mb} MB. Clearing does not touch your outputs.",
     "hint.workEmpty": "No temporary files.",
     "hint.workFail": "Could not read.",
+    "hint.lightMode": "This computer has the light install: sentence-aligned splitting and captions are off. Run the installer again with the 'full' option to enable them.",
+    "job.needFull": "This job needs a transcript, but the computer has the light install. Run the installer again with the 'full' option.",
 
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",
@@ -298,6 +302,8 @@ const I18N = {
     "hint.work": "Heruntergeladene Quellen und Zwischendateien: {mb} MB. Das Leeren betrifft die Ergebnisse nicht.",
     "hint.workEmpty": "Keine temporären Dateien.",
     "hint.workFail": "Nicht lesbar.",
+    "hint.lightMode": "Auf diesem Rechner ist die leichte Installation: satzweise Teilung und Untertitel sind aus. Führe die Installation erneut mit der Option 'voll' aus.",
+    "job.needFull": "Dieser Job braucht ein Transkript, aber der Rechner hat die leichte Installation. Führe die Installation erneut mit der Option 'voll' aus.",
 
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",
@@ -422,6 +428,8 @@ const I18N = {
     "hint.work": "Sources téléchargées et fichiers intermédiaires : {mb} Mo. Vider n'affecte pas vos rendus.",
     "hint.workEmpty": "Aucun fichier temporaire.",
     "hint.workFail": "Lecture impossible.",
+    "hint.lightMode": "Cet ordinateur a l'installation légère : découpage par phrases et sous-titres sont désactivés. Relance l'installation avec l'option « complète ».",
+    "job.needFull": "Ce travail demande une transcription, mais l'ordinateur a l'installation légère. Relance l'installation avec l'option « complète ».",
 
     "foot.faq": "FAQ",
     "foot.cookies": "Cookies",

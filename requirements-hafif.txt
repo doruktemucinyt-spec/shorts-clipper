@@ -1,0 +1,8 @@
+# Hafif kurulum: YouTube linkinden 9:16 partlar cikarmak icin gereken her sey.
+# Transkript (cumle sonuna hizali bolme ve caption) bunda yok -- onu isteyen
+# requirements.txt ile kuruyor.
+fastapi
+uvicorn[standard]
+yt-dlp
+truststore
+certifi

@@ -127,6 +127,11 @@ def run_job(job_id: str, req: JobRequest):
     pct = lambda stage, inner: _stage_pct(stage, inner, stages)
 
     try:
+        if need_transcript and not transcribe.available():
+            _emit(job_id, status="error", stage="error",
+                  error="transcript-unavailable", msg_key="job.needFull", msg_args={})
+            return
+
         # 1) Indirme
         _emit(job_id, stage="download", pct=0, msg_key="job.downloading", msg_args={})
         info = download(
@@ -314,7 +319,10 @@ def hello(request: Request):
     """Site once buraya soruyor: yardimci calisiyor mu, izinli miyim?"""
     origin = request.headers.get("origin", "")
     return {"app": "shorts-clipper", "version": APP_VERSION,
-            "paired": PAIR.is_local(origin) or PAIR.known(origin)}
+            "paired": PAIR.is_local(origin) or PAIR.known(origin),
+            # Hafif kurulumda transkript kutuphanesi yok; arayuz cumleye
+            # hizali bolme ve caption seceneklerini buna gore kapatiyor.
+            "transcript": transcribe.available()}
 
 
 @app.post("/api/pair")

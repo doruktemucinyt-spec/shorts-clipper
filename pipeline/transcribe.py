@@ -21,6 +21,13 @@ TRAIL = "”’\"')]"   # cumle sonundaki tirnak/parantezleri at
 MAX_UNIT = 14.0          # noktalama hic gelmezse en fazla bu kadar birikir
 
 
+def available() -> bool:
+    """Transkript kutuphanesi kurulu mu? Hafif kurulumda gelmiyor."""
+    import importlib.util
+
+    return importlib.util.find_spec("faster_whisper") is not None
+
+
 def extract_audio(source: Path, workdir: Path) -> Path:
     """Whisper icin 16kHz mono wav. mp4'u dogrudan okutmaktan daha guvenilir."""
     wav = workdir / "audio.wav"

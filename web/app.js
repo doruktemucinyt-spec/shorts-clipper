@@ -387,10 +387,26 @@ function setConnState(next) {
   paintConnection();
 }
 
+/** Hafif kurulumda transkript yok: o secenekleri kapatiyoruz ki kullanici
+    calismayacak bir isi baslatmasin. */
+function applyHelperFeatures(status) {
+  const noTranscript = status.running && status.transcript === false;
+  $("light-note").classList.toggle("hidden", !noTranscript);
+  const sentence = $("split").querySelector('option[value="sentence"]');
+  if (sentence) sentence.disabled = noTranscript;
+  $("captions").disabled = noTranscript;
+  if (noTranscript) {
+    if ($("split").value === "sentence") $("split").value = "fixed";
+    if ($("captions").checked) $("captions").checked = false;
+    updateCaptionOpts();
+  }
+}
+
 async function refreshConnection() {
   if (IS_LOCAL) return;
   setConnState("checking");
   const status = await helperStatus();
+  applyHelperFeatures(status);
   if (status.running) {
     setConnState(status.paired ? "ok" : "unpaired");
     return;
@@ -420,6 +436,9 @@ onLangChange(() => paintConnection());
 
 // Yardimcidan acildiysa hicbir sey sorulmuyor; siteden acildiysa kullanici
 // "Bagla" diyene kadar bekliyoruz.
-if (IS_LOCAL) setConnState("ok");
+if (IS_LOCAL) {
+  setConnState("ok");
+  helperStatus().then(applyHelperFeatures);    // hafif kurulum mu?
+}
 else if (helperToken) refreshConnection();
 else paintConnection();

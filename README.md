@@ -150,6 +150,29 @@ Yeni dil eklemek için `web/i18n.js` içindeki nesneye bir dil anahtarı, sonra
 İndirilen kaynak videolar `work/` altında birikir. Alt taraftaki **Temizle**
 butonu bunları siler; `output/` klasörüne dokunmaz.
 
+## Başka bir bilgisayara kurmak
+
+`kurulum.bat`'a çift tıkla (ya da `python kurulum.py`). İki seçenek sunuyor:
+
+- **Hafif** (~200 MB) — YouTube linkinden 9:16 partlar. Bölme tam sürede
+  yapılır, caption yoktur. Transkript kütüphanesi hiç kurulmaz.
+- **Tam** (~2 GB kurulum + ilk kullanımda ~3 GB altyazı modeli) — üstüne cümle
+  sonuna hizalı bölme ve caption yakma gelir.
+
+Kurulum sanal ortamı (`.venv`) proje klasörüne kuruyor, sistemde başka bir yeri
+değiştirmiyor; ffmpeg'i winget ile kurmayı ise soruyor, sessizce kurmuyor.
+
+Başlatmak için `baslat.bat`. Hafif kurulumda arayüz cümleye hizalı bölme ve
+caption seçeneklerini kendiliğinden kapatıyor, sunucu da `/api/hello` içinde
+`transcript: false` diyerek durumu bildiriyor.
+
+**Kurulum neden `.bat` değil de Python:** ilk sürüm toplu iş dosyasıydı ve
+içinden `powershell -ExecutionPolicy Bypass` çağırıp masaüstüne kısayol
+yazıyordu. Norton bunu zararlı yazılım kalıbı sayıp karantinaya aldı — haklı
+olarak, çünkü kalıp birebir aynı. Aynı iş Python'da yapılınca uyarı çıkmıyor.
+Kuruluma PowerShell çağrısı veya masaüstüne dosya yazma eklenirse sorun geri
+gelir.
+
 ## Bağımlılıklar
 
 - Python 3.12 + `pip install -r requirements.txt`

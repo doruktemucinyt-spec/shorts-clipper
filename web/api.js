@@ -70,7 +70,12 @@ async function helperStatus() {
     }));
     if (!res.ok) return { running: true, paired: false };
     const info = await res.json();
-    return { running: true, paired: Boolean(info.paired) || Boolean(helperToken), version: info.version };
+    return {
+      running: true,
+      paired: Boolean(info.paired) || Boolean(helperToken),
+      version: info.version,
+      transcript: info.transcript !== false,   // eski surumler bildirmiyorsa var say
+    };
   } catch {
     return { running: false, paired: false };     // yardimci kapali ya da kurulu degil
   }
