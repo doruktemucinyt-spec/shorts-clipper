@@ -1,7 +1,7 @@
 """Shorts Clipper kurulumu.
 
 Neden .bat degil de Python: kurulum isini bir toplu is dosyasinda yaptigimizda
-antivirus programlari (Norton, Avast...) bunu zararli yazilim kalibi sayip
+antivirus programlari bunu zararli yazilim kalibi sayip
 uyari veriyor. Ozellikle bat'in icinden PowerShell cagirmak ve masaustune
 dosya yazmak dogrudan "dropper" olarak isaretleniyor. Ayni isi Python'da
 yapinca hem uyari cikmiyor hem de ne yaptigi okunabiliyor.
