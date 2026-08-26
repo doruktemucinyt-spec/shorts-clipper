@@ -1,0 +1,246 @@
+"""YouTube -> Shorts Clipper. Yerel FastAPI sunucusu."""
+import json
+import queue
+import subprocess
+import threading
+import traceback
+import uuid
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+
+from pipeline import captions, render, segment, transcribe
+from pipeline.download import download
+from pipeline.tools import probe_dimensions
+
+ROOT = Path(__file__).parent
+WEB = ROOT / "web"
+WORK = ROOT / "work"
+OUTPUT = ROOT / "output"
+WORK.mkdir(exist_ok=True)
+OUTPUT.mkdir(exist_ok=True)
+
+# Asama agirliklari: toplam ilerleme yuzdesini bu araliklara dagitiyoruz.
+STAGES_FULL = {
+    "download": (0, 18), "transcribe": (18, 55),
+    "split": (55, 58), "render": (58, 100),
+}
+# Transkript atlanirsa render tum zamani kaplar
+STAGES_FAST = {
+    "download": (0, 12), "transcribe": (12, 12),
+    "split": (12, 14), "render": (14, 100),
+}
+
+app = FastAPI(title="Shorts Clipper")
+jobs = {}
+lock = threading.Lock()
+
+
+class JobRequest(BaseModel):
+    url: str
+    part_minutes: float = 4.0
+    highlight: str = "#FFD400"
+    model: str = "large-v3"
+    font: str = "Arial Black"
+    zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
+    captions: bool = False         # caption yakilsin mi
+    split_mode: str = "sentence"   # "sentence" | "fixed"
+
+
+def _emit(job_id: str, **fields):
+    with lock:
+        job = jobs.get(job_id)
+        if not job:
+            return
+        job.update(fields)
+        snapshot = {k: v for k, v in job.items() if k != "queue"}
+    jobs[job_id]["queue"].put(snapshot)
+
+
+def _stage_pct(stage: str, inner: float, stages=None) -> float:
+    lo, hi = (stages or STAGES_FULL)[stage]
+    return lo + (hi - lo) * max(0.0, min(100.0, inner)) / 100.0
+
+
+def run_job(job_id: str, req: JobRequest):
+    workdir = WORK / job_id
+    # Transkript sadece caption yakilacaksa ya da cumle sonuna hizali bolme
+    # istenirse gerekli. Ikisi de yoksa Whisper'i tamamen atliyoruz -- asil
+    # zamani yiyen adim o.
+    need_transcript = req.captions or req.split_mode == "sentence"
+    stages = STAGES_FULL if need_transcript else STAGES_FAST
+    pct = lambda stage, inner: _stage_pct(stage, inner, stages)
+
+    try:
+        # 1) Indirme
+        _emit(job_id, stage="download", pct=0, msg_key="job.downloading", msg_args={})
+        info = download(
+            req.url, workdir,
+            on_progress=lambda p, k, a: _emit(
+                job_id, pct=pct("download", p), msg_key=k, msg_args=a),
+        )
+        title, slug, source = info["title"], info["slug"], info["path"]
+        out_dir = OUTPUT / slug
+        out_dir.mkdir(parents=True, exist_ok=True)
+        _emit(job_id, title=title, slug=slug, out_dir=str(out_dir),
+              msg_key="job.downloaded", msg_args={"title": title})
+
+        src_w, src_h = probe_dimensions(source)
+        layout = render.compute_layout(src_w, src_h, req.zoom)
+        _emit(job_id, layout={"video_h": layout["video_h"], "band": layout["band"]})
+
+        # 2) Transkript (gerekiyorsa)
+        segments = []
+        if need_transcript:
+            _emit(job_id, stage="transcribe", pct=pct("transcribe", 0),
+                  msg_key="job.extractingAudio", msg_args={})
+            wav = transcribe.extract_audio(source, workdir)
+            result = transcribe.transcribe(
+                wav, model_size=req.model, duration=info["duration"],
+                on_progress=lambda p, k, a: _emit(
+                    job_id, pct=pct("transcribe", p), msg_key=k, msg_args=a),
+            )
+            segments = result["segments"]
+            _emit(job_id, device=result["device"], language=result["language"])
+            wav.unlink(missing_ok=True)
+
+        # 3) Bolme
+        _emit(job_id, stage="split", pct=pct("split", 50),
+              msg_key="job.splitting", msg_args={})
+        target = req.part_minutes * 60
+        if need_transcript and req.split_mode == "sentence":
+            parts = segment.build_parts(segments, target=target)
+        else:
+            parts = segment.build_parts_fixed(info["duration"], target=target)
+        total = len(parts)
+        if not total:
+            raise RuntimeError("Video bolunemedi (sure okunamadi).")
+        _emit(job_id, part_total=total,
+              msg_key="job.partsFound", msg_args={"total": total})
+
+        # 4) Render
+        _emit(job_id, stage="render", pct=pct("render", 0))
+        done_parts = []
+        used_nvenc = True
+        for p_ in parts:
+            idx = p_["index"]
+            name = f"part-{idx:02d}"
+            words = segment.words_in_range(segments, p_["start"], p_["end"])                 if req.captions else []
+            ass_text = captions.build_ass(
+                words, p_["start"], p_["duration"], title, idx, total,
+                font=req.font, highlight=req.highlight,
+                include_words=req.captions,
+            )
+            ass_file = workdir / f"{name}.ass"
+            ass_file.write_text(ass_text, encoding="utf-8")
+
+            def on_part(inner, idx=idx):
+                overall = ((idx - 1) + inner / 100.0) / total * 100.0
+                _emit(job_id, pct=pct("render", overall), msg_key="job.rendering",
+                      msg_args={"index": idx, "total": total, "pct": round(inner)})
+
+            out_file = out_dir / f"{name}.mp4"
+            used_nvenc = render.render_part(
+                source, workdir, f"{name}.ass", p_["start"], p_["duration"],
+                out_file, layout, use_nvenc=used_nvenc, on_progress=on_part,
+            )
+            done_parts.append({
+                "index": idx, "name": out_file.name,
+                "duration": round(p_["duration"], 1),
+                "url": f"/media/{slug}/{out_file.name}",
+            })
+            _emit(job_id, parts=list(done_parts))
+
+        _emit(job_id, stage="done", pct=100, status="done",
+              encoder="NVENC (GPU)" if used_nvenc else "libx264 (CPU)",
+              msg_key="job.done", msg_args={"total": total})
+    except Exception as exc:
+        _emit(job_id, status="error", stage="error", error=f"{exc}",
+              msg_key="job.failed", msg_args={"error": str(exc)[:400]})
+        traceback.print_exc()
+    finally:
+        jobs[job_id]["queue"].put(None)
+
+
+@app.post("/api/jobs")
+def create_job(req: JobRequest):
+    job_id = uuid.uuid4().hex[:12]
+    jobs[job_id] = {
+        "id": job_id, "status": "running", "stage": "download", "pct": 0,
+        "msg_key": "job.starting", "msg_args": {}, "parts": [], "title": "", "url": req.url,
+        "queue": queue.Queue(),
+    }
+    threading.Thread(target=run_job, args=(job_id, req), daemon=True).start()
+    return {"id": job_id}
+
+
+@app.get("/api/jobs/{job_id}")
+def get_job(job_id: str):
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(404, "Is bulunamadi")
+    return {k: v for k, v in job.items() if k != "queue"}
+
+
+@app.get("/api/jobs/{job_id}/events")
+def job_events(job_id: str):
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(404, "Is bulunamadi")
+
+    def stream():
+        snapshot = {k: v for k, v in job.items() if k != "queue"}
+        yield f"data: {json.dumps(snapshot)}\n\n"
+        while True:
+            item = job["queue"].get()
+            if item is None:
+                yield "event: end\ndata: {}\n\n"
+                break
+            yield f"data: {json.dumps(item)}\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache",
+                                      "X-Accel-Buffering": "no"})
+
+
+class RevealRequest(BaseModel):
+    path: str
+
+
+@app.get("/api/workspace")
+def workspace_size():
+    total = sum(f.stat().st_size for f in WORK.rglob("*") if f.is_file())
+    return {"bytes": total, "mb": round(total / 1024 / 1024, 1)}
+
+
+@app.post("/api/workspace/clear")
+def workspace_clear():
+    """Indirilen kaynak videolar ve ara dosyalar. output/ klasorune dokunmaz."""
+    import shutil
+    freed = 0
+    for child in WORK.iterdir():
+        if child.is_dir():
+            freed += sum(f.stat().st_size for f in child.rglob("*") if f.is_file())
+            shutil.rmtree(child, ignore_errors=True)
+    return {"freed_mb": round(freed / 1024 / 1024, 1)}
+
+
+@app.post("/api/reveal")
+def reveal(req: RevealRequest):
+    target = Path(req.path)
+    if not target.exists():
+        raise HTTPException(404, "Klasor yok")
+    subprocess.Popen(["explorer", str(target)])
+    return {"ok": True}
+
+
+app.mount("/media", StaticFiles(directory=str(OUTPUT)), name="media")
+app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
+
+
+@app.get("/")
+def index():
+    return FileResponse(WEB / "index.html")

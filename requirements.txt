@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+yt-dlp
+faster-whisper
+truststore
+certifi
+# GPU (opsiyonel, yoksa CPU'ya duser):
+nvidia-cublas-cu12
+nvidia-cudnn-cu12

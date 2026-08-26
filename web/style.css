@@ -1,0 +1,591 @@
+:root {
+  --bg: #08080a;
+  --accent: #ffd400;
+  --accent-warm: #ff9d00;
+  --fg: #f2f2f5;
+  --dim: #9c9ca6;
+  --faint: #7c7c87;
+  --line: rgba(255, 255, 255, .1);
+  --line-soft: rgba(255, 255, 255, .06);
+  /* Cam yuzeyin KENDI koyu tabani var. Saf beyaz saydamlik kullanirsam
+     arkadaki sari kubbeyi emip kahverengiye donuyor.                      */
+  --glass: linear-gradient(180deg, rgba(24, 24, 29, .72), rgba(15, 15, 19, .66));
+  --sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --danger: #ff4d6d;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 15px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Arka plan katmanlari ------------------------------------------
+   Ucu katman: sicak isik kubbesi, zaman cizelgesi cizgileri, ince grain.
+   Hepsi fixed ve tiklanamaz; icerik uzerlerinde cam gibi duruyor.          */
+
+.backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+
+.glow {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: -56vh;
+  transform: translateX(-50%);
+  width: 150vw;
+  height: 100vh;
+  background:
+    radial-gradient(40% 42% at 50% 50%, rgba(255, 212, 0, .30) 0%, rgba(255, 212, 0, 0) 66%),
+    radial-gradient(56% 54% at 50% 52%, rgba(255, 138, 0, .16) 0%, rgba(255, 138, 0, 0) 70%),
+    radial-gradient(78% 66% at 50% 54%, rgba(255, 90, 0, .06) 0%, rgba(255, 90, 0, 0) 76%);
+  filter: blur(14px);
+}
+
+/* Isik kubbesi asagi tasmasin: govdeyi tekrar siyaha cekiyoruz ki kartlar
+   parlamanin uzerinde degil, koyu zeminde otursun.                        */
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(8, 8, 10, .35) 42%, rgba(8, 8, 10, .88) 68%, var(--bg) 84%),
+    radial-gradient(130% 78% at 50% 0%, transparent 46%, rgba(0, 0, 0, .55) 100%);
+}
+
+/* Video araci oldugu icin arka plana bir zaman cizelgesi cetveli koydum:
+   ince kucuk tikler + seyrek parlak ana tikler.                            */
+.ticks {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(90deg, rgba(255, 212, 0, .10) 0 1px, transparent 1px 280px);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 58%, transparent 88%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 58%, transparent 88%);
+  opacity: .8;
+}
+
+/* Akan isik darbeleri. Optimizasyon: animasyon SADECE transform uzerinde
+   calisiyor, GPU katmaninda kompoze ediliyor -- layout/paint tetiklemiyor.
+   Ic katman tam bir doku boyu (260px) yukari kayip basa donuyor, bu yuzden
+   dongu dikissiz. Solma maskesi disaridaki sabit katmanda, yoksa o da
+   animasyonla birlikte kayardi.                                            */
+.stream {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 64%, transparent 94%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 64%, transparent 94%);
+}
+
+.stream-inner {
+  position: absolute;
+  inset: -260px 0;
+  background-image: repeating-linear-gradient(90deg,
+    rgba(255, 212, 0, .55) 0 1px, transparent 1px 140px);
+  -webkit-mask-image: repeating-linear-gradient(180deg,
+    transparent 0 168px, #000 206px, #000 224px, transparent 260px);
+          mask-image: repeating-linear-gradient(180deg,
+    transparent 0 168px, #000 206px, #000 224px, transparent 260px);
+  animation: stream-up 7s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes stream-up {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -260px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stream-inner { animation: none; }
+}
+
+.grain {
+  position: absolute;
+  inset: -50%;
+  z-index: 4;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Yerlesim ------------------------------------------------------ */
+
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px 20px 96px;
+}
+
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 34px;
+}
+.brand { min-width: 0; }
+
+/* ---------- Dil secici ---------------------------------------------------- */
+
+.lang { position: relative; flex: none; }
+
+.globe {
+  position: relative;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  padding: 0;
+  border-radius: 13px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.globe svg {
+  width: 21px; height: 21px;
+  stroke: var(--dim);
+  stroke-width: 1.5;
+  transition: stroke .18s ease;
+}
+.globe:hover { border-color: rgba(255, 212, 0, .38); }
+.globe:hover svg { stroke: var(--accent); }
+
+/* Tiklama: kure ekseni etrafinda donuyor, disina bir halka aciliyor */
+.globe.spin svg { animation: globe-spin .62s cubic-bezier(.45, 0, .25, 1); }
+.globe.spin::after { animation: globe-ring .62s ease-out; }
+
+.globe::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes globe-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+@keyframes globe-ring {
+  0%   { opacity: .85; transform: scale(.86); }
+  100% { opacity: 0;   transform: scale(1.55); }
+}
+
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 20;
+  padding: 5px;
+  white-space: nowrap;
+  border-radius: 15px;
+  /* Liquid glass: bulanik bir panel degil, optik bir cisim.
+     - feDisplacementMap arkadaki goruntuyu kenarlarda buker (kirilma)
+     - blur neredeyse yok, cunku cam saydam; bulaniklik camin ozelligi degil
+     - govde rengi yok denecek kadar az: arkasi gercekten gorunuyor
+     - kalinlik hissi kenar yansimalarindan (specular) geliyor            */
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: url(#liquid-glass) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass) blur(1px) saturate(175%) brightness(1.04);
+  border: 1px solid rgba(255, 255, 255, 0);
+  box-shadow:
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, .34),    /* sol ust kenar parlamasi */
+    inset -1.5px -1.5px 0 rgba(255, 255, 255, .10),  /* karsi kenar, daha sonuk */
+    inset 0 0 26px rgba(255, 255, 255, .05),         /* govde ici yumusak isik */
+    0 22px 54px -22px rgba(0, 0, 0, .85),
+    0 0 30px -12px rgba(255, 212, 0, .2);
+  /* Morph: cam kurenin oldugu yerden dogar. clip-path kurenin genisliginde
+     ve sifir yuksekliginde bir dilimden baslayip tam menuye aciliyor.
+     Kenar parlamalari, dis hale ve backdrop-filter hepsi bu sekle bagli
+     oldugu icin cam buyudukce olusuyor -- ayrica animasyon gerekmiyor. */
+  --globe: 44px;
+  opacity: 0;
+  transform: translateY(-6px) scale(.97);
+  transform-origin: 100% 0;
+  clip-path: inset(0 0 100% calc(100% - var(--globe)) round 14px);
+  pointer-events: none;
+  /* Bu kural KAPANISI tanimlar: cam hizlanarak kureye geri emiliyor.
+     Opaklik gecikmeli soluyor, yoksa morph gorunmeden kayboluyordu. */
+  transition:
+    opacity .3s ease .08s,
+    clip-path .4s cubic-bezier(.55, 0, .8, .3),
+    transform .4s cubic-bezier(.55, 0, .8, .3),
+    background-color .3s ease,
+    border-color .26s ease;
+}
+
+.lang-menu.open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  clip-path: inset(0 0 0 0 round 15px);
+  background: rgba(255, 255, 255, .045);
+  border-color: rgba(255, 255, 255, .18);
+  /* ACILIS: yavas ve yaylanmali, kapanistan farkli */
+  transition:
+    opacity .14s ease,
+    clip-path .62s cubic-bezier(.38, .7, .2, 1),
+    transform .62s cubic-bezier(.34, 1.22, .4, 1),
+    background-color .5s ease,
+    border-color .45s ease;
+}
+
+/* Filtreyi isitma katmani. Ayrintisi index.html'de. */
+.glass-warm {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 6px;
+  z-index: 0;
+  opacity: .02;
+  pointer-events: none;
+  backdrop-filter: url(#liquid-glass);
+  -webkit-backdrop-filter: url(#liquid-glass);
+}
+
+.lang-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 15% 0%,
+    rgba(255, 255, 255, .1) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+.lang-menu button {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 8px 12px 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--dim);
+  font: 400 14px var(--sans);
+  text-align: left;
+}
+.flag {
+  flex: none;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  /* Koyu zeminde bayragin kenari kaybolmasin diye ince bir cerceve */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 1px 3px rgba(0, 0, 0, .5);
+  opacity: .92;
+  transition: opacity .18s ease;
+}
+.lang-menu button:hover .flag,
+.lang-menu button.active .flag { opacity: 1; }
+.lang-menu button:hover { background: rgba(255, 255, 255, .06); color: var(--fg); }
+.lang-menu button.active { color: var(--accent); }
+
+.mark { display: flex; align-items: flex-end; gap: 4px; height: 22px; margin-bottom: 16px; }
+.mark span {
+  width: 5px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-warm));
+  box-shadow: 0 0 14px rgba(255, 212, 0, .45);
+}
+.mark span:nth-child(1) { height: 11px; }
+.mark span:nth-child(2) { height: 22px; }
+.mark span:nth-child(3) { height: 15px; }
+
+h1 {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #ffffff 30%, #b9b9c4 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+.sub {
+  margin: 8px 0 0;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .01em;
+}
+
+h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+
+/* ---------- Cam kartlar --------------------------------------------------- */
+
+.card {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow:
+    0 22px 60px -26px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .075);
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--accent);
+  background: rgba(255, 212, 0, .08);
+  border: 1px solid rgba(255, 212, 0, .22);
+  padding: 4px 10px;
+  border-radius: 99px;
+  margin-bottom: 20px;
+}
+
+.head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Form ---------------------------------------------------------- */
+
+label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  margin: 20px 0 8px;
+}
+.card > label:first-of-type, .tag + label { margin-top: 0; }
+
+input, select {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, .45);
+  color: var(--fg);
+  border: 1px solid var(--line-soft);
+  border-radius: 11px;
+  font: 400 15px var(--sans);
+  transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+input::placeholder { color: #4d4d55; }
+
+input:focus, select:focus {
+  outline: none;
+  border-color: rgba(255, 212, 0, .5);
+  background: rgba(0, 0, 0, .58);
+  box-shadow: 0 0 0 3px rgba(255, 212, 0, .13);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%2393939c' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+select option { background: #131317; color: var(--fg); }
+
+.row { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 14px; }
+.row.two { grid-template-columns: 1fr 1fr; }
+.row label { margin-top: 20px; }
+
+input[type=color] {
+  padding: 5px;
+  height: 46px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, .45);
+}
+
+/* Kaydiraci elle bicimlendiriyoruz ki sari cizgi ve tutamak tema ile uysun */
+input[type=range] {
+  appearance: none;
+  padding: 0;
+  height: 30px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+input[type=range]:focus { box-shadow: none; }
+input[type=range]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(255, 212, 0, .55), rgba(255, 157, 0, .22));
+  border: 1px solid var(--line-soft);
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px; height: 18px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fff2a8, var(--accent));
+  border: 1px solid rgba(0, 0, 0, .5);
+  box-shadow: 0 0 16px rgba(255, 212, 0, .55);
+}
+input[type=range]::-moz-range-track {
+  height: 5px; border-radius: 99px;
+  background: linear-gradient(90deg, rgba(255, 212, 0, .55), rgba(255, 157, 0, .22));
+}
+input[type=range]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 1px solid rgba(0, 0, 0, .5);
+  box-shadow: 0 0 16px rgba(255, 212, 0, .55);
+}
+
+.check { display: flex; align-items: center; gap: 10px; margin-top: 22px; }
+.check input {
+  appearance: none;
+  width: 19px; height: 19px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .45);
+  cursor: pointer;
+  display: grid; place-content: center;
+  transition: background .16s ease, border-color .16s ease;
+}
+.check input::before {
+  content: "";
+  width: 10px; height: 10px;
+  clip-path: polygon(14% 47%, 0 61%, 40% 100%, 100% 20%, 85% 8%, 38% 71%);
+  background: #1b1500;
+  transform: scale(0);
+  transition: transform .14s ease;
+}
+.check input:checked {
+  background: linear-gradient(180deg, #ffe14d, var(--accent));
+  border-color: transparent;
+  box-shadow: 0 0 14px rgba(255, 212, 0, .45);
+}
+.check input:checked::before { transform: scale(1); }
+.check label {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.hint { margin: 10px 0 0; font-family: var(--mono); font-size: 11.5px; color: var(--faint); line-height: 1.55; }
+
+/* ---------- Butonlar ------------------------------------------------------ */
+
+button {
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 20px;
+  font: 500 15px var(--sans);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:active:not(:disabled) { transform: translateY(1px); }
+
+.primary {
+  width: 100%;
+  margin-top: 24px;
+  font-weight: 600;
+  color: #1b1500;
+  background: linear-gradient(180deg, #ffe14d, var(--accent) 55%, #f0a800);
+  box-shadow: 0 10px 30px -10px rgba(255, 190, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+.primary:hover:not(:disabled) { box-shadow: 0 14px 40px -10px rgba(255, 190, 0, .8), inset 0 1px 0 rgba(255, 255, 255, .55); }
+
+.ghost {
+  background: rgba(255, 255, 255, .04);
+  color: var(--dim);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+.ghost:hover { color: var(--fg); background: rgba(255, 255, 255, .08); border-color: rgba(255, 212, 0, .35); }
+
+/* ---------- Ilerleme ------------------------------------------------------ */
+
+.bar {
+  height: 6px;
+  background: rgba(0, 0, 0, .5);
+  border: 1px solid var(--line-soft);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent));
+  box-shadow: 0 0 18px rgba(255, 212, 0, .55);
+  transition: width .3s ease;
+}
+.fill.error { background: var(--danger); box-shadow: 0 0 18px rgba(255, 77, 109, .5); }
+
+.status { margin: 16px 0 0; font-size: 14.5px; }
+.meta { margin: 6px 0 0; font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
+#reveal { margin-top: 16px; }
+
+.parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 14px; margin-top: 20px; }
+.part {
+  background: rgba(255, 255, 255, .035);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  padding: 9px;
+  transition: border-color .18s ease;
+}
+.part:hover { border-color: rgba(255, 212, 0, .35); }
+.part video {
+  width: 100%;
+  aspect-ratio: 9 / 16;   /* metadata gelmeden de kutular esit yukseklikte dursun */
+  border-radius: 9px;
+  display: block;
+  background: #000;
+  object-fit: contain;
+}
+.part span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 9px;
+}
+
+/* ---------- Gecmis -------------------------------------------------------- */
+
+.history div {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 14px;
+}
+.history div:last-child { border-bottom: 0; }
+.history .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history .when { font-family: var(--mono); font-size: 11px; color: var(--faint); white-space: nowrap; }
+
+.empty { color: var(--faint); font-family: var(--mono); font-size: 12px; margin: 0; }
+.hidden { display: none; }
+
+@media (max-width: 560px) {
+  main { padding: 44px 16px 72px; }
+  h1 { font-size: 30px; }
+  .row, .row.two { grid-template-columns: 1fr; }
+}

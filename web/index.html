@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shorts Clipper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<svg class="filters" aria-hidden="true">
+  <filter id="liquid-glass" x="0%" y="0%" width="100%" height="100%"
+          color-interpolation-filters="sRGB">
+    <!-- Yer degistirme haritasi: R kanali yatay, G kanali dikey kirilmayi
+         tasiyor. Merkez notr (127,127) oldugu icin cam ortada duz, kenarlara
+         dogru mercek gibi buker. -->
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%237f0000%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ff0000%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="mapX"/>
+    <feImage href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23000000%22%2F%3E%3Cstop%20offset%3D%220.32%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%220.68%22%20stop-color%3D%22%23007f00%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2300ff00%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E" preserveAspectRatio="none"
+             x="0%" y="0%" width="100%" height="100%" result="mapY"/>
+    <feComposite in="mapX" in2="mapY" operator="arithmetic"
+                 k1="0" k2="1" k3="1" k4="0" result="map"/>
+
+    <!-- Kromatik sapma: gercek camda kirmizi, yesil ve mavi farkli acilarda
+         kirilir. Uc kanali ayri olcekte buküp yeniden birlestiriyoruz.
+         Acilirken R ve B ayrisip renk sacagi yapiyor, sonra yesile
+         yakinsayarak kayboluyor -- durgun halde uc kanal da esit. -->
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="56"
+                       xChannelSelector="R" yChannelSelector="G" result="dR">
+      <animate id="disp-r" attributeName="scale" begin="indefinite" dur="0.62s"
+               values="56;94;56" keyTimes="0;0.36;1" fill="freeze"
+               calcMode="spline" keySplines="0.4 0 0.3 1; 0.3 0 0.25 1"/>
+    </feDisplacementMap>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="56"
+                       xChannelSelector="R" yChannelSelector="G" result="dG"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="56"
+                       xChannelSelector="R" yChannelSelector="G" result="dB">
+      <animate id="disp-b" attributeName="scale" begin="indefinite" dur="0.62s"
+               values="56;20;56" keyTimes="0;0.36;1" fill="freeze"
+               calcMode="spline" keySplines="0.4 0 0.3 1; 0.3 0 0.25 1"/>
+    </feDisplacementMap>
+
+    <feColorMatrix in="dR" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyR"/>
+    <feColorMatrix in="dG" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="onlyG"/>
+    <feColorMatrix in="dB" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="onlyB"/>
+    <feComposite in="onlyR" in2="onlyG" operator="arithmetic"
+                 k1="0" k2="1" k3="1" k4="0" result="rg"/>
+    <feComposite in="rg" in2="onlyB" operator="arithmetic"
+                 k1="0" k2="1" k3="1" k4="0"/>
+  </filter>
+</svg>
+
+<!-- Filtre isitmasi: feImage'lar ilk kullanimda cozulurken efekt bir kez
+     atliyordu (ilk tikta animasyon oynamiyor, ikincide oynuyordu). Bu 6px'lik
+     katman ayni filtreyi sayfa acilir acilmaz kullanarak onlari hazir tutuyor. -->
+<div class="glass-warm" aria-hidden="true"></div>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="glow"></div>
+  <div class="ticks"></div>
+  <div class="stream"><div class="stream-inner"></div></div>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <header class="masthead">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1>Shorts Clipper</h1>
+      <p class="sub" data-i18n="sub"></p>
+    </div>
+
+    <div class="lang">
+      <button id="lang-btn" class="globe" aria-haspopup="menu" aria-expanded="false" title="Dil">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <ellipse cx="12" cy="12" rx="4" ry="9"/>
+          <path d="M3.4 9h17.2M3.4 15h17.2"/>
+        </svg>
+      </button>
+      <div id="lang-menu" class="lang-menu" role="menu">
+        <button role="menuitem" data-lang="tr"><svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#E30A17"/><circle cx="10.5" cy="12" r="6.3" fill="#fff"/><circle cx="12.5" cy="12" r="5.1" fill="#E30A17"/><polygon fill="#fff" points="20.9,12 18.6,12.8 18.55,15.23 17.08,13.29 14.75,14 16.14,12 14.75,10 17.08,10.71 18.55,8.77 18.6,11.2"/></svg><span>Türkçe</span></button>
+        <button role="menuitem" data-lang="en"><svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#012169"/><path d="M0 0 24 24M24 0 0 24" stroke="#fff" stroke-width="5"/><path d="M0 0 24 24M24 0 0 24" stroke="#C8102E" stroke-width="2.8"/><path d="M12 0v24M0 12h24" stroke="#fff" stroke-width="8"/><path d="M12 0v24M0 12h24" stroke="#C8102E" stroke-width="4.8"/></svg><span>English</span></button>
+        <button role="menuitem" data-lang="de"><svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="8" fill="#000"/><rect y="8" width="24" height="8" fill="#DD0000"/><rect y="16" width="24" height="8" fill="#FFCE00"/></svg><span>Deutsch</span></button>
+        <button role="menuitem" data-lang="fr"><svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="24" fill="#002395"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" fill="#ED2939"/></svg><span>Français</span></button>
+      </div>
+    </div>
+  </header>
+
+  <section class="card">
+    <span class="tag" data-i18n="tag.source"></span>
+
+    <label for="url" data-i18n="label.url"></label>
+    <input id="url" type="url" data-i18n-placeholder="ph.url" autocomplete="off">
+
+    <div class="row two">
+      <div>
+        <label for="minutes" data-i18n="label.minutes"></label>
+        <input id="minutes" type="number" min="1" max="15" step="0.5" value="4">
+      </div>
+      <div>
+        <label for="split" data-i18n="label.split"></label>
+        <select id="split">
+          <option value="sentence" data-i18n="opt.sentence"></option>
+          <option value="fixed" data-i18n="opt.fixed"></option>
+        </select>
+      </div>
+    </div>
+
+    <label for="zoom" data-i18n="label.zoom"></label>
+    <input id="zoom" type="range" min="100" max="250" step="5" value="140">
+    <p class="hint" id="zoom-hint"></p>
+
+    <div class="check">
+      <input id="captions" type="checkbox">
+      <label for="captions" data-i18n="check.captions"></label>
+    </div>
+
+    <div id="caption-opts" class="row two hidden">
+      <div>
+        <label for="highlight" data-i18n="label.highlight"></label>
+        <input id="highlight" type="color" value="#FFD400">
+      </div>
+      <div>
+        <label for="model" data-i18n="label.model"></label>
+        <select id="model">
+          <option value="large-v3" data-i18n="opt.large"></option>
+          <option value="medium" data-i18n="opt.medium"></option>
+          <option value="small" data-i18n="opt.small"></option>
+        </select>
+      </div>
+    </div>
+
+    <button id="start" class="primary"></button>
+  </section>
+
+  <section class="card hidden" id="progress-card">
+    <span class="tag" data-i18n="tag.process"></span>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <p class="status" id="status"></p>
+    <p class="meta" id="meta"></p>
+    <button id="reveal" class="ghost hidden" data-i18n="btn.reveal"></button>
+    <div id="parts" class="parts"></div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <h2 data-i18n="h2.history"></h2>
+      <div class="actions">
+        <button id="export" class="ghost" data-i18n="btn.export"></button>
+        <button id="import-btn" class="ghost" data-i18n="btn.import"></button>
+        <input id="import" type="file" accept="application/json" hidden>
+      </div>
+    </div>
+    <div id="history" class="history"></div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <h2 data-i18n="h2.temp"></h2>
+      <div class="actions">
+        <button id="clear-work" class="ghost" data-i18n="btn.clear"></button>
+      </div>
+    </div>
+    <p class="hint" id="work-size"></p>
+  </section>
+</main>
+
+<script src="/static/i18n.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

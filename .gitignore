@@ -1,0 +1,11 @@
+# Indirilen kaynak videolar ve ara dosyalar
+work/
+
+# Render edilen partlar -- buyuk dosyalar, yeniden uretilebilir
+output/
+
+# Gelistirme sirasinda alinan ekran goruntuleri
+*.png
+
+__pycache__/
+*.pyc
