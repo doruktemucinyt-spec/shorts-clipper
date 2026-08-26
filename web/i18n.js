@@ -51,6 +51,11 @@ const I18N = {
     "hint.workEmpty": "Geçici dosya yok.",
     "hint.workFail": "Okunamadı.",
 
+    "foot.faq": "SSS",
+    "foot.cookies": "Çerezler",
+    "foot.privacy": "Gizlilik",
+    "foot.note": "Her şey bu bilgisayarda çalışır",
+
     "history.empty": "Henüz iş yok.",
     "history.parts": "{count} part",
     "part.label": "Part {index} · {duration}s",
@@ -131,6 +136,11 @@ const I18N = {
     "hint.work": "Downloaded sources and intermediates: {mb} MB. Clearing does not touch your outputs.",
     "hint.workEmpty": "No temporary files.",
     "hint.workFail": "Could not read.",
+
+    "foot.faq": "FAQ",
+    "foot.cookies": "Cookies",
+    "foot.privacy": "Privacy",
+    "foot.note": "Everything runs on this computer",
 
     "history.empty": "No jobs yet.",
     "history.parts": "{count} parts",
@@ -213,6 +223,11 @@ const I18N = {
     "hint.workEmpty": "Keine temporären Dateien.",
     "hint.workFail": "Nicht lesbar.",
 
+    "foot.faq": "FAQ",
+    "foot.cookies": "Cookies",
+    "foot.privacy": "Datenschutz",
+    "foot.note": "Alles läuft auf diesem Rechner",
+
     "history.empty": "Noch keine Aufträge.",
     "history.parts": "{count} Teile",
     "part.label": "Teil {index} · {duration}s",
@@ -293,6 +308,11 @@ const I18N = {
     "hint.work": "Sources téléchargées et fichiers intermédiaires : {mb} Mo. Vider n'affecte pas vos rendus.",
     "hint.workEmpty": "Aucun fichier temporaire.",
     "hint.workFail": "Lecture impossible.",
+
+    "foot.faq": "FAQ",
+    "foot.cookies": "Cookies",
+    "foot.privacy": "Confidentialité",
+    "foot.note": "Tout tourne sur cet ordinateur",
 
     "history.empty": "Aucune tâche pour l'instant.",
     "history.parts": "{count} parties",

@@ -79,6 +79,17 @@ Video başlığı ve "Part N" yazısı caption ayarından bağımsız, her zaman
 Ayarlar ve geçmiş tarayıcıda (localStorage) tutulur. **Yedek indir** ile JSON olarak
 dışarı alıp başka bilgisayarda **Yedekten yükle** ile geri koyabilirsin.
 
+## Bilgi sayfaları
+
+Alt taraftaki bağlantılardan üç sayfa açılıyor: **SSS** (`/sss`), **Çerezler**
+(`/cerez`) ve **Gizlilik** (`/gizlilik`). Olmayan bir adres yazılırsa aynı
+kabuk 404 sayfası olarak açılıyor (API adresleri JSON dönmeye devam ediyor).
+
+Metinler `web/pages.js` içinde, dört dilde; sayfa kabuğu `web/page.html`,
+gösterim `web/page.js`. Dil menüsü ve çeviri artık ortak `web/lang.js`
+dosyasında — ana sayfa da bilgi sayfaları da onu kullanıyor, yani menü tek
+yerden yönetiliyor.
+
 ## Dil
 
 Sağ üstteki küre butonundan Türkçe, İngilizce, Almanca ve Fransızca arasında

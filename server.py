@@ -7,10 +7,11 @@ import traceback
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
@@ -284,3 +285,21 @@ app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
 @app.get("/")
 def index():
     return FileResponse(WEB / "index.html")
+
+
+# Bilgi sayfalarinin hepsi ayni kabugu kullaniyor; hangi metnin gosterilecegine
+# tarayici tarafinda adrese bakarak karar veriliyor (web/page.js).
+@app.get("/sss")
+@app.get("/cerez")
+@app.get("/gizlilik")
+def info_page():
+    return FileResponse(WEB / "page.html")
+
+
+@app.exception_handler(StarletteHTTPException)
+def not_found(request: Request, exc: StarletteHTTPException):
+    """Olmayan adresler icin 404 sayfasi. API ve dosya yollari JSON aliyor."""
+    api_like = request.url.path.startswith(("/api", "/media", "/static", "/preview"))
+    if exc.status_code == 404 and not api_like:
+        return FileResponse(WEB / "page.html", status_code=404)
+    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
