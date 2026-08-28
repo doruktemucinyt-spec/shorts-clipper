@@ -91,6 +91,21 @@ function renderDiscord() {
   disLink("foot-source", typeof REPO_URL === "string" ? REPO_URL : "");
   // Kurulum dosyasi GitHub'da durdugu icin baglanti config.js'ten geliyor
   disLink("install-btn", typeof SETUP_URL === "string" ? SETUP_URL : "");
+  showVersion(typeof APP_VERSION === "string" ? APP_VERSION : "");
+}
+
+/* Altbilgideki surum. Iki yerden gelebiliyor: sitede config.js'ten (yayinlanan
+   surum), yardimcinin kendi adresinde /api/hello'dan. Ikincisi asenkron geldigi
+   icin deger burada saklaniyor -- yoksa dil her uygulandiginda altbilgi bastan
+   yaziliyor ve yardimcidan gelen surumu siliyordu. Bos cagri var olani bozmuyor. */
+let surumMetni = "";
+
+function showVersion(ver) {
+  if (ver) surumMetni = String(ver);
+  const el = $("app-version");
+  if (!el) return;
+  el.textContent = surumMetni ? `v${surumMetni}` : "";
+  $("ver-sep")?.classList.toggle("hidden", !surumMetni);
 }
 
 /** Adres varsa baglanti, yoksa tiklanamaz duz yazi. */

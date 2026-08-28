@@ -20,6 +20,7 @@ dogru yer degil; GitHub Releases bu is icin ucretsiz ve sinirsiz.
 """
 import hashlib
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -58,6 +59,19 @@ def rewrite(html: str, harita: dict) -> str:
     for eski_yol, yeni_yol in harita.items():
         html = html.replace(eski_yol, yeni_yol)
     return html
+
+
+def oku_surum() -> str:
+    """Surumu server.py'den okuyor: tek kaynak orasi, iki yerde tutulmuyor.
+
+    Import etmek yerine metin olarak okunuyor -- build_site.py'nin FastAPI'yi
+    yuklemesi gerekmesin.
+    """
+    metin = (ROOT / "server.py").read_text(encoding="utf-8")
+    m = re.search(r'^APP_VERSION\s*=\s*"([^"]+)"', metin, re.M)
+    if not m:
+        raise RuntimeError("server.py icinde APP_VERSION bulunamadi")
+    return m.group(1)
 
 
 def damgali_ad(ad: str, veri: bytes) -> str:
@@ -124,9 +138,15 @@ def build() -> Path:
     (OUT / "vercel.json").write_text(
         json.dumps(VERCEL_CONFIG, indent=2), encoding="utf-8")
 
+    surum = oku_surum()
+
     harita = {}
     for name in ASSETS:
         veri = (WEB / name).read_bytes()
+        if name == "config.js":
+            # Surumun tek kaynagi server.py; site uretilirken buraya yaziliyor.
+            veri = veri.replace(b'const APP_VERSION = "";',
+                                f'const APP_VERSION = "{surum}";'.encode("utf-8"))
         yeni_ad = damgali_ad(name, veri)
         (OUT / "assets" / yeni_ad).write_bytes(veri)
         harita[f"/assets/{name}"] = f"/assets/{yeni_ad}"

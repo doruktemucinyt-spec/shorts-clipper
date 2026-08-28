@@ -654,7 +654,23 @@ def tiktok_send(req: TikTokSendRequest):
 
 app.mount("/preview", StaticFiles(directory=str(PREVIEW)), name="preview")
 app.mount("/media", StaticFiles(directory=str(OUTPUT)), name="media")
-app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
+class TazeStatic(StaticFiles):
+    """Arayuz dosyalari her acilista tazelensin.
+
+    Tarayici Cache-Control gormeyince kendi tahminini yuruttuyor ve
+    guncellemeden sonra ESKI js/css'i calistirabiliyordu -- ekranda yeni
+    surum, davranista eski. no-cache dosyayi yasaklamiyor, sadece "once
+    bana sor" diyor: icerik degismediyse ETag ile 304 donuyor, yani maliyeti
+    tek bir kucuk istek.
+    """
+
+    def file_response(self, *args, **kwargs):
+        yanit = super().file_response(*args, **kwargs)
+        yanit.headers["Cache-Control"] = "no-cache"
+        return yanit
+
+
+app.mount("/static", TazeStatic(directory=str(WEB)), name="static")
 
 
 @app.get("/")

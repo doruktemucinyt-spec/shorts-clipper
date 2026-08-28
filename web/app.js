@@ -554,6 +554,10 @@ function setConnState(next) {
 /** Hafif kurulumda transkript yok: o secenekleri kapatiyoruz ki kullanici
     calismayacak bir isi baslatmasin. */
 function applyHelperFeatures(status) {
+  // Yardimcinin kendi adresinden acilan sayfada config.js'teki surum bos:
+  // orasi yayinlanmiyor. Surumu o zaman yardimcinin kendisi soyluyor.
+  if (!APP_VERSION && status.version) showVersion(status.version);
+
   const noTranscript = status.running && status.transcript === false;
   $("light-note").classList.toggle("hidden", !noTranscript);
   $("captions").disabled = noTranscript;
