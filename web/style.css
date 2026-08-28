@@ -1041,7 +1041,7 @@ a.primary:active {
 .step-title {
   margin: 10px 0 7px;
   font-size: 16.5px;
-  font-weight: 700;
+  font-weight: 800;   /* Inter 700 yuklenmiyor: tarayici zaten 800 ciziyordu, ad artik gercegi soyluyor */
   letter-spacing: -.02em;
   line-height: 1.25;
 }

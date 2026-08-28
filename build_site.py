@@ -18,6 +18,7 @@ ClipCloverKurulum.exe dosyasini gosteriyor (adres web/config.js icinde).
 Sebep: kurulum dosyasi 200 MB civari ve Vercel statik dosya barindirmak icin
 dogru yer degil; GitHub Releases bu is icin ucretsiz ve sinirsiz.
 """
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -50,9 +51,25 @@ DOWNLOAD_NAME = "ClipClover-Setup.zip"
 API_DIR = ROOT / "vercel_api"
 
 
-def rewrite(html: str) -> str:
-    """Yardimcidaki /static/ yolu, sitede /assets/ oluyor."""
-    return html.replace("/static/", "/assets/")
+def rewrite(html: str, harita: dict) -> str:
+    """Yardimcidaki /static/ yolu sitede /assets/ oluyor; dosya adlari da
+    icerige gore damgalanmis hallerine cevriliyor."""
+    html = html.replace("/static/", "/assets/")
+    for eski_yol, yeni_yol in harita.items():
+        html = html.replace(eski_yol, yeni_yol)
+    return html
+
+
+def damgali_ad(ad: str, veri: bytes) -> str:
+    """style.css -> style.9f2a1c04.css
+
+    Adin icinde iceriğin ozeti oldugu icin dosya degistiginde adres de
+    degisiyor. Bu sayede dosyalari bir yil boyunca "bir daha sorma" diye
+    isaretleyebiliyoruz: yeni surum zaten yeni adresten iniyor, eskisini
+    tarayici hic sormadan kendi kopyasindan aciyor.
+    """
+    p = Path(ad)
+    return f"{p.stem}.{hashlib.sha256(veri).hexdigest()[:8]}{p.suffix}"
 
 
 # Vercel'de temiz adresler: /sss klasorunun index.html'i /sss olarak aciliyor,
@@ -66,6 +83,17 @@ VERCEL_CONFIG = {
         "has": [{"type": "host", "value": "www.clipclover.online"}],
         "destination": "https://clipclover.online/$1",
         "permanent": True,
+    }],
+    # assets/ altindaki her dosyanin adinda icerigin ozeti var, yani bir
+    # dosyanin adresi ancak icerigi degistiginde degisiyor. O yuzden
+    # "bir daha sorma" diyebiliyoruz. HTML damgasiz kaliyor ve her acilista
+    # tazeleniyor -- yeni surume gecisi o saglıyor.
+    "headers": [{
+        "source": "/assets/(.*)",
+        "headers": [{
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable",
+        }],
     }],
 }
 
@@ -96,13 +124,18 @@ def build() -> Path:
     (OUT / "vercel.json").write_text(
         json.dumps(VERCEL_CONFIG, indent=2), encoding="utf-8")
 
+    harita = {}
     for name in ASSETS:
-        shutil.copy2(WEB / name, OUT / "assets" / name)
+        veri = (WEB / name).read_bytes()
+        yeni_ad = damgali_ad(name, veri)
+        (OUT / "assets" / yeni_ad).write_bytes(veri)
+        harita[f"/assets/{name}"] = f"/assets/{yeni_ad}"
 
     (OUT / "index.html").write_text(
-        rewrite((WEB / "index.html").read_text(encoding="utf-8")), encoding="utf-8")
+        rewrite((WEB / "index.html").read_text(encoding="utf-8"), harita),
+        encoding="utf-8")
 
-    page = rewrite((WEB / "page.html").read_text(encoding="utf-8"))
+    page = rewrite((WEB / "page.html").read_text(encoding="utf-8"), harita)
     for name in DOC_PAGES + DOC_ALIASES:
         (OUT / name).mkdir(parents=True, exist_ok=True)
         (OUT / name / "index.html").write_text(page, encoding="utf-8")
