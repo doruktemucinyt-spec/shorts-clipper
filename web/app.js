@@ -540,6 +540,10 @@ function paintSteps() {
 function setConnState(next) {
   connState = next;
   paintConnection();
+  // Baglanti kurulur kurulmaz TikTok'u da yokluyoruz: durumu ancak yardimci
+  // konusabildigimizde ogrenebiliyoruz, yoksa buton ve kart sayfa yenilenene
+  // kadar gizli kaliyordu.
+  if (next === "ok") refreshTikTok();
 }
 
 /** Hafif kurulumda transkript yok: o secenekleri kapatiyoruz ki kullanici
@@ -601,6 +605,7 @@ async function refreshTikTok() {
 
   ttConnected = Boolean(info.connected);
   $("tiktok-card").classList.toggle("hidden", !info.available);
+  paintTikTokButton(info);
   if (!info.available) return;
 
   $("tiktok-connect").classList.toggle("hidden", ttConnected);
@@ -610,14 +615,61 @@ async function refreshTikTok() {
     : t("tiktok.off");
 }
 
-$("tiktok-connect").onclick = async () => {
-  const res = await api("/api/tiktok/start", { method: "POST" });
-  const veri = await res.json().catch(() => ({}));
-  if (!res.ok) { alert(veri.detail || t("tiktok.off")); return; }
+// Ust sagdaki buton: bagli degilken "TikTok ile giris", bagliyken hesabin
+// adi ve yesil bir nokta. Anahtar yoksa ya da yardimci kapaliysa hic yok.
+function paintTikTokButton(info) {
+  const btn = $("tt-login");
+  btn.classList.toggle("hidden", !info || !info.available);
+  if (!info || !info.available) return;
 
-  // Pencereyi tiklamanin kendisinde aciyoruz: tarayici gecikmeli acilan
-  // pencereleri engelliyor.
-  window.open(veri.url, "_blank", "noopener");
+  $("tt-login-label").textContent = ttConnected
+    ? (info.display_name || "TikTok")
+    : t("btn.ttLogin");
+
+  // Bagliyken adin yaninda TikTok profil fotografi duruyor. Fotograf yoksa ya
+  // da yuklenemezse yerine yesil nokta geciyor -- baglilik isareti her halukarda
+  // kalsin, buton bir anda "cikis yapilmis" gibi gorunmesin.
+  btn.querySelector(".tt-avatar")?.remove();
+  btn.querySelector(".dot")?.remove();
+  if (!ttConnected) return;
+
+  if (info.avatar_url) {
+    const foto = document.createElement("img");
+    foto.className = "tt-avatar";
+    foto.alt = "";
+    // TikTok'un gorsel sunucusuna nereden geldigimizi bildirmiyoruz.
+    foto.referrerPolicy = "no-referrer";
+    foto.onerror = () => { foto.replaceWith(nokta()); };
+    foto.src = info.avatar_url;
+    btn.append(foto);
+  } else {
+    btn.append(nokta());
+  }
+}
+
+function nokta() {
+  const s = document.createElement("span");
+  s.className = "dot";
+  return s;
+}
+
+async function ttLogin() {
+  // Pencere tiklamanin KENDINDE aciliyor. Adres ancak istekten sonra belli
+  // oluyor ama araya await girmis bir window.open'i tarayici engelliyor --
+  // once bos pencere aciliyor, adresi sonra yaziliyor.
+  const pencere = window.open("about:blank", "_blank");
+  if (pencere) pencere.opener = null;
+
+  let res, veri;
+  try {
+    res = await api("/api/tiktok/start", { method: "POST" });
+    veri = await res.json().catch(() => ({}));
+  } catch { pencere?.close(); return; }
+
+  if (!res.ok) { pencere?.close(); alert(veri.detail || t("tiktok.off")); return; }
+
+  if (pencere) pencere.location = veri.url;
+  else window.open(veri.url, "_blank", "noopener");
   $("tiktok-state").textContent = t("tiktok.waiting");
 
   // Izni kullanici TikTok'ta veriyor, donus de yardimciya gidiyor; bittigini
@@ -626,6 +678,15 @@ $("tiktok-connect").onclick = async () => {
     await new Promise((r) => setTimeout(r, 3000));
     await refreshTikTok();
   }
+}
+
+$("tiktok-connect").onclick = ttLogin;
+
+// Bagliyken ayni butona basmak asagidaki TikTok kartina goturuyor -- baglanti
+// kesme ve aciklama orada duruyor.
+$("tt-login").onclick = () => {
+  if (!ttConnected) { ttLogin(); return; }
+  $("tiktok-card").scrollIntoView({ behavior: "smooth", block: "center" });
 };
 
 $("tiktok-disconnect").onclick = async () => {
@@ -662,14 +723,18 @@ $("parts").addEventListener("click", async (ev) => {
 });
 
 onUnpaired(() => setConnState("idle"));
-onLangChange(() => paintConnection());
+onLangChange(() => {
+  paintConnection();
+  // Ust sagdaki butonun yazisi data-i18n ile degil elle yaziliyor (bagliyken
+  // yerine hesap adi geciyor), o yuzden dil degisince ayrica tazeleniyor.
+  refreshTikTok();
+});
 
 // Yardimcidan acildiysa hicbir sey sorulmuyor; siteden acildiysa kullanici
 // "Bagla" diyene kadar bekliyoruz.
 if (IS_LOCAL) {
-  setConnState("ok");
+  setConnState("ok");                          // TikTok'u da bu tetikliyor
   helperStatus().then(applyHelperFeatures);    // hafif kurulum mu?
-  refreshTikTok();
   pullMemory();
 }
 else if (helperToken) refreshConnection();

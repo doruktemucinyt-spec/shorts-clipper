@@ -170,6 +170,97 @@ main {
 }
 .brand { min-width: 0; }
 
+/* Ust sagdaki iki dugme: TikTok girisi ve dil kuresi. */
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+/* ---------- TikTok girisi -------------------------------------------------
+   Kureyle AYNI cam tarifi ve ayni yukseklik (44px). Kirilma olcegi cismin
+   boyutuna gore ayarlanmak zorunda oldugu icin ayni filtreyi ancak ayni
+   yukseklikteki bir cisim kullanabilir -- kenar bandi yukseklikten cikiyor,
+   genislik degistirmiyor. Daha kisa/uzun bir cam eleman eklenirse kendi
+   olcegini almali (bkz. #liquid-glass, #liquid-glass-sm).               */
+.tt-login {
+  position: relative;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 15px;
+  border-radius: 13px;
+  cursor: pointer;
+  color: var(--fg);
+  font: 600 13.5px/1 var(--sans);
+  letter-spacing: -.01em;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
+  -webkit-backdrop-filter: url(#liquid-glass-sm) blur(1px) saturate(175%) brightness(1.04);
+  box-shadow:
+    inset 1.2px 1.2px 0 rgba(255, 255, 255, .32),
+    inset -1.2px -1.2px 0 rgba(255, 255, 255, .09),
+    inset 0 0 12px rgba(255, 255, 255, .05),
+    0 10px 22px -14px rgba(0, 0, 0, .85);
+  transition: border-color .18s ease, background-color .18s ease;
+}
+/* Ust kenardan suzulen isik -- kuredekinin aynisi */
+.tt-login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 20% 0%,
+    rgba(255, 255, 255, .12) 0%, rgba(255, 255, 255, 0) 62%);
+}
+/* Dokunmatikte kalici kalmasin */
+@media (hover: hover) and (pointer: fine) {
+  .tt-login:hover {
+    border-color: rgba(119, 232, 79, .38);
+    background: rgba(255, 255, 255, .07);
+  }
+}
+.tt-login:active { transform: translateY(1px); }
+
+.tt-logo {
+  width: 19px; height: 19px;
+  flex: none;
+  /* Renkli kopyalar ust uste bindigi icin sekil kendi disina tasiyor;
+     kirpilmasin diye kutu biraz genis. */
+  overflow: visible;
+}
+
+/* Bagliyken: ad + yesil nokta. Ayni buton, ikinci bir yer kaplamiyor. */
+.tt-login .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(119, 232, 79, .8);
+  flex: none;
+}
+
+/* Bagliyken adin sagindaki profil fotografi. Cam yuzeyin uzerinde durdugu
+   icin ince bir kenari var: fotograf koyuysa butonda delik gibi durmasin. */
+.tt-avatar {
+  width: 24px; height: 24px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .06);
+}
+
+@media (max-width: 560px) {
+  /* Dar ekranda yazi dusuyor; logo ve fotograf kaliyor -- baslikla ayni
+     satirda sikismasin. */
+  .tt-login { padding: 0 13px; }
+  .tt-login span:not(.dot) { display: none; }
+}
+
 /* ---------- Dil secici ---------------------------------------------------- */
 
 .lang { position: relative; flex: none; }

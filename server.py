@@ -614,6 +614,15 @@ async def tiktok_finish(request: Request):
         })
     except RuntimeError as e:
         return _tiktok_sayfa("Bağlanamadı", str(e), status_code=400)
+    except Exception as e:
+        # Beklenmeyen bir sey: kullanici bu sayfayi GORUYOR, o yuzden ciplak
+        # "Internal Server Error" yerine ne oldugunu yaziyoruz. Sebep sunucu
+        # gunlugune de dusuyor.
+        traceback.print_exc()
+        return _tiktok_sayfa(
+            "Bağlanamadı",
+            f"Beklenmeyen bir hata: {type(e).__name__}: {e}",
+            status_code=500)
     return _tiktok_sayfa(
         "TikTok bağlandı",
         "Bu sekmeyi kapatabilirsin. Artık bitmiş parçaları taslaklarına gönderebilirsin.")
