@@ -30,7 +30,7 @@ local helper  ──►  yt-dlp        download
    FastAPI    ──►  faster-whisper transcript (only when captions are on)
               ──►  ffmpeg         9:16 render, NVENC when available
                                   ↓
-                            output/<video>/part-01.mp4
+                            output/<video>-part-01.mp4
 ```
 
 ## Install (Windows)

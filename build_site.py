@@ -7,7 +7,7 @@ gerektirmiyor.
 
 Ciktilar:
   shorts-clipper/index.html            ana arayuz
-  shorts-clipper/faq|cookies|privacy/  bilgi sayfalari (temiz adresler)
+  shorts-clipper/faq|cookies|privacy|terms/  bilgi sayfalari (temiz adresler)
   shorts-clipper/404.html              bulunamayan adresler
   shorts-clipper/assets/...            css + js + ikon
   shorts-clipper/download/...          kaynak koddan kurmak isteyenler icin zip
@@ -31,10 +31,10 @@ OUT = ROOT / "shorts-clipper"
 
 ASSETS = ["style.css", "config.js", "i18n.js", "lang.js", "api.js", "app.js",
           "pages.js", "page.js", "gate.js", "favicon.svg"]
-DOC_PAGES = ["faq", "cookies", "privacy"]
+DOC_PAGES = ["faq", "cookies", "privacy", "terms"]
 # Eski Turkce adresler: paylasilmis baglantilar kirilmasin diye ayni sayfa
 # bir de bu klasorlerden servis ediliyor.
-DOC_ALIASES = ["sss", "cerez", "gizlilik"]
+DOC_ALIASES = ["sss", "cerez", "gizlilik", "kosullar"]
 
 # Kaynak koddan kurmak isteyenler icin duran zip. Normal kullanicinin
 # dugmesi buraya degil GitHub Releases'teki exe'ye gidiyor -- bu dosya sadece

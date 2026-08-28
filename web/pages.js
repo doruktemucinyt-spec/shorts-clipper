@@ -1,4 +1,4 @@
-/* Bilgi sayfalarinin metni (SSS, cerez, gizlilik, 404).
+/* Bilgi sayfalarinin metni (SSS, cerez, gizlilik, kosullar, 404).
 
    Ana sayfanin sozlugu i18n.js'te; uzun metinler o dosyayi sisirmesin diye
    burada duruyor. Yeni dil eklerken buraya da bir anahtar gerekiyor; eksikse
@@ -12,7 +12,7 @@ const PAGES = {
       lead: "Aracı kullanırken en çok takılınan yerler.",
       items: [
         ["Çıktılar nereye kaydediliyor?",
-         "<b>Videolar → ClipClover</b> içinde, videonun adıyla açılan bir klasöre, part-01.mp4 diye. İş bitince <b>Klasörü aç</b> butonu seni doğrudan oraya götürür. Programı kaldırsan bile bu videolar silinmez."],
+         "Hepsi tek klasörde: <b>Videolar → ClipClover</b>. Dosya adında hem videonun adı hem parça numarası var — <i>video-adı-part-01.mp4</i>, <i>video-adı-part-02.mp4</i> — yani farklı videoların parçaları birbirine karışmıyor. İş bitince <b>Klasörü aç</b> butonu seni doğrudan oraya götürür. Programı kaldırsan bile bu videolar silinmez."],
         ["Bir video ne kadar sürer?",
          "Üç adım var: indirme, caption açıksa transkript, sonra render. Render bu bilgisayarda videonun süresinin kabaca yedide biri kadar sürüyor. Transkript sadece caption açıkken çalışıyor ve genelde en uzun adım o oluyor."],
         ["Neden bazen çok yavaş?",
@@ -30,7 +30,7 @@ const PAGES = {
       ],
     },
     cookies: {
-      tag: "Çerez politikası", title: "Çerezler",
+      tag: "Çerez politikası", title: "Çerez Politikası",
       lead: "Kısa cevap: bu araç çerez kullanmıyor.",
       items: [
         ["Çerez var mı?",
@@ -44,7 +44,7 @@ const PAGES = {
       ],
     },
     privacy: {
-      tag: "Gizlilik", title: "Gizlilik",
+      tag: "Gizlilik politikası", title: "Gizlilik Politikası",
       lead: "Araç tamamen senin bilgisayarında çalışıyor. Videon, sesin ve transkriptin hiçbir yere gönderilmiyor.",
       items: [
         ["Video nereye gidiyor?",
@@ -57,10 +57,36 @@ const PAGES = {
          "Hayır. Sunucu yalnızca bu bilgisayarın kendi adreslerini dinliyor; aynı ağdaki başka bir cihaz bağlanamaz."],
         ["Kayıt tutuluyor mu?",
          "Sunucu penceresinde istek satırları görünüyor, o kadar. Hesap yok, analitik yok, kullanıcı takibi yok."],
+        ["TikTok'a bağlanınca ne saklanıyor?",
+         "Bağlanmayı seçersen TikTok'un verdiği erişim anahtarı ve kullanıcı adın <b>senin bilgisayarındaki</b> yardımcı programın klasöründe duruyor. Anahtar, girişin son adımında bir kez clipclover.online üzerinden geçiyor — TikTok gizli anahtarın bir sunucuda durmasını zorunlu tutuyor — ama orada saklanmıyor. Videolar doğrudan senin bilgisayarından TikTok'a yükleniyor, aradan bir sunucu geçmiyor. Bağlantıyı kesersen anahtar diskten siliniyor."],
         ["Beta anahtarı nereye gidiyor?",
          "Hiçbir yere. Anahtarın doğruluğu tarayıcının içinde kontrol ediliyor; sunucuya gönderilmiyor, kimin hangi anahtarı girdiği tutulmuyor. Kod açık, isteyen bakabilir."],
         ["Sorumluluk",
          "YouTube'dan video indirmek, kendi içeriğin veya izin aldığın içerik dışında YouTube kullanım şartlarına aykırıdır. Ne indireceğin sana ait bir karar."],
+      ],
+    },
+    terms: {
+      tag: "Kullanım koşulları", title: "Kullanım Koşulları",
+      lead: "Son güncelleme: 28 Ağustos 2026. ClipClover'ı kullanarak bu koşulları kabul etmiş oluyorsun.",
+      items: [
+        ["ClipClover nedir?",
+         "Uzun bir videoyu dikey 9:16 kısa parçalara bölen bir araç. İndirme, transkript ve render senin bilgisayarında, kendi kurduğun yardımcı program üzerinde çalışıyor. <b>clipclover.online</b> yalnızca arayüzü sunuyor; videon bu siteye hiçbir zaman yüklenmiyor."],
+        ["Ücretli mi?",
+         "Hayır. ClipClover ücretsiz ve açık kaynak (MIT lisansı). Şu an beta aşamasında ve davetle kullanılıyor. Kesintisiz çalışacağı taahhüt edilmiyor; araç herhangi bir zamanda değişebilir veya durabilir."],
+        ["Kimler kullanabilir?",
+         "Bulunduğun ülkede bağlayıcı bir sözleşme yapabilecek yaşta olman gerekiyor. Araç üzerinden ulaştığın diğer servislerin — YouTube ve TikTok dahil — kendi koşullarına da uymak zorundasın."],
+        ["İşlediğin içerikten kim sorumlu?",
+         "Sen. Bir videoyu indirmeye, kesmeye ve yeniden paylaşmaya hakkın olduğundan emin olmak sana ait. Başkasının telifli içeriğini izinsiz indirmek kaynak platformun koşullarına aykırı olabilir. ClipClover bunu denetlemiyor ve bu kullanımdan doğacak sonuçlardan sorumlu değil."],
+        ["TikTok bağlantısı ne yapıyor?",
+         "İzin verirsen ClipClover, hazırladığın bir parçayı önerilen başlık ve hashtaglerle birlikte <b>TikTok taslaklarına</b> gönderebiliyor. Paylaşma işini program yapmıyor: video senin TikTok gelen kutuna düşüyor, yayınlayıp yayınlamamaya sen karar veriyorsun. Verdiğin izni istediğin an TikTok ayarlarından ya da programın içinden geri alabilirsin."],
+        ["Yapılmaması gerekenler",
+         "Aracı yasa dışı içerik üretmek, başkasının emeğini kendine mal etmek, spam ya da otomatik toplu paylaşım yapmak için kullanamazsın. Programı kırmaya, sunucuya izinsiz erişmeye ya da başkasının bilgisayarındaki yardımcıya bağlanmaya çalışmak da yasak."],
+        ["Garanti ve sorumluluk",
+         "Araç “olduğu gibi” sunuluyor. Doğru çalışacağı, kesintisiz olacağı veya çıktının belirli bir kalitede olacağı garanti edilmiyor. Kullanımından doğan veri kaybı, gelir kaybı ve dolaylı zararlar için, yasanın izin verdiği azami ölçüde, sorumluluk kabul edilmiyor."],
+        ["Koşullar değişirse",
+         "Bu sayfa güncellenir ve en üstteki tarih onunla birlikte değişir. Değişiklikten sonra kullanmaya devam etmen yeni halini kabul ettiğin anlamına gelir."],
+        ["İletişim",
+         "Discord sunucusundan ulaşabilirsin; bağlantı sayfanın altında."],
       ],
     },
     notfound: {
@@ -77,7 +103,7 @@ const PAGES = {
       lead: "The things people get stuck on.",
       items: [
         ["Where do the parts get saved?",
-         "Under <b>Videos → ClipClover</b>, in a folder named after the video, as part-01.mp4 and so on. When a job finishes, <b>Open folder</b> takes you straight there. Uninstalling the program never deletes them."],
+         "All in one folder: <b>Videos → ClipClover</b>. Each file name carries the video's name and the part number — <i>video-name-part-01.mp4</i>, <i>video-name-part-02.mp4</i> — so parts of different videos never get mixed up. When a job finishes, <b>Open folder</b> takes you straight there. Uninstalling the program never deletes them."],
         ["How long does a video take?",
          "Three steps: download, a transcript if captions are on, then render. Rendering takes roughly a seventh of the video's length on this machine. The transcript only runs with captions, and it is usually the longest step."],
         ["Why is it slow sometimes?",
@@ -95,7 +121,7 @@ const PAGES = {
       ],
     },
     cookies: {
-      tag: "Cookie policy", title: "Cookies",
+      tag: "Cookie policy", title: "Cookie Policy",
       lead: "Short answer: this tool uses no cookies.",
       items: [
         ["Are there cookies?",
@@ -109,7 +135,7 @@ const PAGES = {
       ],
     },
     privacy: {
-      tag: "Privacy", title: "Privacy",
+      tag: "Privacy policy", title: "Privacy Policy",
       lead: "The tool runs entirely on your computer. Your video, audio and transcript are never sent anywhere.",
       items: [
         ["Where does the video go?",
@@ -122,10 +148,36 @@ const PAGES = {
          "No. It listens only on this computer's own addresses; no other device on the network can connect."],
         ["Are there logs?",
          "Request lines show up in the server window, and that is all. No accounts, no analytics, no user tracking."],
+        ["What is stored when I connect TikTok?",
+         "If you choose to connect, the access token TikTok issues and your username sit in the helper's folder <b>on your own computer</b>. The token passes through clipclover.online once, on the last step of the login — TikTok requires the client secret to live on a server — but it is not stored there. Videos are uploaded to TikTok straight from your computer, with no server in between. Disconnecting deletes the token from disk."],
         ["Where does the beta key go?",
          "Nowhere. The key is checked inside your browser; it is never sent to a server and no record is kept of who entered which key. The code is open, anyone can check."],
         ["Responsibility",
          "Downloading from YouTube is against its terms of service unless the content is yours or you have permission. What you download is your call."],
+      ],
+    },
+    terms: {
+      tag: "Terms of service", title: "Terms of Service",
+      lead: "Last updated: 28 August 2026. By using ClipClover you agree to these terms.",
+      items: [
+        ["What ClipClover is",
+         "A tool that cuts a long video into vertical 9:16 short-form parts. Downloading, transcription and rendering all run on your own computer, inside a helper program you install yourself. <b>clipclover.online</b> only serves the interface — your video is never uploaded to this site."],
+        ["Is it paid?",
+         "No. ClipClover is free and open source (MIT licence). It is currently in beta and invite-only. No uptime is promised; the tool may change or stop at any time."],
+        ["Who may use it",
+         "You must be old enough to enter a binding agreement where you live. You must also follow the terms of the services you reach through it, including YouTube and TikTok."],
+        ["Responsibility for content",
+         "Yours. Making sure you have the right to download, cut and re-publish a video is up to you. Downloading someone else's copyrighted material without permission may breach the source platform's terms. ClipClover does not police this and is not liable for how you use it."],
+        ["What the TikTok connection does",
+         "If you grant permission, ClipClover can send a finished part to your <b>TikTok drafts</b> along with a suggested caption and hashtags. The program publishes nothing: the video lands in your TikTok inbox and you decide whether to post it. You can revoke the permission at any time from your TikTok settings or from inside the program."],
+        ["What you may not do",
+         "Do not use the tool to produce illegal content, to pass off someone else's work as your own, or for spam and automated bulk posting. Do not attempt to break the program, reach the server without permission, or connect to a helper running on someone else's computer."],
+        ["No warranty, limited liability",
+         "The tool is provided “as is”. There is no guarantee that it works correctly, runs without interruption, or produces output of any particular quality. To the fullest extent the law allows, no liability is accepted for lost data, lost income or indirect damages arising from its use."],
+        ["If these terms change",
+         "This page is updated and the date at the top changes with it. Continuing to use the tool after a change means you accept the new version."],
+        ["Contact",
+         "Through the Discord server; the link is at the bottom of the page."],
       ],
     },
     notfound: {
@@ -142,7 +194,7 @@ const PAGES = {
       lead: "Die Stellen, an denen es meistens hakt.",
       items: [
         ["Wo landen die Teile?",
-         "Unter <b>Videos → ClipClover</b>, in einem Ordner mit dem Namen des Videos, als part-01.mp4 und so weiter. Nach dem Job führt <b>Ordner öffnen</b> direkt dorthin. Beim Deinstallieren bleiben sie erhalten."],
+         "Alle in einem Ordner: <b>Videos → ClipClover</b>. Im Dateinamen stehen der Name des Videos und die Teilnummer — <i>video-name-part-01.mp4</i>, <i>video-name-part-02.mp4</i> — so vermischen sich die Teile verschiedener Videos nie. Nach dem Job führt <b>Ordner öffnen</b> direkt dorthin. Beim Deinstallieren bleiben sie erhalten."],
         ["Wie lange dauert ein Video?",
          "Drei Schritte: Herunterladen, bei eingeschalteten Untertiteln ein Transkript, dann Rendern. Das Rendern dauert auf diesem Rechner etwa ein Siebtel der Videolänge. Das Transkript läuft nur mit Untertiteln und ist meist der längste Schritt."],
         ["Warum ist es manchmal langsam?",
@@ -160,7 +212,7 @@ const PAGES = {
       ],
     },
     cookies: {
-      tag: "Cookie-Richtlinie", title: "Cookies",
+      tag: "Cookie-Richtlinie", title: "Cookie-Richtlinie",
       lead: "Kurz: dieses Werkzeug verwendet keine Cookies.",
       items: [
         ["Gibt es Cookies?",
@@ -174,7 +226,7 @@ const PAGES = {
       ],
     },
     privacy: {
-      tag: "Datenschutz", title: "Datenschutz",
+      tag: "Datenschutz", title: "Datenschutzerklärung",
       lead: "Das Werkzeug läuft vollständig auf deinem Rechner. Video, Ton und Transkript werden nirgendwohin gesendet.",
       items: [
         ["Wohin geht das Video?",
@@ -187,10 +239,36 @@ const PAGES = {
          "Nein. Er lauscht nur auf den eigenen Adressen dieses Rechners; kein anderes Gerät im Netz kommt heran."],
         ["Werden Protokolle geführt?",
          "Im Serverfenster erscheinen Anfragezeilen, mehr nicht. Keine Konten, keine Analyse, kein Tracking."],
+        ["Was wird gespeichert, wenn ich TikTok verbinde?",
+         "Wenn du dich verbindest, liegen das von TikTok ausgestellte Zugriffstoken und dein Benutzername im Ordner des Helfers <b>auf deinem eigenen Rechner</b>. Das Token läuft im letzten Schritt der Anmeldung einmal über clipclover.online — TikTok verlangt, dass das Client-Secret auf einem Server liegt — wird dort aber nicht gespeichert. Videos werden direkt von deinem Rechner zu TikTok hochgeladen, ohne Server dazwischen. Beim Trennen wird das Token von der Festplatte gelöscht."],
         ["Wohin geht der Beta-Schlüssel?",
          "Nirgendwohin. Der Schlüssel wird im Browser geprüft, nicht an einen Server geschickt; es wird nicht festgehalten, wer welchen Schlüssel eingegeben hat. Der Code ist offen, jeder kann nachsehen."],
         ["Verantwortung",
          "Das Herunterladen von YouTube verstößt gegen deren Nutzungsbedingungen, außer es sind eigene oder freigegebene Inhalte. Was du lädst, ist deine Entscheidung."],
+      ],
+    },
+    terms: {
+      tag: "Nutzungsbedingungen", title: "Nutzungsbedingungen",
+      lead: "Zuletzt aktualisiert: 28. August 2026. Mit der Nutzung von ClipClover stimmst du diesen Bedingungen zu.",
+      items: [
+        ["Was ClipClover ist",
+         "Ein Werkzeug, das ein langes Video in vertikale 9:16-Teile schneidet. Herunterladen, Transkript und Rendern laufen auf deinem eigenen Rechner, in einem Hilfsprogramm, das du selbst installierst. <b>clipclover.online</b> liefert nur die Oberfläche — dein Video wird nie auf diese Seite hochgeladen."],
+        ["Kostet es etwas?",
+         "Nein. ClipClover ist kostenlos und quelloffen (MIT-Lizenz). Es ist derzeit in der Beta und nur mit Einladung nutzbar. Eine Verfügbarkeit wird nicht zugesichert; das Werkzeug kann sich jederzeit ändern oder eingestellt werden."],
+        ["Wer es nutzen darf",
+         "Du musst nach dem Recht deines Wohnorts alt genug sein, um einen bindenden Vertrag zu schließen. Es gelten außerdem die Bedingungen der Dienste, die du darüber erreichst — unter anderem YouTube und TikTok."],
+        ["Verantwortung für Inhalte",
+         "Liegt bei dir. Du musst sicherstellen, dass du ein Video herunterladen, schneiden und erneut veröffentlichen darfst. Urheberrechtlich geschütztes Material anderer ohne Erlaubnis herunterzuladen kann gegen die Bedingungen der Quellplattform verstoßen. ClipClover prüft das nicht und haftet nicht dafür."],
+        ["Was die TikTok-Verbindung macht",
+         "Wenn du es erlaubst, kann ClipClover einen fertigen Teil zusammen mit einem Textvorschlag und Hashtags in deine <b>TikTok-Entwürfe</b> legen. Das Programm veröffentlicht nichts: Das Video landet in deinem TikTok-Posteingang, und du entscheidest, ob du es postest. Die Erlaubnis kannst du jederzeit in den TikTok-Einstellungen oder im Programm widerrufen."],
+        ["Was nicht erlaubt ist",
+         "Das Werkzeug darf nicht für rechtswidrige Inhalte, für das Ausgeben fremder Arbeit als eigene oder für Spam und automatisiertes Massenposten verwendet werden. Ebenso wenig darfst du versuchen, das Programm zu umgehen, unbefugt auf den Server zuzugreifen oder dich mit dem Helfer auf einem fremden Rechner zu verbinden."],
+        ["Keine Gewährleistung, begrenzte Haftung",
+         "Das Werkzeug wird „wie besehen“ bereitgestellt. Es wird nicht zugesichert, dass es fehlerfrei oder ununterbrochen läuft oder eine bestimmte Ausgabequalität liefert. Für Datenverlust, entgangene Einnahmen und mittelbare Schäden wird im gesetzlich zulässigen Rahmen keine Haftung übernommen."],
+        ["Wenn sich diese Bedingungen ändern",
+         "Diese Seite wird aktualisiert und das Datum oben ändert sich mit. Nutzt du das Werkzeug danach weiter, akzeptierst du die neue Fassung."],
+        ["Kontakt",
+         "Über den Discord-Server; der Link steht unten auf der Seite."],
       ],
     },
     notfound: {
@@ -207,7 +285,7 @@ const PAGES = {
       lead: "Là où ça coince le plus souvent.",
       items: [
         ["Où sont enregistrées les parties ?",
-         "Dans <b>Vidéos → ClipClover</b>, dans un dossier au nom de la vidéo, sous la forme part-01.mp4. Une fois le travail fini, <b>Ouvrir le dossier</b> t'y emmène directement. La désinstallation ne les supprime pas."],
+         "Toutes dans un seul dossier : <b>Vidéos → ClipClover</b>. Le nom du fichier contient le nom de la vidéo et le numéro de la partie — <i>nom-video-part-01.mp4</i>, <i>nom-video-part-02.mp4</i> — les parties de vidéos différentes ne se mélangent donc jamais. Une fois le travail fini, <b>Ouvrir le dossier</b> t'y emmène directement. La désinstallation ne les supprime pas."],
         ["Combien de temps ça prend ?",
          "Trois étapes : téléchargement, transcription si les sous-titres sont activés, puis rendu. Le rendu prend environ un septième de la durée de la vidéo sur cette machine. La transcription ne tourne qu'avec les sous-titres et c'est en général l'étape la plus longue."],
         ["Pourquoi c'est parfois lent ?",
@@ -225,7 +303,7 @@ const PAGES = {
       ],
     },
     cookies: {
-      tag: "Politique de cookies", title: "Cookies",
+      tag: "Politique de cookies", title: "Politique de cookies",
       lead: "Réponse courte : cet outil n'utilise aucun cookie.",
       items: [
         ["Y a-t-il des cookies ?",
@@ -239,7 +317,7 @@ const PAGES = {
       ],
     },
     privacy: {
-      tag: "Confidentialité", title: "Confidentialité",
+      tag: "Confidentialité", title: "Politique de confidentialité",
       lead: "L'outil tourne entièrement sur ton ordinateur. Ta vidéo, ton audio et ta transcription ne partent nulle part.",
       items: [
         ["Où va la vidéo ?",
@@ -252,10 +330,36 @@ const PAGES = {
          "Non. Il n'écoute que les adresses locales de cet ordinateur ; aucun autre appareil du réseau ne peut s'y connecter."],
         ["Y a-t-il des journaux ?",
          "Des lignes de requêtes apparaissent dans la fenêtre du serveur, rien de plus. Pas de compte, pas d'analyse, pas de suivi."],
+        ["Qu'est-ce qui est stocké quand je connecte TikTok ?",
+         "Si tu choisis de te connecter, le jeton d'accès délivré par TikTok et ton nom d'utilisateur restent dans le dossier de l'assistant <b>sur ton propre ordinateur</b>. Le jeton transite une fois par clipclover.online, à la dernière étape de la connexion — TikTok exige que la clé secrète soit sur un serveur — mais il n'y est pas conservé. Les vidéos sont envoyées à TikTok directement depuis ton ordinateur, sans serveur intermédiaire. Te déconnecter efface le jeton du disque."],
         ["Où va la clé bêta ?",
          "Nulle part. La clé est vérifiée dans ton navigateur ; elle n'est pas envoyée à un serveur et personne ne note qui a saisi quelle clé. Le code est ouvert, chacun peut vérifier."],
         ["Responsabilité",
          "Télécharger depuis YouTube va à l'encontre de ses conditions d'utilisation, sauf pour ton propre contenu ou avec autorisation. Ce que tu télécharges relève de toi."],
+      ],
+    },
+    terms: {
+      tag: "Conditions d'utilisation", title: "Conditions d'utilisation",
+      lead: "Dernière mise à jour : 28 août 2026. En utilisant ClipClover, tu acceptes ces conditions.",
+      items: [
+        ["Ce qu'est ClipClover",
+         "Un outil qui découpe une longue vidéo en parties verticales 9:16. Le téléchargement, la transcription et le rendu tournent sur ton propre ordinateur, dans un programme d'aide que tu installes toi-même. <b>clipclover.online</b> ne fournit que l'interface — ta vidéo n'est jamais envoyée sur ce site."],
+        ["Est-ce payant ?",
+         "Non. ClipClover est gratuit et open source (licence MIT). Il est en bêta et accessible sur invitation. Aucune disponibilité n'est garantie ; l'outil peut changer ou s'arrêter à tout moment."],
+        ["Qui peut l'utiliser",
+         "Tu dois avoir l'âge requis pour conclure un contrat là où tu vis. Tu dois aussi respecter les conditions des services que tu atteins au travers, notamment YouTube et TikTok."],
+        ["Responsabilité du contenu",
+         "Elle t'incombe. C'est à toi de t'assurer que tu as le droit de télécharger, découper et republier une vidéo. Télécharger sans autorisation du contenu protégé par le droit d'auteur peut enfreindre les conditions de la plateforme source. ClipClover ne le contrôle pas et n'en est pas responsable."],
+        ["Ce que fait la connexion TikTok",
+         "Si tu l'autorises, ClipClover peut envoyer une partie terminée dans tes <b>brouillons TikTok</b>, avec une légende et des hashtags proposés. Le programme ne publie rien : la vidéo arrive dans ta boîte de réception TikTok et c'est toi qui décides de la publier. Tu peux retirer cette autorisation à tout moment depuis les réglages TikTok ou depuis le programme."],
+        ["Ce qui est interdit",
+         "Ne pas utiliser l'outil pour produire du contenu illégal, s'attribuer le travail d'autrui, ni pour du spam ou de la publication automatisée en masse. Ne pas tenter de contourner le programme, d'accéder au serveur sans autorisation, ni de se connecter à l'assistant installé sur l'ordinateur de quelqu'un d'autre."],
+        ["Aucune garantie, responsabilité limitée",
+         "L'outil est fourni « en l'état ». Rien ne garantit qu'il fonctionne correctement, sans interruption, ni qu'il produise une qualité donnée. Dans la limite permise par la loi, aucune responsabilité n'est acceptée pour la perte de données, la perte de revenus ou les dommages indirects."],
+        ["Si ces conditions changent",
+         "Cette page est mise à jour et la date en haut change avec elle. Continuer à utiliser l'outil après une modification vaut acceptation de la nouvelle version."],
+        ["Contact",
+         "Via le serveur Discord ; le lien est en bas de page."],
       ],
     },
     notfound: {

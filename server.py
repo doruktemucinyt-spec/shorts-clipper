@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from pairing import LOCAL_ORIGINS, Pairing
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 from pipeline import captions, preview, render, segment, transcribe
 from pipeline.download import download
@@ -204,6 +204,20 @@ def _stage_pct(stage: str, inner: float, stages=None) -> float:
     return lo + (hi - lo) * max(0.0, min(100.0, inner)) / 100.0
 
 
+def _unique_base(slug: str) -> str:
+    """Dosya adlarinin basina gelecek benzersiz ad.
+
+    Butun partlar tek klasorde durdugu icin ayni video ikinci kez islenirse
+    eski dosyalarin ustune yazilirdi. O yuzden ayni adla baslayan partlar
+    zaten varsa sona bir sayi ekliyoruz: "...-2-part-01.mp4".
+    """
+    base, n = slug, 1
+    while any(OUTPUT.glob(f"{base}-part-*.mp4")):
+        n += 1
+        base = f"{slug}-{n}"
+    return base
+
+
 def run_job(job_id: str, req: JobRequest):
     workdir = WORK / job_id
     # Partlar her zaman tam surede kesiliyor; transkript yalnizca caption
@@ -226,8 +240,11 @@ def run_job(job_id: str, req: JobRequest):
                 job_id, pct=pct("download", p), msg_key=k, msg_args=a),
         )
         title, slug, source = info["title"], info["slug"], info["path"]
-        out_dir = OUTPUT / slug
-        out_dir.mkdir(parents=True, exist_ok=True)
+        # Bitmis videolarin hepsi tek klasorde duruyor -- kullanici tek yere
+        # bakiyor. Hangi videonun kacinci parti oldugu dosya adindan okunuyor:
+        # "video-basligi-part-03.mp4".
+        out_dir = OUTPUT
+        base = _unique_base(slug)
         _emit(job_id, title=title, slug=slug, out_dir=str(out_dir),
               msg_key="job.downloaded", msg_args={"title": title})
 
@@ -268,7 +285,7 @@ def run_job(job_id: str, req: JobRequest):
         used_nvenc = True
         for p_ in parts:
             idx = p_["index"]
-            name = f"part-{idx:02d}"
+            name = f"part-{idx:02d}"   # sadece is klasorundeki .ass adi
             words = segment.words_in_range(segments, p_["start"], p_["end"])                 if req.captions else []
             ass_text = captions.build_ass(
                 words, p_["start"], p_["duration"], title, idx, total,
@@ -283,7 +300,7 @@ def run_job(job_id: str, req: JobRequest):
                 _emit(job_id, pct=pct("render", overall), msg_key="job.rendering",
                       msg_args={"index": idx, "total": total, "pct": round(inner)})
 
-            out_file = out_dir / f"{name}.mp4"
+            out_file = out_dir / f"{base}-part-{idx:02d}.mp4"
             used_nvenc = render.render_part(
                 source, workdir, f"{name}.ass", p_["start"], p_["duration"],
                 out_file, layout, use_nvenc=used_nvenc, on_progress=on_part,
@@ -291,7 +308,7 @@ def run_job(job_id: str, req: JobRequest):
             done_parts.append({
                 "index": idx, "name": out_file.name,
                 "duration": round(p_["duration"], 1),
-                "url": f"/media/{slug}/{out_file.name}",
+                "url": "/media/" + quote(out_file.name),
             })
             _emit(job_id, parts=list(done_parts))
 
@@ -541,11 +558,13 @@ def index():
 @app.get("/faq")
 @app.get("/cookies")
 @app.get("/privacy")
+@app.get("/terms")
 # Eski Turkce adresler de calismaya devam ediyor: paylasilmis baglantilar
 # kirilmasin.
 @app.get("/sss")
 @app.get("/cerez")
 @app.get("/gizlilik")
+@app.get("/kosullar")
 def info_page():
     return FileResponse(WEB / "page.html")
 

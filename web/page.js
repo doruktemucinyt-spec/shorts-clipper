@@ -1,11 +1,14 @@
-/* Bilgi sayfalari: /sss, /cerez, /gizlilik ve bulunamayan adresler.
+/* Bilgi sayfalari: /faq, /cookies, /privacy, /terms ve bulunamayan
+   adresler.
    Metinler pages.js'te, dort dilde. Sayfa hangi adreste acildiysa ona ait
    boluma bakiyor; eslesme yoksa 404 gosteriyor.                          */
 
 // Adresler Ingilizce; eski Turkce adresler de ayni sayfaya cikiyor.
 const DOC_PATHS = {
   "/faq": "faq", "/cookies": "cookies", "/privacy": "privacy",
+  "/terms": "terms",
   "/sss": "faq", "/cerez": "cookies", "/gizlilik": "privacy",
+  "/kosullar": "terms",
 };
 const docKey = DOC_PATHS[location.pathname.replace(/\/+$/, "")] || "notfound";
 

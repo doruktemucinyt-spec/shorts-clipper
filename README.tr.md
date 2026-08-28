@@ -17,7 +17,10 @@ Kapatmak için siyah komut penceresini kapat.
 3. **Önizle** — kadrajı render'a girmeden gör (aşağıda anlatılıyor)
 4. **Başla**
 
-Çıktılar `output/<video-adı>/part-01.mp4` şeklinde kaydedilir.
+Çıktılar tek klasörde, `output/<video-adı>-part-01.mp4` şeklinde kaydedilir:
+farklı videoların parçaları dosya adından ayrıldığı için birbirine karışmıyor.
+Aynı video ikinci kez işlenirse eskisinin üstüne yazılmaz, adına bir sayı eklenir
+(`<video-adı>-2-part-01.mp4`).
 
 ## Önizleme
 
