@@ -44,6 +44,7 @@ if (settings.model && $("model").querySelector(`option[value="${settings.model}"
 if (settings.zoom) $("zoom").value = settings.zoom;
 if (settings.at) $("preview-at").value = settings.at;
 $("captions").checked = Boolean(settings.captions);
+$("mirror").checked = Boolean(settings.mirror);
 
 const rememberSettings = () => {
   save(STAMP_KEY, Date.now());
@@ -54,11 +55,12 @@ const rememberSettings = () => {
     model: $("model").value,
     zoom: $("zoom").value,
     captions: $("captions").checked,
+    mirror: $("mirror").checked,
     at: $("preview-at").value,
   });
 };
 
-["minutes", "highlight", "model", "zoom", "captions"].forEach(
+["minutes", "highlight", "model", "zoom", "captions", "mirror"].forEach(
   (id) => $(id).addEventListener("change", rememberSettings)
 );
 
@@ -132,6 +134,7 @@ async function runPreview() {
         zoom: ($("zoom").value / 100) || 1.4,
         at: ($("preview-at").value / 100) || 0,
         captions: $("captions").checked,
+        mirror: $("mirror").checked,
         highlight: $("highlight").value,
         sample: t("preview.sample"),
         part_minutes: parseFloat($("minutes").value) || 4,
@@ -174,7 +177,7 @@ function schedulePreview(delay = 320) {
 
 $("preview-btn").onclick = () => { clearTimeout(previewTimer); runPreview(); };
 $("zoom").addEventListener("input", () => schedulePreview());
-["captions", "highlight", "minutes"].forEach(
+["captions", "mirror", "highlight", "minutes"].forEach(
   (id) => $(id).addEventListener("change", () => schedulePreview(0))
 );
 // Kare konumu yeni indirme demek: kaydirirken degil, birakinca calis
@@ -272,6 +275,7 @@ async function pullMemory() {
     $("model").value = ayar.model;
   }
   $("captions").checked = Boolean(ayar.captions);
+  $("mirror").checked = Boolean(ayar.mirror);
 
   updateZoomHint();
   updateCaptionOpts();
@@ -382,6 +386,7 @@ $("start").onclick = async () => {
         model: $("model").value,
         zoom: ($("zoom").value / 100) || 1.4,
         captions: $("captions").checked,
+        mirror: $("mirror").checked,
       }),
     });
     if (!res.ok) throw new Error(await res.text());

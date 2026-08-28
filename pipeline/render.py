@@ -41,13 +41,22 @@ BLUR_W, BLUR_H = W // 4, H // 4     # 270x480
 BLUR_SIGMA = 7                      # 28 / 4 -- kucuk olcekte ayni yayilma
 
 
-def build_filter(layout: dict, ass_name: str = None) -> str:
+def build_filter(layout: dict, ass_name: str = None, mirror: bool = False) -> str:
+    """mirror=True: goruntu yatayda cevriliyor (aynadaki gibi).
+
+    Cevirme iki kaynak zincirinde de, KIRPMADAN SONRA yapiliyor. Iki sebep:
+    kirpmalar zaten ortalanmis oldugu icin once cevirmekle sonra cevirmek ayni
+    sonucu veriyor; sonra cevirince islem kucultulmus goruntu uzerinde donuyor,
+    4K bir karede bu bosuna bir tam gecis demek. Altyazi bilerek disarida:
+    o, overlay'den SONRA yaziliyor, yoksa yazi da ters cikardi.
+    """
+    ayna = ",hflip" if mirror else ""
     chain = (
         f"[0:v]scale={BLUR_W}:{BLUR_H}:force_original_aspect_ratio=increase,"
-        f"crop={BLUR_W}:{BLUR_H},gblur=sigma={BLUR_SIGMA},eq=brightness=-0.08,"
+        f"crop={BLUR_W}:{BLUR_H}{ayna},gblur=sigma={BLUR_SIGMA},eq=brightness=-0.08,"
         f"scale={W}:{H}[bg];"
         f"[0:v]scale={layout['scaled_w']}:{layout['scaled_h']},"
-        f"crop={W}:{layout['scaled_h']}[fg];"
+        f"crop={W}:{layout['scaled_h']}{ayna}[fg];"
         "[bg][fg]overlay=(W-w)/2:(H-h)/2[base]"
     )
     if ass_name:
@@ -81,14 +90,15 @@ def _build_cmd(source: Path, start: float, duration: float, filter_str: str,
 
 def render_part(source: Path, workdir: Path, ass_name, start: float,
                 duration: float, out_path: Path, layout: dict,
-                use_nvenc: bool = True, on_progress=None) -> bool:
+                use_nvenc: bool = True, on_progress=None,
+                mirror: bool = False) -> bool:
     """Tek bir partı render eder. NVENC patlarsa libx264 ile tekrar dener.
 
     ass= filtresine mutlak yol vermek yerine ffmpeg'i workdir icinde calistirip
     goreli dosya adi veriyoruz -- Windows'ta yol escape sorunu boylece hic yok.
     """
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    filter_str = build_filter(layout, ass_name)
+    filter_str = build_filter(layout, ass_name, mirror)
 
     for nvenc in ([True, False] if use_nvenc else [False]):
         cmd = _build_cmd(source, start, duration, filter_str, out_path, nvenc)

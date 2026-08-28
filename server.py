@@ -168,6 +168,7 @@ class JobRequest(BaseModel):
     font: str = "Arial Black"
     zoom: float = 1.4              # 1.0 = hic kesilmez, buyudukce video buyur
     captions: bool = False         # caption yakilsin mi
+    mirror: bool = False           # goruntu yatayda cevrilsin mi (ayna)
 
 
 def check_url(url: str) -> str:
@@ -312,6 +313,7 @@ def run_job(job_id: str, req: JobRequest):
             used_nvenc = render.render_part(
                 source, workdir, f"{name}.ass", p_["start"], p_["duration"],
                 out_file, layout, use_nvenc=used_nvenc, on_progress=on_part,
+                mirror=req.mirror,
             )
             done_parts.append({
                 "index": idx, "name": out_file.name,
@@ -393,6 +395,7 @@ class PreviewRequest(BaseModel):
     font: str = "Arial Black"
     sample: str = "ornek altyazi"
     part_minutes: float = 4.0
+    mirror: bool = False
 
 
 @app.post("/api/preview")
@@ -408,6 +411,7 @@ def make_preview(req: PreviewRequest):
             req.url, PREVIEW, zoom=req.zoom, at=req.at,
             with_captions=req.captions, highlight=req.highlight,
             font=req.font, sample=req.sample, part_minutes=req.part_minutes,
+            mirror=req.mirror,
         )
     except Exception as exc:
         raise HTTPException(400, str(exc)[:400])

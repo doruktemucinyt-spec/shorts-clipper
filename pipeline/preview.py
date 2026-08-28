@@ -68,12 +68,13 @@ def _sample_words(text: str) -> list:
             for i, w in enumerate(words)]
 
 
-def _compose(frame: Path, out: Path, workdir: Path, layout: dict, ass_name: str):
+def _compose(frame: Path, out: Path, workdir: Path, layout: dict, ass_name: str,
+             mirror: bool = False):
     """Kareyi gercek render filtresinden gecirir."""
     cmd = [
         require_ffmpeg(), "-y", "-hide_banner", "-loglevel", "error",
         "-loop", "1", "-t", "1", "-i", str(frame),
-        "-filter_complex", render.build_filter(layout, ass_name),
+        "-filter_complex", render.build_filter(layout, ass_name, mirror),
         "-map", "[vout]", "-ss", str(FRAME_AT), "-frames:v", "1", "-q:v", "3",
         str(out.resolve()),
     ]
@@ -86,7 +87,7 @@ def _compose(frame: Path, out: Path, workdir: Path, layout: dict, ass_name: str)
 def build(url: str, root: Path, zoom: float = 1.4, at: float = 0.25,
           with_captions: bool = False, highlight: str = "#FFD400",
           font: str = "Arial Black", sample: str = "ornek altyazi",
-          part_minutes: float = 4.0) -> dict:
+          part_minutes: float = 4.0, mirror: bool = False) -> dict:
     """Onizleme karesi uretir ve dosya adini + kadraj bilgisini dondurur."""
     key = _key(url)
     workdir = root / key
@@ -123,9 +124,10 @@ def build(url: str, root: Path, zoom: float = 1.4, at: float = 0.25,
         encoding="utf-8",
     )
 
-    tag = f"{round(zoom * 100)}-{1 if with_captions else 0}-{highlight.lstrip('#')}"
+    tag = (f"{round(zoom * 100)}-{1 if with_captions else 0}"
+           f"-{highlight.lstrip('#')}-{1 if mirror else 0}")
     out = workdir / f"out-{slot:04d}-{tag}.jpg"
-    _compose(frame, out, workdir, layout, ass_name)
+    _compose(frame, out, workdir, layout, ass_name, mirror)
 
     crop = max(0.0, (1 - render.W / layout["scaled_w"]) / 2 * 100)
     return {
