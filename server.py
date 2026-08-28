@@ -10,12 +10,15 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
+from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse, Response,
+                               StreamingResponse)
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+import tiktok
 from pairing import LOCAL_ORIGINS, Pairing
+import urllib.parse
 from urllib.parse import quote, urlparse
 
 from pipeline import captions, preview, render, segment, transcribe
@@ -59,8 +62,13 @@ APP_VERSION = "1.1"
 # Internetteki siteyle bu bilgisayar arasindaki izin mekanizmasi (pairing.py)
 PAIR = Pairing(WORK / "pairing.json")
 
-# Izin gerektirmeyen uclar: siteyi taniyip izin isteyebilmek icin gerekli
-OPEN_PATHS = ("/api/hello", "/api/pair")
+# Izin gerektirmeyen uclar: siteyi taniyip izin isteyebilmek icin gerekli.
+# /api/tiktok/finish de burada, cunku TikTok girisinin son adimi sitedeki
+# callback sayfasindan ust seviye form gonderimiyle geliyor: o istekte
+# tarayici bizim anahtarimizi tasiyamiyor. Yerine "state" dogrulaniyor --
+# o degeri yalnizca bu surec uretiyor, disaridan tahmin edilemiyor
+# (bkz. tiktok.finish).
+OPEN_PATHS = ("/api/hello", "/api/pair", "/api/tiktok/finish")
 
 # Sunucunun kabul ettigi adresler. Bu kontrol DNS yeniden baglama (rebinding)
 # saldirisini kesiyor: kotu bir site kendi alan adini 127.0.0.1'e cozdurup
@@ -541,6 +549,94 @@ def reveal(req: RevealRequest):
         raise HTTPException(404, "Klasor yok")
     subprocess.Popen(["explorer", str(target)])
     return {"ok": True}
+
+
+# --- TikTok ---------------------------------------------------------------
+# Ayrintili aciklama tiktok.py'nin basinda. Ozet: giris sitedeki sunucu
+# parcasindan geciyor (secret oraya ait), video ise dogrudan bu bilgisayardan
+# TikTok'a gidiyor ve taslak olarak dusuyor -- program hicbir sey yayinlamiyor.
+
+class TikTokSendRequest(BaseModel):
+    name: str      # cikti klasorundeki dosya adi
+
+
+def _tiktok_sayfa(baslik: str, mesaj: str, status_code: int = 200) -> HTMLResponse:
+    """Giris donusunde tarayicida gorunen sayfa.
+
+    Burasi bir form gonderiminin hedefi, yani kullanici bu cevabi sayfa olarak
+    goruyor -- JSON donmek ekrana ham metin basardi.
+    """
+    return HTMLResponse(f"""<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{baslik} &middot; ClipClover</title>
+<style>
+  :root {{ color-scheme: dark; }}
+  body {{ margin:0; min-height:100vh; display:grid; place-items:center;
+         background:#08090a; color:#e8ebe9;
+         font:400 15px/1.6 Inter, system-ui, -apple-system, sans-serif; }}
+  .kutu {{ max-width:30rem; padding:2.5rem 2rem; text-align:center; }}
+  h1 {{ font-size:1.35rem; font-weight:800; margin:0 0 .75rem; }}
+  p {{ margin:0; color:#9aa3a0; }}
+</style></head>
+<body><div class="kutu"><h1>{baslik}</h1><p>{mesaj}</p></div></body></html>""",
+        status_code=status_code)
+
+
+@app.get("/api/tiktok/status")
+def tiktok_status():
+    return tiktok.status()
+
+
+@app.post("/api/tiktok/start")
+def tiktok_start():
+    try:
+        return {"url": tiktok.begin()}
+    except RuntimeError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/tiktok/finish")
+async def tiktok_finish(request: Request):
+    """Sitedeki callback sayfasi token'lari buraya form olarak gonderiyor.
+
+    Govdeyi FastAPI'nin Form()'u yerine elle cozuyoruz: Form() python-multipart
+    paketini zorunlu kiliyor ve bu tek uc icin pakete yeni bir bagimlilik
+    girmesi gereksiz. Gelen icerik zaten duz urlencoded.
+    """
+    alanlar = urllib.parse.parse_qs((await request.body()).decode("utf-8", "replace"))
+    al = lambda k: (alanlar.get(k) or [""])[0]
+    try:
+        tiktok.finish(al("state"), {
+            "access_token": al("access_token"), "refresh_token": al("refresh_token"),
+            "expires_in": al("expires_in"), "open_id": al("open_id"),
+            "scope": al("scope"),
+        })
+    except RuntimeError as e:
+        return _tiktok_sayfa("Bağlanamadı", str(e), status_code=400)
+    return _tiktok_sayfa(
+        "TikTok bağlandı",
+        "Bu sekmeyi kapatabilirsin. Artık bitmiş parçaları taslaklarına gönderebilirsin.")
+
+
+@app.post("/api/tiktok/disconnect")
+def tiktok_disconnect():
+    tiktok.disconnect()
+    return tiktok.status()
+
+
+@app.post("/api/tiktok/send")
+def tiktok_send(req: TikTokSendRequest):
+    """Bitmis bir parcayi TikTok taslaklarina yukler."""
+    # Dosya adi disaridan geliyor: cikti klasorunun disina cikilamasin.
+    target = (OUTPUT / req.name).resolve()
+    if target.parent != OUTPUT.resolve() or not target.is_file():
+        raise HTTPException(400, "Bu dosya gonderilemez")
+    try:
+        sonuc = tiktok.send_to_drafts(target)
+    except RuntimeError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, **sonuc}
 
 
 app.mount("/preview", StaticFiles(directory=str(PREVIEW)), name="preview")

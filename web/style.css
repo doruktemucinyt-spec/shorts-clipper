@@ -667,6 +667,36 @@ a.primary:active {
   margin-top: 9px;
 }
 
+/* Part kutusundaki "TikTok'a gonder". Kutu dar oldugu icin buton tam
+   genislikte ve kucuk puntolu; durum yazisi da ayni butonun uzerinde
+   degisiyor, yani ayri bir satir yer kaplamiyor. */
+.part .tt {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease, background .18s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .part .tt:hover:not(:disabled) {
+    color: var(--ink);
+    border-color: rgba(119, 232, 79, .35);
+    background: rgba(255, 255, 255, .07);
+  }
+}
+.part .tt:disabled { cursor: default; opacity: .75; }
+.part .tt.ok { color: var(--accent); border-color: rgba(119, 232, 79, .35); }
+.part .tt.err { color: #ff8b7d; border-color: rgba(255, 139, 125, .35); }
+
 /* ---------- Gecmis -------------------------------------------------------- */
 
 .history div {

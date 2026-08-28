@@ -9,6 +9,7 @@ Ciktilar:
   shorts-clipper/index.html            ana arayuz
   shorts-clipper/faq|cookies|privacy|terms/  bilgi sayfalari (temiz adresler)
   shorts-clipper/404.html              bulunamayan adresler
+  shorts-clipper/api/tiktok/...        TikTok girisinin sunucu tarafi
   shorts-clipper/assets/...            css + js + ikon
   shorts-clipper/download/...          kaynak koddan kurmak isteyenler icin zip
 
@@ -41,6 +42,12 @@ DOC_ALIASES = ["sss", "cerez", "gizlilik", "kosullar"]
 # gelistiriciler ve Windows disindakiler icin duruyor.
 DOWNLOAD_DIR = "download"
 DOWNLOAD_NAME = "ClipClover-Setup.zip"
+
+# Sitedeki tek sunucu parcasi: TikTok girisi. Vercel api/ altindaki her
+# .js dosyasini kendisi fonksiyon yapiyor, uzantisiz adresten servis
+# ediyor. Burada durmasinin sebebi client_secret: kullanicinin
+# bilgisayarina inemez, ortam degiskeni olarak Vercel'de duruyor.
+API_DIR = ROOT / "vercel_api"
 
 
 def rewrite(html: str) -> str:
@@ -100,6 +107,9 @@ def build() -> Path:
         (OUT / name).mkdir(parents=True, exist_ok=True)
         (OUT / name / "index.html").write_text(page, encoding="utf-8")
     (OUT / "404.html").write_text(page, encoding="utf-8")
+
+    if API_DIR.is_dir():
+        shutil.copytree(API_DIR, OUT / "api", dirs_exist_ok=True)
 
     (OUT / DOWNLOAD_DIR).mkdir(parents=True, exist_ok=True)
     shutil.copy2(package.paketle(), OUT / DOWNLOAD_DIR / DOWNLOAD_NAME)

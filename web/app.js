@@ -7,6 +7,7 @@ const HISTORY_KEY = "clipper.history";
 
 let lastJob = null;    // dil degisince ilerleme metnini yeniden cizmek icin
 let drawnParts = "";   // part listesi en son hangi durumda cizildi
+let ttConnected = false;  // TikTok bagli mi (part butonlari buna bakiyor)
 
 // Sozlukten gelmeyen metinler dil degisince elle yenilenmeli
 // Sayfa ilk acilista da bir kez ceviriliyor; o "kullanici degisiklik yapti"
@@ -26,6 +27,7 @@ onLangChange(() => {
   renderPreviewMsg();
   renderHistory();
   refreshWorkSize();
+  refreshTikTok();
   if (lastJob) renderJob(lastJob);
   else $("status").textContent = t("status.ready");
 });
@@ -427,13 +429,14 @@ function renderJob(job) {
   // bastan kurmak video kutularini da bastan yukluyor ve is bitene kadar
   // arayuzu tirmaliyordu. Sadece yeni part eklendiginde (ya da dil degisince)
   // yeniden ciziliyor.
-  const partsKey = `${lang}|${(job.parts || []).length}`;
+  const partsKey = `${lang}|${ttConnected}|${(job.parts || []).length}`;
   if (job.parts?.length && partsKey !== drawnParts) {
     drawnParts = partsKey;
     $("parts").innerHTML = job.parts.map((p) => `
       <div class="part">
         <video src="${mediaUrl(p.url)}" controls preload="metadata"></video>
         <span>${escapeHtml(t("part.label", { index: p.index, duration: p.duration }))}</span>
+        ${ttConnected ? `<button class="tt" data-name="${escapeHtml(p.name)}">${escapeHtml(t("part.toTikTok"))}</button>` : ""}
       </div>`).join("");
   }
 }
@@ -581,6 +584,83 @@ $("connect-btn").onclick = async () => {
   }
 };
 
+
+// --- TikTok ----------------------------------------------------------------
+// Video dogrudan bu bilgisayardan TikTok'a gidiyor ve TASLAK olarak dusuyor;
+// program hicbir sey yayinlamiyor. Basligi kullanici TikTok uygulamasinda
+// yaziyor -- taslak ucu baslik alani kabul etmiyor (bkz. tiktok.py).
+// Anahtar tanimli degilse kart hic gorunmuyor.
+
+async function refreshTikTok() {
+  let info;
+  try {
+    const res = await api("/api/tiktok/status");
+    if (!res.ok) return;
+    info = await res.json();
+  } catch { return; }                      // yardimci kapaliysa sessiz gec
+
+  ttConnected = Boolean(info.connected);
+  $("tiktok-card").classList.toggle("hidden", !info.available);
+  if (!info.available) return;
+
+  $("tiktok-connect").classList.toggle("hidden", ttConnected);
+  $("tiktok-disconnect").classList.toggle("hidden", !ttConnected);
+  $("tiktok-state").textContent = ttConnected
+    ? t("tiktok.on", { name: info.display_name || "TikTok" })
+    : t("tiktok.off");
+}
+
+$("tiktok-connect").onclick = async () => {
+  const res = await api("/api/tiktok/start", { method: "POST" });
+  const veri = await res.json().catch(() => ({}));
+  if (!res.ok) { alert(veri.detail || t("tiktok.off")); return; }
+
+  // Pencereyi tiklamanin kendisinde aciyoruz: tarayici gecikmeli acilan
+  // pencereleri engelliyor.
+  window.open(veri.url, "_blank", "noopener");
+  $("tiktok-state").textContent = t("tiktok.waiting");
+
+  // Izni kullanici TikTok'ta veriyor, donus de yardimciya gidiyor; bittigini
+  // buradan gormenin tek yolu durumu yoklamak.
+  for (let i = 0; i < 60 && !ttConnected; i++) {
+    await new Promise((r) => setTimeout(r, 3000));
+    await refreshTikTok();
+  }
+};
+
+$("tiktok-disconnect").onclick = async () => {
+  await api("/api/tiktok/disconnect", { method: "POST" });
+  refreshTikTok();
+};
+
+// Butonlar liste her cizildiginde yeniden olusuyor, o yuzden dinleyici
+// listenin kendisinde duruyor.
+$("parts").addEventListener("click", async (ev) => {
+  const btn = ev.target.closest(".tt");
+  if (!btn || btn.disabled) return;
+
+  btn.disabled = true;
+  btn.classList.remove("ok", "err");
+  btn.textContent = t("part.sending");
+  try {
+    const res = await api("/api/tiktok/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: btn.dataset.name }),
+    });
+    if (!res.ok) {
+      const veri = await res.json().catch(() => ({}));
+      throw new Error(veri.detail || "");
+    }
+    btn.textContent = t("part.sent");
+    btn.classList.add("ok");
+  } catch (e) {
+    btn.textContent = e.message || t("part.sendFail");
+    btn.classList.add("err");
+    btn.disabled = false;                  // tekrar denenebilsin
+  }
+});
+
 onUnpaired(() => setConnState("idle"));
 onLangChange(() => paintConnection());
 
@@ -589,6 +669,7 @@ onLangChange(() => paintConnection());
 if (IS_LOCAL) {
   setConnState("ok");
   helperStatus().then(applyHelperFeatures);    // hafif kurulum mu?
+  refreshTikTok();
   pullMemory();
 }
 else if (helperToken) refreshConnection();

@@ -304,6 +304,20 @@
     <div id="history" class="history"></div>
   </section>
 
+  <!-- TikTok. Anahtar tanimli degilse (work/tiktok-config.json yoksa) bu kart
+       hic gorunmuyor -- aciklamasi tiktok.py'nin basinda. -->
+  <section class="card hidden" id="tiktok-card">
+    <div class="head">
+      <h2 data-i18n="h2.tiktok"></h2>
+      <div class="actions">
+        <button id="tiktok-connect" class="ghost" data-i18n="btn.tiktokConnect"></button>
+        <button id="tiktok-disconnect" class="ghost hidden" data-i18n="btn.tiktokDisconnect"></button>
+      </div>
+    </div>
+    <p class="hint" id="tiktok-state"></p>
+    <p class="hint" data-i18n="tiktok.note"></p>
+  </section>
+
   <section class="card">
     <div class="head">
       <h2 data-i18n="h2.temp"></h2>
