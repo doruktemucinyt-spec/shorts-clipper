@@ -32,3 +32,8 @@ build/
 dist/
 dagitim/
 .buildvenv/
+
+# TikTok eklentisi: yalnizca bu bilgisayarda duruyor, yayinlanan kaynak koda
+# girmiyor. server.py bu dosyalari bulamazsa program eksiksiz calisiyor.
+eklenti.py
+web/eklenti.js
